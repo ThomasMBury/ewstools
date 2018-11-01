@@ -15,3 +15,19 @@ def add_numbers(a,b):
 
 def multi_numbers(a,b):
     return a*b
+
+def myfun(country="Angleterre"):
+    print("I am from",country)
+    return 'hello'
+    
+def myfun2(a ,b ,c=3):
+    return a*b*c
+
+def myfun3(a,b):
+    return a-b
+
+def myfun4(*varvallist):
+    print("The output is")
+    for varval in varvallist:
+        print(varval)
+    return
