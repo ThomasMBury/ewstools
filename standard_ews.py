@@ -10,9 +10,10 @@ A module containing functionns to cmopute EWS from time-series data.
 
 # import required python modules
 import numpy as np
-from scipy import gaussian_filter as gf
+from scipy.ndimage.filters import gaussian_filter as gf
 
 
+#–----------------------------
 
 def smooth_function(x,band_width=0.2):
     '''
@@ -24,16 +25,21 @@ def smooth_function(x,band_width=0.2):
     of the length of the data)
     
     Output
-    detrended signal
+    detrended signal (nx1 array)
     '''
     
     # compute the size of the bandwidth 
     bw_size=np.size(x)*band_width
     
     # use pre-built gaussian filter function
-    output=gf(x,bw_size)
+    output=gf(x,sigma=bw_size, mode='reflect')
     
     # return output
     return output
+
+
+#--------------------------------
+    
+
 
     
