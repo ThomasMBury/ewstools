@@ -11,7 +11,7 @@ A module containing functionns to cmopute EWS from time-series data.
 # import required python modules
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter as gf
-
+import pandas as pd
 
 #–----------------------------
 
@@ -40,6 +40,35 @@ def smooth_function(x,band_width=0.2):
 
 #--------------------------------
     
+def roll_variance(tseries,roll_window=0.25):
+       '''
+    Function to compute the variance of a trajecotry over a rolling window.
+    We use pandas to compute rolling statistics.    
+    
+    Input
+    tseries : input time-series ((t1,x1),(t2,x2),...,(tn,xn))
+    roll_windopw (0.25) : size of the rolling window (as a proportion
+    of the length of the data)
+    
+    Output
+    variance time-series
+    '''
+
+    # compute the size of the rolling window (this must be an integer)
+    rw_size=np.floor(roll_window * tseries.length[0])
+    
+    
+
+
+
+
+
+
+
+
+
+
+
 
 
     
