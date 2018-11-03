@@ -10,13 +10,32 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-data={'happy rating':[2,2,3,5,6,7,11,11,23,22,22,22,25]}
+# create a noisy trajectory
+t=np.linspace(1,10,100)
+x=np.random.randn(len(t))*0.5
+
+data={'happy rating':x}
 df=pd.DataFrame(data)
 
+roll_window=4
 
-roll_mean=df.rollring(window=2).mean()
+# compute rolling stats
+roll_var=df.rolling(window=roll_window).var()
+#roll_ac=df.rolling(window=roll_window).apply(lambda x: x.autocorr(lag=1),raw=False)
+roll_std=df.rolling(window=roll_window).std()
+roll_skew=df.rolling(window=roll_window).skew()
+
+
+       
+       
+# add rolling stats to dataframe
+df.loc[:,'rolling var']=roll_var.iloc[:,0]
+#df.loc[:,'rolling ac']=roll_ac.iloc[:,0]
+df.loc[:,'rolling std']=roll_std.iloc[:,0]
+df.loc[:,'rolling skew']=roll_skew.iloc[:,0]
+
+
 
 plt.figure();
 df.plot();
-roll_mean.plot()
 plt.legend(loc='best')
