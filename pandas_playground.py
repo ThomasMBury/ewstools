@@ -25,3 +25,14 @@ df1=pd.DataFrame(data=my_2darray, index=range(0,2),columns=['A','B','C'])
 df1.iloc[1,1]
 
 
+
+
+# export pandas dataframe to csv
+products = pd.DataFrame({'category': ['Cleaning', 'Cleaning', 'Entertainment', 'Entertainment', 'Tech', 'Tech'],
+                        'store': ['Walmart', 'Dia', 'Walmart', 'Fnac', 'Dia','Walmart'],
+                        'price':[11.42, 23.50, 19.99, 15.95, 19.99, 111.55],
+                        'testscore': [4, 3, 5, 7, 5, 8]})
+
+
+
+
