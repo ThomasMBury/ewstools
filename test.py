@@ -30,3 +30,9 @@ plt.plot(t,y,t,xn)
 plt.ylabel('x')
 plt.xlabel('t')
 
+
+#-----------------
+# Test variance function
+#-----------------
+
+
