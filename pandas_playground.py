@@ -23,6 +23,7 @@ df1=pd.DataFrame(data=my_2darray, index=range(0,2),columns=['A','B','C'])
 
 # use .loc for label based indexing, .iloc for positional indexing
 df1.iloc[1,1]
+df1.loc[0,'B']
 
 
 
