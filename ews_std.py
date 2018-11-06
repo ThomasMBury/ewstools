@@ -115,8 +115,18 @@ def ews_std(raw_series,
         df_ews['Kurtosis'] = roll_kurt
 
 
+
+#--------------------
+# Compute kendall taus
+#-----------------------
+        
+    # Put time values as their own series for correlation computation
+    time_series = pd.Series(raw_series.index, index=raw_series.index)
     
-    return df_ews
+    # Find kendall tau correlation coefficient for each EWS (column of df_ews)
+    ktau = df_ews.corrwith(time_series)
+
+    return df_ews, ktau
     
     
 

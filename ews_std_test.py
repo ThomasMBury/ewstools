@@ -28,7 +28,7 @@ series = pd.Series(xn, index=t)
 
 
 # run ews_std
-df_ews = ews_std(series, 
+df_ews,ktau = ews_std(series, 
                       roll_window=0.2, 
                       lag_times=[1,2,3], 
                       ews=['var','ac','sd','skew','kurt','cv'])
