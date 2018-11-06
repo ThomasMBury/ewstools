@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+    #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Thu Nov  1 19:11:58 2018
@@ -111,7 +111,7 @@ def roll_ews_std(raw_series,
 
     # compute the kurtosis and add to DataFrame
     if 'kurt' in ews:
-        roll_kurt = eval_series.rolling(window=rw_size).kurtosis()
+        roll_kurt = eval_series.rolling(window=rw_size).kurt()
         df_ews['Kurtosis'] = roll_kurt
 
 
