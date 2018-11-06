@@ -44,3 +44,7 @@ df=pd.concat([x_series,roll_var,roll_ac,roll_std,roll_skew], axis=1)
 plt.figure();
 df.plot();
 plt.legend(loc='best')
+
+
+
+

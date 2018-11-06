@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 # Test smooth_function
 #-------------
 
-from standard_ews import smooth_function
+from ews_std import smooth_function
 
 # create a noisy trajectory
 t=np.linspace(1,10,100)
@@ -29,6 +29,7 @@ y=smooth_function(xn,band_width=0.2)
 plt.plot(t,y,t,xn)
 plt.ylabel('x')
 plt.xlabel('t')
+plt.title('smoothed function')
 
 
 #-----------------

@@ -42,8 +42,8 @@ def smooth_function(x,band_width=0.2):
     
 def roll_variance(tseries,roll_window=0.25):
     '''
-    Function to compute the variance of a trajecotry over a rolling window.
-    We use pandas to compute rolling statistics.    
+    Function to compute the variance of a trajectory over a rolling window.
+    The pandas library is used to compute rolling statistics.    
     
     Input
     tseries : input time-series ((t1,x1),(t2,x2),...,(tn,xn))
@@ -59,6 +59,9 @@ def roll_variance(tseries,roll_window=0.25):
     return
     
     
+
+
+#-------------------------------------
 
 
 
