@@ -14,7 +14,7 @@ import pandas as pd
 
 
 #  import EWS functions
-from ews_std import roll_ews_std
+from ews_std import ews_std
 
 
 
@@ -26,18 +26,19 @@ xn=x+np.random.randn(len(t))*0.5
 # put in the form of a pandas.Series
 series = pd.Series(xn, index=t)
 
-# plot of series
-series.plot()
 
-# test ews_std
-df_ews = roll_ews_std(series, 
+# run ews_std
+df_ews = ews_std(series, 
                       roll_window=0.2, 
                       lag_times=[1,2,3], 
                       ews=['var','ac','sd','skew','kurt','cv'])
 
 
-# plot it all!
+# Note: df_ews is indexed by t and has (titled) columns csp to each EWS
+
+# a crazy plot of every metric
 df_ews.plot()
 
-
+# choose metrics to plot
+df_ews[['State variable','Variance', 'Lag-1 AC']].plot()
 

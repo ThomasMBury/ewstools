@@ -13,10 +13,10 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter as gf
 import pandas as pd
 
-
+        
 #--------------------------------
     
-def roll_ews_std(raw_series, 
+def ews_std(raw_series, 
                  roll_window=0.25,
                  smooth=True,
                  band_width=0.2,
@@ -26,7 +26,7 @@ def roll_ews_std(raw_series,
     Function to compute the standard EWS over a rolling window.
     The pandas library is used to compute rolling statistics.    
     
-    Input
+    Input (default)
     raw_series : pandas Series indexed by time 
     roll_windopw (0.25) : size of the rolling window (as a proportion
     of the length of the data)
