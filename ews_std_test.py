@@ -5,17 +5,20 @@ Created on Thu Nov  1 21:21:29 2018
 
 @author: tb460
 
-script to test functions
+script to test functions in ews_std
 """
 
+# standard libraries
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
-# -----------
-# Test smooth_function
-#-------------
 
+# EWS functions
 from ews_std import smooth_function
+from ews_std import roll_ews_std
+
+
 
 # create a noisy trajectory
 t=np.linspace(1,10,100)
@@ -29,11 +32,23 @@ y=smooth_function(xn,band_width=0.2)
 plt.plot(t,y,t,xn)
 plt.ylabel('x')
 plt.xlabel('t')
-plt.title('smoothed function')
+plt.title('Smoothed function')
 
 
 #-----------------
-# Test variance function
+# Test roll_ews_std
 #-----------------
+
+# put residuals into a series
+series = pd.Series(xn-y,index = t)
+
+# apply roll_ews_std
+lags = [1,2]
+rw = 0.2
+
+df_ews = roll_ews_std(series, roll_window=rw, lag_times=lags, ews=['var'])
+
+
+
 
 
