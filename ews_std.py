@@ -128,8 +128,7 @@ def ews_std(raw_series,
 
     return df_ews, ktau
     
-    
-
+# update readme file with kendall tau info.
 
 #-------------------------------------
 
