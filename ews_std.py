@@ -60,6 +60,7 @@ def ews_std(raw_series,
     # compute smoothed data and add residuals to DataFrame
     if smooth:
         smooth_data = gf(raw_series.values, sigma=bw_size, mode='reflect')
+        df_ews['Smooth'] = smooth_data
         residuals = raw_series.values - smooth_data
         resid_series = pd.Series(residuals,index=raw_series.index)
         df_ews['Residuals'] = resid_series
