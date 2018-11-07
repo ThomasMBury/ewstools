@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov  1 21:21:29 2018
+
+@author: tb460
+
+script to send multiple time-series into ews_std and collect EWS in a 3d array
+"""
+
+# import standard libraries
+import numpy as np
+import pandas as pd
+
+
+#  import EWS functions
+from ews_std import ews_std
+
+
+# create many noisy trajectories in an array (len(t) x num_sims )
+num_sims = 10
+t = np.linspace(1,10,100)
+xn = np.zeros([len(t),num_sims]) # initialize
+for i in range(num_sims):
+    xn[:,i]=1+np.random.randn(len(t))*0.5
+
+# put into a DataFrame
+df_traj = pd.DataFrame(xn, index=t)
+df_traj.index.rename('Time',inplace=True)
+
+
+# run ews_std on each trajectory
+df_ews,ktau = ews_std(df_traj[0], 
+                      roll_window=0.2, 
+                      lag_times=[1], 
+                      ews=['var','ac'])
+
+
+# Note: df_ews is indexed by t and has (titled) columns csp to each EWS
+
+# Plot
+df_ews.plot()
+
+
