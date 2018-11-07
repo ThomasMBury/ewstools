@@ -40,5 +40,5 @@ df_ews, ktau = ews_std(series,
 df_ews.plot()
 
 # choose metrics to plot
-df_ews[['State variable','Variance', 'Lag-1 AC']].plot()
+df_ews[['State variable','Smoothing','Variance', 'Lag-1 AC']].plot()
 

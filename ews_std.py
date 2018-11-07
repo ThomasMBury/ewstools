@@ -17,11 +17,11 @@ import pandas as pd
 #--------------------------------
     
 def ews_std(raw_series, 
-                 roll_window=0.25,
-                 smooth=True,
-                 band_width=0.2,
-                 ews=['var','ac','cv','skew'], 
-                 lag_times=[1]):
+            roll_window=0.25,
+            smooth=True,
+            band_width=0.2,
+            ews=['var','ac','cv','skew'], 
+            lag_times=[1]):
     '''
     Function to compute the standard EWS over a rolling window.
     The pandas library is used to compute rolling statistics.    
@@ -49,7 +49,8 @@ def ews_std(raw_series,
 
 
     # initialise a DataFrame to store EWS data - indexed by time
-    df_ews = pd.DataFrame(raw_series, columns = ['State variable'])
+    df_ews = pd.DataFrame(raw_series)
+    df_ews.columns = ['State variable']
     df_ews.index.rename('Time', inplace=True)
 
     ## detrend the data
@@ -57,15 +58,18 @@ def ews_std(raw_series,
     # compute the size of the bandwidth
     bw_size=raw_series.shape[0]*band_width   
     
-    # compute smoothed data and add residuals to DataFrame
+    # compute smoothed data and residuals
     if smooth:
         smooth_data = gf(raw_series.values, sigma=bw_size, mode='reflect')
-        df_ews['Smooth'] = smooth_data
+        smooth_series = pd.Series(smooth_data, index=raw_series.index)
         residuals = raw_series.values - smooth_data
         resid_series = pd.Series(residuals,index=raw_series.index)
+    
+        # add them to the DataFrame
+        df_ews['Smoothing'] = smooth_series
         df_ews['Residuals'] = resid_series
-    
-    
+        
+        
     # use residuals for EWS if smooth=True, ow use raw series
     eval_series = resid_series if smooth else raw_series
     

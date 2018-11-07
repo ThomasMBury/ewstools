@@ -41,4 +41,5 @@ df_ews,ktau = ews_std(df_traj[0],
 # Plot
 df_ews.plot()
 
+df_ews[['State variable','Smoothing','Variance', 'Lag-1 AC']].plot()
 
