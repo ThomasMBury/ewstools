@@ -61,6 +61,10 @@ for i in range(num_sims):
     # append data to lists
     appended_ews.append(df_temp)
     appended_ktau.append(ktau_temp)
+    
+    # print status every 10 realisations
+    if np.remainder(i+1,10)==0:
+        print('Realisation '+str(i+1)+' complete')
 
 
 # concatenate EWS DataFrames - use realisation number and time as indices
