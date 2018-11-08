@@ -16,7 +16,8 @@ import pandas as pd
 
         
 #--------------------------------
-
+## pspec_welch
+#------------------------------
 
 def pspec_welch(series,
                 ham_length,
@@ -31,7 +32,7 @@ def pspec_welch(series,
     
     Input (default)
     series : pandas Series indexed by time
-    ham_length : number of data points in the Hamming window
+    ham_length (40) : number of data points in the Hamming window
     ham_offset (0.5) : proportion of ham_length to use as an offset for each
                        Hamming window.
     w_cutoff (1) : proportion of maximum frequency with which to cutoff higher
@@ -74,12 +75,15 @@ def pspec_welch(series,
     # sort into ascending frequency
     perio_series.sort_index(inplace=True)
     
-    # for symmetry, don't include first point
-    perio_output = perio_series.iloc[1:]
+    # append power spectrum with first value (by symmetry)
+    perio_series.at[-min(perio_series.index)] = perio_series.iat[0]
+    
+    # impose cutoff frequency
+    wmax = w_cutoff*max(perio_series.index) # cutoff frequency
+    perio_output = perio_series[-wmax:wmax] # subset of power spectrum
+        
     
     return perio_output
-
-
 
 
 
