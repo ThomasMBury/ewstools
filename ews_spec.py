@@ -10,7 +10,6 @@ A module containing functions to compute spectral EWS from time-series data.
 
 # import required python modules
 import numpy as np
-from scipy.ndimage.filters import gaussian_filter as gf
 from scipy import signal
 import pandas as pd
 
@@ -61,7 +60,7 @@ def pspec_welch(series,
     ham_offset_points = int(ham_offset*ham_length)
         
     ## compute the periodogram using Welch's method (scipy.signal function)
-    perio_raw = signal.welch(series.values,
+    pspec_raw = signal.welch(series.values,
                                fs,
                                nperseg=ham_length,
                                noverlap=ham_offset_points,
@@ -69,21 +68,57 @@ def pspec_welch(series,
                                scaling=scaling)
     
     # put into a pandas series and index by frequency (scaled by 2*pi)
-    perio_series = pd.Series(perio_raw[1], index=2*np.pi*perio_raw[0], name='Power spectrum')
-    perio_series.index.name = 'Frequency'
+    pspec_series = pd.Series(pspec_raw[1], index=2*np.pi*pspec_raw[0], name='Power spectrum')
+    pspec_series.index.name = 'Frequency'
     
     # sort into ascending frequency
-    perio_series.sort_index(inplace=True)
+    pspec_series.sort_index(inplace=True)
     
     # append power spectrum with first value (by symmetry)
-    perio_series.at[-min(perio_series.index)] = perio_series.iat[0]
+    pspec_series.at[-min(pspec_series.index)] = pspec_series.iat[0]
     
     # impose cutoff frequency
-    wmax = w_cutoff*max(perio_series.index) # cutoff frequency
-    perio_output = perio_series[-wmax:wmax] # subset of power spectrum
-        
+    wmax = w_cutoff*max(pspec_series.index) # cutoff frequency
+    pspec_output = pspec_series[-wmax:wmax] # subset of power spectrum
     
-    return perio_output
+    
+    return pspec_output
+
+
+
+
+#--------------------------
+## pspec_metrics
+#-------------------------
+
+
+
+def pspec_metrics(pspec,
+                  ews = ['coher_factor','smax','aic']):
+
+
+    '''
+    Function to compute the metrics associated with *pspec* that can be
+    used as EWS.
+    
+    Input (default)
+    pspec : power spectrum in the form of a Series indexed by frequency
+    ews ( ['coher_factor', 'smax', 'aic'] ) : array of strings corresponding 
+    to the EWS to be computed. Options include
+        'coher_factor' : coherence factor
+        'smax' : peak in the power spectrum
+        'aic' : Hopf, Fold and Null AIC weights
+        
+                 
+    Output
+    Series of spectral metrics 
+    
+    '''
+
+
+
+    
+
 
 
 
