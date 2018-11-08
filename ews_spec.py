@@ -94,7 +94,7 @@ def pspec_welch(series,
 
 
 def pspec_metrics(pspec,
-                  ews = ['coher_factor','smax','aic']):
+                  ews = ['smax','coher_factor','aic']):
 
 
     '''
@@ -103,26 +103,59 @@ def pspec_metrics(pspec,
     
     Input (default)
     pspec : power spectrum in the form of a Series indexed by frequency
-    ews ( ['coher_factor', 'smax', 'aic'] ) : array of strings corresponding 
+    ews ( ['smax', 'coher_factor', 'aic'] ) : array of strings corresponding 
     to the EWS to be computed. Options include
         'coher_factor' : coherence factor
         'smax' : peak in the power spectrum
         'aic' : Hopf, Fold and Null AIC weights
+        'aic_params' : AIC model parameter values
         
                  
     Output
     Series of spectral metrics 
     
     '''
+    
+    
+    # initialise a Series for EWS
+    spec_ews = pd.Series([])
+    
+    # compute smax
+    if 'smax' in ews:
+        smax = max(pspec)
+        # add to DataFrame
+        spec_ews['Smax'] = smax
+        
+        
+        
+    # compute coherence factor
+    if 'coher_factor' in ews:
+        
+        # frequency at which peak occurs
+        w_peak = abs(pspec.idxmax())
+        # index location
+        
+        # power of peak frequency
+        power_peak = pspec.max()
+        
+        # compute the first frequency from -w_peak at which power<power_peak/2
+        w_half = next( (w for w in pspec[-w_peak:] if pspec[w] < power_peak/2 ), 'None')
+        
+        # if there was no such frequency set w_peak = 0 (makes CF=0) 
+        if w_half == 'None':
+            w_peak = 0
+            
+        else:
+            w_width = 2*(w_half-w_peak)
+            
+        # compute coherence factor (height/relative width)
+        coher_factor = power_peak/(w_width/w_peak) if w_peak != 0 else 0
 
-
-
+        # add to dataframe
+        spec_ews['Coherence factor'] = coher_factor
     
 
-
-
-
-
+    # compute AIC weights
 
 
 
