@@ -5,7 +5,10 @@ Created on Thu Nov  1 21:21:29 2018
 
 @author: tb460
 
-script to send multiple time-series into ews_std and collect EWS in a 3d array
+Script demonstrating how to use ews_std to compute EWS for multiple 
+trajectories and obtain a dataframe indexed by realisation number and time.
+
+
 """
 
 # import standard libraries
@@ -15,6 +18,12 @@ import pandas as pd
 
 #  import EWS functions
 from ews_std import ews_std
+
+
+
+#-----------------------
+## Import trajectories (here we just create some) 
+#----------------------
 
 
 # create many noisy trajectories in an array (len(t) x num_sims )
@@ -29,17 +38,58 @@ df_traj = pd.DataFrame(xn, index=t)
 df_traj.index.rename('Time',inplace=True)
 
 
-# run ews_std on each trajectory
-df_ews,ktau = ews_std(df_traj[0], 
+
+#----------------------
+## Feed trajectories into ews_std
+#---------------------
+
+
+# set up lists to store output data of ews_std
+appended_ews = []
+appended_ktau = []
+
+# loop through each trajectory as an input to ews_std
+for i in range(num_sims):
+    df_temp,ktau_temp = ews_std(df_traj[i], 
                       roll_window=0.2, 
                       lag_times=[1], 
                       ews=['var','ac'])
+    # add realisation number as a column for reference
+    df_temp['Realisation number'] = pd.Series(int(i)*np.ones([len(t)],dtype=int),index=t)
+    ktau_temp['Realisation number'] = int(i)
+    
+    # append data to lists
+    appended_ews.append(df_temp)
+    appended_ktau.append(ktau_temp)
 
 
-# Note: df_ews is indexed by t and has (titled) columns csp to each EWS
+# concatenate EWS DataFrames - use realisation number and time as indices
+df_ews = pd.concat(appended_ews).set_index('Realisation number',append=True).reorder_levels([1,0])
 
-# Plot
-df_ews.plot()
+# concatenate Kendall tau data into DataFrame indexed by realisation number
+df_ktau = pd.concat(appended_ktau, axis=1).transpose().set_index('Realisation number')
 
-df_ews[['State variable','Smoothing','Variance', 'Lag-1 AC']].plot()
+
+
+
+#-----------------------------------------------
+## Examples of obtaining specific data / plots
+#------------------------------------------------
+
+
+# EWS of realisation 1 at time 2
+df_ews.loc[(1,2)] # must include () when referencing multiple indexes
+
+# Varaince of realisation 7
+df_ews.loc[7,'Variance']
+
+# kendall tau of variance for all realisations
+df_ktau.loc[:,'Variance']
+
+# plot of all variance trajectories
+df_ews.loc[:,'Variance'].unstack(level=0).plot() # unstack puts index back as a column
+
+
+
+
 
