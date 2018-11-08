@@ -94,7 +94,7 @@ def pspec_welch(series,
 
 
 def pspec_metrics(pspec,
-                  ews = ['smax','coher_factor','aic']):
+                  ews = ['smax','cf','aic']):
 
 
     '''
@@ -105,8 +105,8 @@ def pspec_metrics(pspec,
     pspec : power spectrum in the form of a Series indexed by frequency
     ews ( ['smax', 'coher_factor', 'aic'] ) : array of strings corresponding 
     to the EWS to be computed. Options include
-        'coher_factor' : coherence factor
         'smax' : peak in the power spectrum
+        'cf' : coherence factor
         'aic' : Hopf, Fold and Null AIC weights
         'aic_params' : AIC model parameter values
         
@@ -129,7 +129,7 @@ def pspec_metrics(pspec,
         
         
     # compute coherence factor
-    if 'coher_factor' in ews:
+    if 'cf' in ews:
         
         # frequency at which peak occurs
         w_peak = abs(pspec.idxmax())
@@ -139,14 +139,16 @@ def pspec_metrics(pspec,
         power_peak = pspec.max()
         
         # compute the first frequency from -w_peak at which power<power_peak/2
-        w_half = next( (w for w in pspec[-w_peak:] if pspec[w] < power_peak/2 ), 'None')
+        w_half = next( (w for w in pspec[-w_peak:].index if pspec.loc[w] < power_peak/2 ), 'None')
         
-        # if there was no such frequency set w_peak = 0 (makes CF=0) 
-        if w_half == 'None':
+        # if there was no such frequency, or if peak crosses zero frequency,
+        # set w_peak = 0 (makes CF=0) 
+        if w_half == 'None' or w_half > 0:
             w_peak = 0
             
         else:
-            w_width = 2*(w_half-w_peak)
+            # double the difference between w_half and -w_peak to get the width of the peak
+            w_width = 2*(w_half - (-w_peak))
             
         # compute coherence factor (height/relative width)
         coher_factor = power_peak/(w_width/w_peak) if w_peak != 0 else 0
@@ -156,10 +158,17 @@ def pspec_metrics(pspec,
     
 
     # compute AIC weights
+    
+    
+    
+    
+    
+    
+    
 
 
-
-
+    # return DataFrame of metrics
+    return spec_ews
 
 
 
