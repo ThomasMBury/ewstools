@@ -5,7 +5,7 @@ Created on Thu Nov  1 19:11:58 2018
 
 @author: tb460
 
-A module containing functionns to cmopute EWS from time-series data.
+A module containing a function to compute the standard EWS from time-series data.
 """
 
 # import required python modules

@@ -93,7 +93,8 @@ df_ktau.loc[:,'Variance']
 # plot of all variance trajectories
 df_ews.loc[:,'Variance'].unstack(level=0).plot() # unstack puts index back as a column
 
-
+# plot of autocorrelation and variance for a single realisation
+df_ews.loc[3,['Variance','Lag-1 AC']].plot()
 
 
 
