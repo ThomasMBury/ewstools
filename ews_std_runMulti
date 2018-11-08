@@ -27,7 +27,7 @@ from ews_std import ews_std
 
 
 # create many noisy trajectories in an array (len(t) x num_sims )
-num_sims = 10
+num_sims = 100
 t = np.linspace(1,10,100)
 xn = np.zeros([len(t),num_sims]) # initialize
 for i in range(num_sims):
