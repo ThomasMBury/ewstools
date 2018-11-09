@@ -13,6 +13,7 @@ import numpy as np
 from scipy import signal
 import pandas as pd
 from lmfit import Model, Parameters
+import matplotlib.pyplot as plt
 
         
 #--------------------------------
@@ -190,11 +191,14 @@ def pspec_metrics(pspec,
         psi = 0.25
         hopf_model.set_param_hint('psi',value=psi,vary=False)
         # introduce new free parameter delta = psi*S(omega0)-S(0) >0
-        hopf_model.set_param_hint('delta', value=1, min=0, vary=True)
-        # write omega0 in terms of delta
-        hopf_model.set_param_hint('omega0', expr='sqrt(delta + (mu**2/(4*pi))*(4-3*psi+sqrt(psi**2-16*psi+16)))')
+        hopf_model.set_param_hint('delta', value=0.01, min=0, vary=True)
         
-        null_model.set_param_hint('c',value=1)
+        # IMPOSE ANOTHER CONDITION OF W < WMAX SOMEHOW... TO DO!
+        
+        # write omega0 in terms of delta
+        hopf_model.set_param_hint('omega0', expr='sqrt(delta + (mu**2/(4*psi))*(4-3*psi+sqrt(psi**2-16*psi+16)))')
+        
+        null_model.set_param_hint('c',value=1, vary=True)
                 
         # assign initial parameter values and constraints
         fold_params = fold_model.make_params()
@@ -203,9 +207,9 @@ def pspec_metrics(pspec,
         
     
         # fit each model to the power spectrum
-        fold_result = fold_model.fit(power_vals, fold_params, x=freq_vals)
-        hopf_result = hopf_model.fit(power_vals, hopf_params, x=freq_vals)
-        null_result = null_model.fit(power_vals, null_params, x=freq_vals)
+        fold_result = fold_model.fit(power_vals, fold_params, omega=freq_vals)
+        hopf_result = hopf_model.fit(power_vals, hopf_params, omega=freq_vals)
+        null_result = null_model.fit(power_vals, null_params, omega=freq_vals)
 
         # get AIC statistics
         fold_aic = fold_result.aic
@@ -216,9 +220,21 @@ def pspec_metrics(pspec,
         spec_ews['AIC fold'] = fold_aic
         spec_ews['AIC hopf'] = hopf_aic
         spec_ews['AIC null'] = null_aic
+        
+        # print out report (for now)
+        print(fold_result.fit_report())
+        print(hopf_result.fit_report())
+        print(null_result.fit_report())
     
     
-
+        # make a plot of fits
+        plt.plot(freq_vals, fold_result.best_fit)
+        plt.plot(freq_vals, hopf_result.best_fit)
+        plt.plot(freq_vals, null_result.best_fit*np.ones(len(freq_vals)))
+    
+#        # return parameter values if asked for
+#        if 'aic_params' in ews:
+#            
 
     # return DataFrame of metrics
     return spec_ews
