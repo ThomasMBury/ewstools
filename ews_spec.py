@@ -12,6 +12,7 @@ A module containing functions to compute spectral EWS from time-series data.
 import numpy as np
 from scipy import signal
 import pandas as pd
+from lmfit import Model, Parameters
 
         
 #--------------------------------
@@ -158,11 +159,63 @@ def pspec_metrics(pspec,
     
 
     # compute AIC weights
+    if 'aic' in ews:
+        
+        # put frequency values and power values as a list to use LMFIT
+        freq_vals = pspec.index.tolist()
+        power_vals = pspec.tolist()
+        
+        # define models to fit
+        def fit_fold(omega,sigma,lam):
+            return (sigma**2 / (2*np.pi))*(1/(omega**2+lam**2))
+        
+        def fit_hopf(omega,sigma,mu,omega0):
+            return (sigma**2/(4*np.pi))*(1/((omega+omega0)**2+mu**2)+1/((omega-omega0)**2 +mu**2))
+        
+        def fit_null(omega,c):
+            return c
     
+        # assign to Model objects
+        fold_model = Model(fit_fold)
+        hopf_model = Model(fit_hopf)
+        null_model = Model(fit_null)
+        
+        # set parameter initial values and constraints
+        fold_model.set_param_hint('sigma', value=1)
+        fold_model.set_param_hint('lam', value=-1, max=0)
+        
+        hopf_model.set_param_hint('sigma', value=1)
+        hopf_model.set_param_hint('mu', value=-1, max=0)
+        # condition for S(0) < psi*S(omega0)
+        psi = 0.25
+        hopf_model.set_param_hint('psi',value=psi,vary=False)
+        # introduce new free parameter delta = psi*S(omega0)-S(0) >0
+        hopf_model.set_param_hint('delta', value=1, min=0, vary=True)
+        # write omega0 in terms of delta
+        hopf_model.set_param_hint('omega0', expr='sqrt(delta + (mu**2/(4*pi))*(4-3*psi+sqrt(psi**2-16*psi+16)))')
+        
+        null_model.set_param_hint('c',value=1)
+                
+        # assign initial parameter values and constraints
+        fold_params = fold_model.make_params()
+        hopf_params = hopf_model.make_params()
+        null_params = null_model.make_params()
+        
     
+        # fit each model to the power spectrum
+        fold_result = fold_model.fit(power_vals, fold_params, x=freq_vals)
+        hopf_result = hopf_model.fit(power_vals, hopf_params, x=freq_vals)
+        null_result = null_model.fit(power_vals, null_params, x=freq_vals)
+
+        # get AIC statistics
+        fold_aic = fold_result.aic
+        hopf_aic = hopf_result.aic
+        null_aic = null_result.aic
     
-    
-    
+        # add to dataframe
+        spec_ews['AIC fold'] = fold_aic
+        spec_ews['AIC hopf'] = hopf_aic
+        spec_ews['AIC null'] = null_aic
     
     
 

@@ -43,7 +43,7 @@ pspec.plot()
 #---------------------------
 
 # put the power spectrum into pspec_metrics
-spec_ews = pspec_metrics(pspec, ews=['smax', 'cf'])
+spec_ews = pspec_metrics(pspec, ews=['smax', 'cf', 'aic'])
 print(spec_ews)
 
 
