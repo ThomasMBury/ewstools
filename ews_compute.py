@@ -5,7 +5,7 @@ Created on Thu Nov  1 19:11:58 2018
 
 @author: tb460
 
-A module containing a function to compute the EWS from time-series data.
+A module containing functions to compute the EWS from time-series data.
 """
 
 # import required python modules
@@ -18,8 +18,32 @@ from ews_spec import pspec_welch, pspec_metrics
 
 
         
-#--------------------------------
+#--------------
+# roll_window
+#--------------
+
+from itertools import islice
+
+def roll_window(seq, n=2):
+    '''
+    Returns a rolling window (of length n) over data from the iterable
+    s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...
+    ''' 
     
+    it = iter(seq)
+    result = tuple(islice(it, n))
+    if len(result) == n:
+        yield result
+    for elem in it:
+        result = result[1:] + (elem,)
+        yield result
+        
+        
+#------------------
+
+
+
+
 def ews_compute(raw_series, 
             roll_window=0.25,
             smooth=True,
@@ -131,13 +155,20 @@ def ews_compute(raw_series,
     #-----------------
     
    
-    # compute the power spectrum over a rolling window
-    if '
-
-
-
-
-
+#    if any(['smax','cf','aic']) in ews:
+#        
+#        # compute the power spectrum of residuals over a rolling window
+#        # need to implement rolling window manually now as function on window
+#        # requires multiple outputs
+#        
+#        
+#        
+#        roll_pspec = eval_series.rolling(window=rw_size).apply(
+#        func=lambda x: pd.Series(x)
+#
+#
+#
+#
 
 
 
