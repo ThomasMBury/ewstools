@@ -11,7 +11,7 @@ script to test functions in ews_spec
 # import standard libraries
 import numpy as np
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 
 # import EWS functions
@@ -44,6 +44,28 @@ pspec.plot()
 
 # put the power spectrum into pspec_metrics
 spec_ews = pspec_metrics(pspec, ews=['smax', 'cf', 'aic'])
+
+
+# make a plot of fitted models
+
+# define models to fit
+def fit_fold(w,sigma,lam):
+    return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
+        
+def fit_hopf(w,sigma,mu,w0):
+    return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
+        
+def fit_null(w,sigma):
+    return sigma**2/(2*np.pi)* w**0
+
+# plot with parameter values
+w_vals = np.linspace(-max(pspec.index),max(pspec.index),100)
+
+plt.plot(w_vals, fit_fold(w_vals, spec_ews['Params fold']['sigma'], spec_ews['Params fold']['lam']))
+plt.plot(w_vals, fit_hopf(w_vals, spec_ews['Params hopf']['sigma'], spec_ews['Params hopf']['mu'], spec_ews['Params hopf']['w0']))
+plt.plot(w_vals, fit_null(w_vals, spec_ews['Params null']['sigma']))
+
+
 print(spec_ews)
 
 

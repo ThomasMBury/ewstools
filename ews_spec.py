@@ -12,7 +12,7 @@ A module containing functions to compute spectral EWS from time-series data.
 import numpy as np
 from scipy import signal
 import pandas as pd
-from lmfit import Model, Parameters
+from lmfit import Model
 import matplotlib.pyplot as plt
 
         
@@ -174,7 +174,7 @@ def pspec_metrics(pspec,
             return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
         
         def fit_null(w,sigma):
-            return sigma**2/(2*np.pi)
+            return sigma**2/(2*np.pi) * w**0
     
         # assign to Model objects
         fold_model = Model(fit_fold)
@@ -186,7 +186,7 @@ def pspec_metrics(pspec,
         # intial parameter values and constraints for Fold fit
         fold_model.set_param_hint('sigma', value=0.11)
         # set up constraint S(wMax) < psi*S(0)
-        psi_fold = 0.5
+        psi_fold = 0.25
         wMax = max(freq_vals)
         # results in min value for lambda dependent on wMax and psi
         fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0)
@@ -253,13 +253,6 @@ def pspec_metrics(pspec,
         spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0'))
         spec_ews['Params null'] = null_result.values
         
-    
-    
-        # make a plot of fits
-        plt.plot(freq_vals, fold_result.best_fit)
-        plt.plot(freq_vals, hopf_result.best_fit)
-        plt.plot(freq_vals, null_result.best_fit*np.ones(len(freq_vals)))
-        plt.ylim(0,0.06)
 
 
 
