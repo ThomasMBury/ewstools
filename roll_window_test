@@ -5,4 +5,33 @@ Created on Sat Nov 10 21:53:59 2018
 
 @author: tb460
 """
+import pandas as pd
+from ews_spec import pspec_welch, pspec_metrics
 
+from collections import deque
+class your_multi_output_function_class:
+    def __init__(self):
+        self.deque_2 = deque()
+        self.deque_3 = deque()
+
+    def f1(self, window):
+        # put function with multiple outputs in here
+        pspec = pspec_welch(window,1,10)
+        df_metrics = pspec_metrics(pspec,ews=['smax','cf','aic'])
+        self.k = [df_metrics['Smax'],df_metrics['Coherence factor'],df_metrics['AIC fold']]
+        self.deque_2.append(self.k[1])
+        self.deque_3.append(self.k[2])
+        return self.k[0]    
+
+    def f2(self, window):
+        return self.deque_2.popleft()   
+    def f3(self, window):
+        return self.deque_3.popleft() 
+
+func = your_multi_output_function_class()
+
+my_series=pd.Series(range(100))
+
+output = my_series.rolling(window=40).agg(
+    {'Smax':func.f1,'Coherence factor':func.f2,'AIC fold':func.f3}
+    )

@@ -39,6 +39,7 @@ def roll_window(seq, n=2):
         yield result
         
         
+        
 #------------------
 
 
@@ -49,7 +50,10 @@ def ews_compute(raw_series,
             smooth=True,
             band_width=0.2,
             ews=['var','ac','cv','skew'], 
-            lag_times=[1]):
+            lag_times=[1],
+            ham_length=40,
+            ham_offset=0.5,
+            w_cutoff=1):
     '''
     Function to compute EWS from time-series data.   
     
@@ -155,20 +159,78 @@ def ews_compute(raw_series,
     #-----------------
     
    
-#    if any(['smax','cf','aic']) in ews:
-#        
-#        # compute the power spectrum of residuals over a rolling window
-#        # need to implement rolling window manually now as function on window
-#        # requires multiple outputs
-#        
-#        
-#        
-#        roll_pspec = eval_series.rolling(window=rw_size).apply(
-#        func=lambda x: pd.Series(x)
-#
-#
-#
-#
+    if 'smax' in ews or 'cf' in ews or 'aic' in ews:
+       
+        # make a class for rolling.apply to accept functions with multiple outputs
+        from collections import deque
+        class multi_output_function_class:
+            def __init__(self):
+                self.deque_2 = deque()
+                self.deque_3 = deque()
+                self.deque_4 = deque()
+                self.deque_5 = deque()
+                self.deque_6 = deque()
+                self.deque_7 = deque()
+                self.deque_8 = deque()
+            
+            def f1(self, window):
+                # compute power spectrum of window data using function pspec_welch
+                dt = eval_series.index[1]-eval_series.index[2]
+                pspec = pspec_welch(window,dt,ham_length=ham_length,ham_offset=ham_offset,w_cutoff=w_cutoff)
+                
+                # compute the spectral metrics and put into a dataframe
+                df_spec_metrics = pspec_metrics(pspec,ews)
+                self.k = df_spec_metrics
+                self.deque_2.append(self.k['Coherence factor'])
+                self.deque_3.append(self.k['AIC fold'])
+                self.deque_4.append(self.k['AIC hopf'])
+                self.deque_5.append(self.k['AIC null'])
+                self.deque_6.append(self.k['Params fold'])
+                self.deque_7.append(self.k['Params hopf'])
+                self.deque_8.append(self.k['Params null'])
+                return self.k['Smax']    
+
+            def f2(self, window):
+                return self.deque_2.popleft()   
+            def f3(self, window):
+                return self.deque_3.popleft()
+            def f4(self, window):
+                return self.deque_4.popleft()
+            def f5(self, window):
+                return self.deque_5.popleft()
+            def f6(self, window):
+                return self.deque_6.popleft()
+            def f7(self, window):
+                return self.deque_7.popleft()
+            def f8(self, window):
+                return self.deque_8.popleft()            
+            
+            
+            
+        # introduce a member of class: func
+        func = multi_output_function_class()
+            
+        # apply func over a rolling window
+        output = eval_series.rolling(window=rw_size).agg(
+                {'Smax':func.f1,
+                 'Coherence factor':func.f2,
+                 'AIC fold':func.f3,
+                 'AIC hopf':func.f4,
+                 'AIC null':func.f5,
+                 'Params fold':func.f6,
+                 'Params hopf':func.f7,
+                 'Params null':func.f8})
+                
+        # join to main DataFrame
+        df_ews = df_ews.append(output)
+        
+        
+        
+        
+
+
+
+
 
 
 

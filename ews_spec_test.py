@@ -19,7 +19,7 @@ from ews_spec import pspec_welch, pspec_metrics
 
 
 # create a noisy trajectory
-t=np.linspace(0,100,100)
+t=np.linspace(0,100,1000)
 x=0.5*5
 xn=x+np.random.randn(len(t))*0.5
 
@@ -31,7 +31,9 @@ series = pd.Series(xn, index=t)
 #--------------------------------
 
 # compute the power spectrum of the series
-pspec=pspec_welch(series, ham_length=40, w_cutoff=1)
+yVals = series.values
+dt = series.index[1]-series.index[2]
+pspec=pspec_welch(yVals, dt, ham_length=40, w_cutoff=1)
 
 # make a plot
 pspec.plot()

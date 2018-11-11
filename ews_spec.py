@@ -20,7 +20,8 @@ import matplotlib.pyplot as plt
 ## pspec_welch
 #------------------------------
 
-def pspec_welch(series,
+def pspec_welch(yVals,
+                dt,
                 ham_length,
                 ham_offset=0.5,
                 w_cutoff=1,
@@ -32,7 +33,8 @@ def pspec_welch(series,
     This involves computing the periodogram with overlapping Hamming windows.
     
     Input (default)
-    series : pandas Series indexed by time
+    yVals : array of state values
+    dt : time separation between data points
     ham_length (40) : number of data points in the Hamming window
     ham_offset (0.5) : proportion of ham_length to use as an offset for each
                        Hamming window.
@@ -49,12 +51,10 @@ def pspec_welch(series,
 
     ## Assign properties of *series* to parameters
     
-    # increment in time between data points (assuming uniform)
-    dt = series.index[1] - series.index[0]
     # compute the sampling frequency 
     fs = 1/dt
     # number of data points
-    num_points = series.shape[0]
+    num_points = len(yVals)
     # if ham_length given as a proportion - compute number of data points in ham_length
     if 0 < ham_length <= 1:
         ham_length = num_points * ham_length
@@ -62,7 +62,7 @@ def pspec_welch(series,
     ham_offset_points = int(ham_offset*ham_length)
         
     ## compute the periodogram using Welch's method (scipy.signal function)
-    pspec_raw = signal.welch(series.values,
+    pspec_raw = signal.welch(yVals,
                                fs,
                                nperseg=ham_length,
                                noverlap=ham_offset_points,
@@ -256,53 +256,8 @@ def pspec_metrics(pspec,
     return spec_ews
 
 
-
-#--------------------------
-## ews_spec
-#-------------------------
-
-
-
-def ews_spec(raw_series, 
-            roll_window=0.25,
-            smooth=True,
-            band_width=0.2,
-            ews=['smax','cf','aic']):
-
-
-    '''
-    Function to compute the spectral EWS of a time-series over a rolling window.
+   
     
-    Input (default)
-    raw_series : pandas Series indexed by time 
-    roll_windopw (0.25) : size of the rolling window (as a proportion
-    of the length of the data)
-    smooth (True) : if True, series data is detrended with a Gaussian kernel
-    band_width (0.2) : bandwidth of Gaussian kernel
-    ews (['smax','cf','aic']) : list of strings corresponding to the desired EWS.
-    Options include
-        'smax' : peak in the power spectrum
-        'cf' : coherence factor
-        'aic' : Hopf, Fold and Null AIC weights along with csp. parameter values
-                for model fits.
-
-    Output
-    DataFrame indexed by time with columns csp to each EWS
-    '''
-    
-    
-    
-
-
-
-
-
-    return raw_series
-
-
-
-
-
 
 
 
