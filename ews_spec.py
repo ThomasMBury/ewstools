@@ -159,7 +159,7 @@ def pspec_metrics(pspec,
         spec_ews['Coherence factor'] = coher_factor
     
 
-    # compute AIC weights
+    # fit analytic forms and compute AIC weights
     if 'aic' in ews:
         
         # put frequency values and power values as a list to use LMFIT
@@ -167,74 +167,96 @@ def pspec_metrics(pspec,
         power_vals = pspec.tolist()
         
         # define models to fit
-        def fit_fold(omega,sigma,lam):
-            return (sigma**2 / (2*np.pi))*(1/(omega**2+lam**2))
+        def fit_fold(w,sigma,lam):
+            return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
         
-        def fit_hopf(omega,sigma,mu,omega0):
-            return (sigma**2/(4*np.pi))*(1/((omega+omega0)**2+mu**2)+1/((omega-omega0)**2 +mu**2))
+        def fit_hopf(w,sigma,mu,w0):
+            return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
         
-        def fit_null(omega,c):
-            return c
+        def fit_null(w,sigma):
+            return sigma**2/(2*np.pi)
     
         # assign to Model objects
         fold_model = Model(fit_fold)
         hopf_model = Model(fit_hopf)
         null_model = Model(fit_null)
         
-        # set parameter initial values and constraints
+        ## Parameter initialisation and constraints
+        
+        # intial parameter values for Fold fit
         fold_model.set_param_hint('sigma', value=1)
         fold_model.set_param_hint('lam', value=-1, max=0)
         
+        # intial parameter values and constraints for Hopf fit
         hopf_model.set_param_hint('sigma', value=1)
-        hopf_model.set_param_hint('mu', value=-1, max=0)
-        # condition for S(0) < psi*S(omega0)
-        psi = 0.25
+        # set up constraint S(0) < psi*S(w0) and w0 < wMax 
+        # introduce fixed parameters psi and wMax
+        psi = 0.5
         hopf_model.set_param_hint('psi',value=psi,vary=False)
-        # introduce new free parameter delta = psi*S(omega0)-S(0) >0
+        hopf_model.set_param_hint('wMax',value=max(freq_vals),vary=False)
+        # let w0 be a free parameter with max value wMax
+        hopf_model.set_param_hint('w0', value=0.5*max(freq_vals), max=max(freq_vals))
+        # introduce the dummy parameter delta = psi*S(w0)-S(0) >0
         hopf_model.set_param_hint('delta', value=0.01, min=0, vary=True)
-        
-        # IMPOSE ANOTHER CONDITION OF W < WMAX SOMEHOW... TO DO!
-        
-        # write omega0 in terms of delta
-        hopf_model.set_param_hint('omega0', expr='sqrt(delta + (mu**2/(4*psi))*(4-3*psi+sqrt(psi**2-16*psi+16)))')
-        
-        null_model.set_param_hint('c',value=1, vary=True)
+        # now mu is a fixed parameter dep. on delta
+        hopf_model.set_param_hint('mu', expr='2*(w0-delta)/(sqrt((4-3*psi+sqrt(psi**2-16*psi+16)))/(psi))',vary=False)
+       
+        # initial parameter value for Null fit        
+        null_model.set_param_hint('sigma',value=1, vary=True)
                 
         # assign initial parameter values and constraints
         fold_params = fold_model.make_params()
         hopf_params = hopf_model.make_params()
         null_params = null_model.make_params()
         
-    
+        
         # fit each model to the power spectrum
-        fold_result = fold_model.fit(power_vals, fold_params, omega=freq_vals)
-        hopf_result = hopf_model.fit(power_vals, hopf_params, omega=freq_vals)
-        null_result = null_model.fit(power_vals, null_params, omega=freq_vals)
-
+        fold_result = fold_model.fit(power_vals, fold_params, w=freq_vals)
+        hopf_result = hopf_model.fit(power_vals, hopf_params, w=freq_vals)
+        null_result = null_model.fit(power_vals, null_params, w=freq_vals)
+        
+        ## Compute AIC weights
         # get AIC statistics
         fold_aic = fold_result.aic
         hopf_aic = hopf_result.aic
         null_aic = null_result.aic
-    
-        # add to dataframe
-        spec_ews['AIC fold'] = fold_aic
-        spec_ews['AIC hopf'] = hopf_aic
-        spec_ews['AIC null'] = null_aic
         
-        # print out report (for now)
-        print(fold_result.fit_report())
-        print(hopf_result.fit_report())
-        print(null_result.fit_report())
+        # compute AIC deviations from best model
+        fold_aic_diff = fold_aic - min(fold_aic,hopf_aic,null_aic)
+        hopf_aic_diff = hopf_aic - min(fold_aic,hopf_aic,null_aic)
+        null_aic_diff = null_aic - min(fold_aic,hopf_aic,null_aic)
+        
+        # compute relative likelihoods of each model
+        fold_llhd = np.exp(-(1/2)*fold_aic_diff)
+        hopf_llhd = np.exp(-(1/2)*hopf_aic_diff)
+        null_llhd = np.exp(-(1/2)*null_aic_diff)
+        llhd_sum = fold_llhd + hopf_llhd + null_llhd
+        
+        # compute AIC weights
+        fold_aic_weight = fold_llhd/llhd_sum
+        hopf_aic_weight = hopf_llhd/llhd_sum
+        null_aic_weight = null_llhd/llhd_sum
+               
+        # add to dataframe
+        spec_ews['AIC fold'] = fold_aic_weight
+        spec_ews['AIC hopf'] = hopf_aic_weight
+        spec_ews['AIC null'] = null_aic_weight
+        
+        
+        ## export fitted parameter values
+        spec_ews['Params fold'] = fold_result.values
+        spec_ews['Params hopf'] = dict((k,hopf_result.values[k]) for k in ('sigma','mu','w0'))  # don't include dummy params 
+        spec_ews['Params null'] = null_result.values
+        
     
     
         # make a plot of fits
         plt.plot(freq_vals, fold_result.best_fit)
         plt.plot(freq_vals, hopf_result.best_fit)
         plt.plot(freq_vals, null_result.best_fit*np.ones(len(freq_vals)))
-    
-#        # return parameter values if asked for
-#        if 'aic_params' in ews:
-#            
+        plt.ylim(0,3*max(fold_result.best_fit))
+
+
 
     # return DataFrame of metrics
     return spec_ews
