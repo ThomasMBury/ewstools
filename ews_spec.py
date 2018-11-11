@@ -252,12 +252,31 @@ def pspec_metrics(pspec,
         spec_ews['Params fold'] = dict((k, fold_result.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
         spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0'))
         spec_ews['Params null'] = null_result.values
-        
-
-
 
     # return DataFrame of metrics
     return spec_ews
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
