@@ -110,7 +110,6 @@ def pspec_metrics(pspec,
         'smax' : peak in the power spectrum
         'cf' : coherence factor
         'aic' : Hopf, Fold and Null AIC weights
-        'aic_params' : AIC model parameter values
         
                  
     Output
@@ -258,10 +257,47 @@ def pspec_metrics(pspec,
 
 
 
+#--------------------------
+## ews_spec
+#-------------------------
+
+
+
+def ews_spec(raw_series, 
+            roll_window=0.25,
+            smooth=True,
+            band_width=0.2,
+            ews=['smax','cf','aic']):
+
+
+    '''
+    Function to compute the spectral EWS of a time-series over a rolling window.
+    
+    Input (default)
+    raw_series : pandas Series indexed by time 
+    roll_windopw (0.25) : size of the rolling window (as a proportion
+    of the length of the data)
+    smooth (True) : if True, series data is detrended with a Gaussian kernel
+    band_width (0.2) : bandwidth of Gaussian kernel
+    ews (['smax','cf','aic']) : list of strings corresponding to the desired EWS.
+    Options include
+        'smax' : peak in the power spectrum
+        'cf' : coherence factor
+        'aic' : Hopf, Fold and Null AIC weights along with csp. parameter values
+                for model fits.
+
+    Output
+    DataFrame indexed by time with columns csp to each EWS
+    '''
+    
+    
+    
 
 
 
 
+
+    return raw_series
 
 
 

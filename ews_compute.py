@@ -5,7 +5,7 @@ Created on Thu Nov  1 19:11:58 2018
 
 @author: tb460
 
-A module containing a function to compute the standard EWS from time-series data.
+A module containing a function to compute the EWS from time-series data.
 """
 
 # import required python modules
@@ -13,20 +13,23 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter as gf
 import pandas as pd
 
+# import local modules
+from ews_spec import pspec_welch, pspec_metrics
+
+
         
 #--------------------------------
     
-def ews_std(raw_series, 
+def ews_compute(raw_series, 
             roll_window=0.25,
             smooth=True,
             band_width=0.2,
             ews=['var','ac','cv','skew'], 
             lag_times=[1]):
     '''
-    Function to compute the standard EWS over a rolling window.
-    The pandas library is used to compute rolling statistics.    
+    Function to compute EWS from time-series data.   
     
-    Input (default)
+    Input (default value)
     raw_series : pandas Series indexed by time 
     roll_windopw (0.25) : size of the rolling window (as a proportion
     of the length of the data)
@@ -40,6 +43,9 @@ def ews_std(raw_series,
              'cv'    : Coefficient of variation
              'skew'  : Skewness
              'kurt'  : Kurtosis
+             'smax'  : Peak in the power spectrum
+             'cf'    : Coherence factor
+             'aic'   : AIC weights
              
     lag_times : list of integers corresponding to the desired lag times for AC
     
@@ -74,7 +80,7 @@ def ews_std(raw_series,
     eval_series = resid_series if smooth else raw_series
     
     #-----------------
-    ## compute EWS
+    ## compute standard EWS
     #-----------------
     
     # compute the size of the rolling window (this must be an integer)
@@ -119,10 +125,32 @@ def ews_std(raw_series,
         roll_kurt = eval_series.rolling(window=rw_size).kurt()
         df_ews['Kurtosis'] = roll_kurt
 
+    
+    #-----------------
+    ## compute spectral EWS
+    #-----------------
+    
+   
+    # compute the power spectrum over a rolling window
+    if '
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #--------------------
-# Compute kendall taus
+# Compute kendall taus of EWS trends
 #-----------------------
         
     # Put time values as their own series for correlation computation

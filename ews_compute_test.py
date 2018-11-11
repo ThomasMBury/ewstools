@@ -5,7 +5,8 @@ Created on Thu Nov  1 21:21:29 2018
 
 @author: tb460
 
-script to test functions in ews_std
+script to test the function ews_compute
+
 """
 
 # import standard libraries
@@ -14,7 +15,7 @@ import pandas as pd
 
 
 #  import EWS functions
-from ews_std import ews_std
+from ews_compute import ews_compute
 
 
 
@@ -28,7 +29,7 @@ series = pd.Series(xn, index=t)
 
 
 # run ews_std
-df_ews, ktau = ews_std(series, 
+df_ews, ktau = ews_compute(series, 
                       roll_window=0.2, 
                       lag_times=[1,2,3], 
                       ews=['var','ac','sd','skew','kurt','cv'])
