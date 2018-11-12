@@ -142,6 +142,10 @@ def ews_compute(raw_series,
         # time separation between data points
         dt = eval_series.index[1]-eval_series.index[2]
         
+        # initilise a dataframe to store metrics
+        
+        
+        
         # count through window locations shifted by roll_offset
         for k in np.arange(0, num_comps-roll_window, roll_offset):
             # select subset of series contained in window
@@ -150,8 +154,10 @@ def ews_compute(raw_series,
             # compute power spectrum of window data using function pspec_welch
             pspec = pspec_welch(window,dt,ham_length=ham_length,ham_offset=ham_offset,w_cutoff=w_cutoff)
                 
-            # compute the spectral metrics and put into a dataframe
-            df_spec_metrics = pspec_metrics(pspec,ews)
+            # compute the spectral metrics
+            metrics = pspec_metrics(pspec,ews)
+            
+            
             
             
             
