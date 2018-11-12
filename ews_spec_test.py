@@ -31,13 +31,13 @@ series = pd.Series(xn, index=t)
 ## Test pspec_welch
 #--------------------------------
 
-# begin a timer
-start = time.time()
+
 
 # compute the power spectrum of the series
 yVals = series.values
 dt = series.index[1]-series.index[2]
 pspec=pspec_welch(yVals, dt, ham_length=40, w_cutoff=1)
+
 
 # make a plot
 pspec.plot()
@@ -48,8 +48,13 @@ pspec.plot()
 ## Test spec_metrics
 #---------------------------
 
+
+# begin a timer
+start = time.time()
+
 # put the power spectrum into pspec_metrics
 spec_ews = pspec_metrics(pspec, ews=['smax', 'cf', 'aic'])
+
 
 # end the timer
 end = time.time()
@@ -79,7 +84,7 @@ plt.plot(w_vals, fit_null(w_vals, spec_ews['Params null']['sigma']))
 print(spec_ews)
 
 # print time elapsed for functions to run
-print('took ', end - start,' seconds')
+print('spec_metrics took ', end - start,' seconds')
 
 
 
