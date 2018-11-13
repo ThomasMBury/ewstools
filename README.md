@@ -1,11 +1,15 @@
-# ews_functions
-A collection of functions to compute early warning signals (EWS) from time-series data.
+# early_warnings
+A module to compute early warning signals (EWS) from time-series data.
+Package requirements:
+  - standard python libraries: numpy, pandas, scipy, matplotlib
+  - LMFIT: download [here](https://lmfit.github.io/lmfit-py/installation.html)
 
-## ews_std.py
-Function to compute the EWS that have become standard practise.
-The pandas library is used to compute the metrics over a rolling window.
 
-Input (default)
+## ews_compute.py
+Main function that takes in Series data and outpus EWS in a DataFrame.
+Objects and functions from the pandas library are used extensivley.
+
+Input (default value)
 - *raw_series* : pandas Series indexed by time 
 - *roll_window* (0.25) : size of the rolling window (as a proportion of the length of the data)
 - *smooth* (True) : if True, series data is detrended with a Gaussian kernel
@@ -17,9 +21,15 @@ Input (default)
   - '*cv*'    : Coefficient of variation
   - '*skew*'  : Skewness
   - '*kurt*'  : Kurtosis
+  - '*smax*'  : Peak in the power spectrum
+  - '*cf*'    : Coherence factor
+  - '*aic*'   : AIC weights
 - lag_times ( [1] ) : list of integers corresponding to the desired lag times for AC
     
 Output
 - DataFrame indexed by time with columns csp to each EWS
 
-For an example in action, run  [ews_std_test.py](ews_std_test.py).
+
+
+## ews_compute_test.py
+An example script to run *ews_compute* and plot results.
