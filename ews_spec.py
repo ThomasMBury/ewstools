@@ -110,6 +110,7 @@ def pspec_metrics(pspec,
         'smax' : peak in the power spectrum
         'cf' : coherence factor
         'aic' : Hopf, Fold and Null AIC weights
+        'aic_params' : Parameters of best fit spectra
         
                  
     Output
@@ -185,7 +186,7 @@ def pspec_metrics(pspec,
         # intial parameter values and constraints for Fold fit
         fold_model.set_param_hint('sigma', value=0.11)
         # set up constraint S(wMax) < psi*S(0)
-        psi_fold = 0.75
+        psi_fold = 0.99
         wMax = max(freq_vals)
         # results in min value for lambda dependent on wMax and psi
         fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0)
@@ -246,11 +247,11 @@ def pspec_metrics(pspec,
         spec_ews['AIC hopf'] = hopf_aic_weight
         spec_ews['AIC null'] = null_aic_weight
         
-        
-        ## export fitted parameter values
-        spec_ews['Params fold'] = dict((k, fold_result.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
-        spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0'))
-        spec_ews['Params null'] = null_result.values
+        if 'aic params' in ews:        
+            ## export fitted parameter values
+            spec_ews['Params fold'] = dict((k, fold_result.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
+            spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0'))
+            spec_ews['Params null'] = null_result.values
 
     # return DataFrame of metrics
     return spec_ews

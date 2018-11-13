@@ -21,6 +21,7 @@ from ews_spec import pspec_welch, pspec_metrics
 def ews_compute(raw_series, 
             roll_window=0.25,
             smooth=True,
+            upto='Full',
             band_width=0.2,
             ews=['var','ac','cv','skew'], 
             lag_times=[1],
@@ -35,6 +36,7 @@ def ews_compute(raw_series,
     roll_windopw (0.25) : size of the rolling window (as a proportion
     of the length of the data)
     smooth (True) : if True, series data is detrended with a Gaussian kernel
+    upto ('Full') : if 'Full', use entire time-series, ow input time up to which EWS are to be evaluated
     band_width (0.2) : bandwidth of Gaussian kernel
     ews (['var,'ac'] : list of strings corresponding to the desired EWS.
          Options include
@@ -53,24 +55,29 @@ def ews_compute(raw_series,
     Output
     DataFrame indexed by time with columns csp to each EWS
     '''
-
+    
 
     # initialise a DataFrame to store EWS data - indexed by time
     df_ews = pd.DataFrame(raw_series)
     df_ews.columns = ['State variable']
     df_ews.index.rename('Time', inplace=True)
-
+    
+    # select the portion of the data to evaluate EWS on
+    if upto == 'Full':
+        short_series = raw_series
+    else: short_series = raw_series.loc[:upto]
+    
     ## detrend the data
     
     # compute the size of the bandwidth
-    bw_size=raw_series.shape[0]*band_width   
+    bw_size=short_series.shape[0]*band_width   
     
     # compute smoothed data and residuals
     if smooth:
-        smooth_data = gf(raw_series.values, sigma=bw_size, mode='reflect')
-        smooth_series = pd.Series(smooth_data, index=raw_series.index)
-        residuals = raw_series.values - smooth_data
-        resid_series = pd.Series(residuals,index=raw_series.index)
+        smooth_data = gf(short_series.values, sigma=bw_size, mode='reflect')
+        smooth_series = pd.Series(smooth_data, index=short_series.index)
+        residuals = short_series.values - smooth_data
+        resid_series = pd.Series(residuals,index=short_series.index)
     
         # add them to the DataFrame
         df_ews['Smoothing'] = smooth_series
@@ -78,7 +85,7 @@ def ews_compute(raw_series,
         
         
     # use residuals for EWS if smooth=True, ow use raw series
-    eval_series = resid_series if smooth else raw_series
+    eval_series = resid_series if smooth else short_series
     
     # compute the size of the rolling window for EWS computation (this must be an integer)
     rw_size=int(np.floor(roll_window * raw_series.shape[0]))
