@@ -6,10 +6,10 @@ Package requirements:
 
 
 ## ews_compute.py
-Main function that takes in Series data and outpus EWS in a DataFrame.
-Objects and functions from the pandas library are used extensivley.
+File for function `ews_compute`.
+`ews_compute` takes in Series data and outputs user-specified EWS in a DataFrame.
 
-Input (default value)
+**Input** (default value)
 - *raw_series* : pandas Series indexed by time 
 - *roll_window* (0.25) : size of the rolling window (as a proportion of the length of the data)
 - *smooth* (True) : if True, series data is detrended with a Gaussian kernel
@@ -26,7 +26,7 @@ Input (default value)
   - '*aic*'   : AIC weights
 - lag_times ( [1] ) : list of integers corresponding to the desired lag times for AC
     
-Output
+**Output**
 - DataFrame indexed by time with columns csp to each EWS
 
 
