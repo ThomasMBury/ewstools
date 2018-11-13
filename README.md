@@ -6,7 +6,7 @@ Package requirements:
 
 
 ## ews_compute.py
-File for function `ews_compute`.
+File for function `ews_compute`.  
 `ews_compute` takes in Series data and outputs user-specified EWS in a DataFrame.
 
 **Input** (default value)
@@ -27,7 +27,7 @@ File for function `ews_compute`.
 - lag_times ( [1] ) : list of integers corresponding to the desired lag times for AC
     
 **Output**
-- DataFrame indexed by time with columns csp to each EWS
+- DataFrame indexed by time with columns corresponding to each EWS
 
 
 
