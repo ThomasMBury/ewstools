@@ -32,4 +32,4 @@ File for function `ews_compute`.
 
 
 ## ews_compute_test.py
-An example script to run *ews_compute* and plot results.
+An example script to run *ews_compute*, compute kendall tau values, and plot results.
