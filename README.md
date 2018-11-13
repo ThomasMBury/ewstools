@@ -14,7 +14,7 @@ File for function `ews_compute`.
 - *roll_window* (0.25) : size of the rolling window (as a proportion of the length of the data)
 - *smooth* (True) : if True, series data is detrended with a Gaussian kernel
 - *band_width* (0.2) : bandwidth of Gaussian kernel
-- *ews* ( ['*var*', '*ac*','*smax*'] ) : list of strings corresponding to the desired EWS. Options include
+- *ews* ( ['*var*', '*ac*', '*smax*'] ) : list of strings corresponding to the desired EWS. Options include
   - '*var*'   : Variance
   - '*ac*'    : Autocorrelation
   - '*sd*'    : Standard deviation
