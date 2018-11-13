@@ -35,7 +35,7 @@ series = pd.Series(xn, index=t)
 start = time.time() 
 
 df_ews = ews_compute(series, 
-                      roll_window=0.2, 
+                      roll_window=1, 
                       lag_times=[1,2,3],
                       ham_length=40,
                       ews=['var','ac','smax','cf'])

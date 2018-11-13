@@ -150,13 +150,13 @@ def ews_compute(raw_series,
         
        
         # count through window locations shifted by roll_offset
-        for k in np.arange(0, num_comps-rw_size, roll_offset):
+        for k in np.arange(0, num_comps-(rw_size-1), roll_offset):
             
             # select subset of series contained in window
             window_series = eval_series.iloc[k:k+rw_size]
             
             # time value for metric (right end point of window)
-            t_point = eval_series.index[k+rw_size]            
+            t_point = eval_series.index[k+(rw_size-1)]            
             
             # compute power spectrum of window data using function pspec_welch
             pspec = pspec_welch(window_series, dt, 
