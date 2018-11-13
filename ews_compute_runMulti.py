@@ -5,7 +5,7 @@ Created on Thu Nov  1 21:21:29 2018
 
 @author: tb460
 
-Script demonstrating how to use ews_std to compute EWS for multiple 
+Script demonstrating how to use ews_compute to compute EWS for multiple 
 trajectories and obtain a dataframe indexed by realisation number and time.
 
 
@@ -17,7 +17,7 @@ import pandas as pd
 
 
 #  import EWS functions
-from ews_std import ews_std
+from ews_compute import ews_compute
 
 
 
@@ -50,7 +50,7 @@ appended_ktau = []
 
 # loop through each trajectory as an input to ews_std
 for i in range(num_sims):
-    df_temp,ktau_temp = ews_std(df_traj[i], 
+    df_temp,ktau_temp = ews_compute(df_traj[i], 
                       roll_window=0.2, 
                       lag_times=[1], 
                       ews=['var','ac'])

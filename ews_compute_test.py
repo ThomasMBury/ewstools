@@ -12,6 +12,7 @@ script to test the function ews_compute
 # import standard libraries
 import numpy as np
 import pandas as pd
+import time
 
 
 #  import EWS functions
@@ -37,7 +38,7 @@ df_ews = ews_compute(series,
                       roll_window=0.2, 
                       lag_times=[1,2,3],
                       ham_length=40,
-                      ews=['var','ac','smax','cf','aic'])
+                      ews=['var','ac','smax','cf'])
 
 # end timer
 end = time.time()
@@ -53,9 +54,20 @@ df_ews[['State variable','Smoothing','Variance', 'Lag-1 AC']].plot()
 # plot some spectral metrics
 df_ews[['Coherence factor','Smax']].dropna().plot()
 
-# plot AIC weights
-df_ews[['AIC fold','AIC hopf', 'AIC null']].dropna().plot()
+## plot AIC weights
+#df_ews[['AIC fold','AIC hopf', 'AIC null']].dropna().plot()
 
 # print time taken to run ews_std
 print('ews_compute took ',end-start,' seconds to run')
+
+
+
+## Compute kendall tau values
+        
+# Put time values as their own series for correlation computation
+time_series = pd.Series(series.index, index=series.index)
+    
+# Find kendall tau correlation coefficient for each EWS (column of df_ews)
+ktau = df_ews.corrwith(time_series)
+
 

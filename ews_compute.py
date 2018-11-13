@@ -176,25 +176,18 @@ def ews_compute(raw_series,
         df_ews = df_ews.join(df_spec_metrics.transpose())
         
         
+        
+    # return DataFrame of EWS
+    return df_ews
+        
             
-        return df_ews
 
 
 
 
-
-
-
-
-
-
-
-
-
-#
 #
 ##--------------------
-## Compute kendall taus of EWS trends
+## Compute kendall taus 
 ##-----------------------
 #        
 #    # Put time values as their own series for correlation computation
@@ -208,7 +201,6 @@ def ews_compute(raw_series,
 ## update readme file with kendall tau info.
 #
 ##-------------------------------------
-
 
 
 
