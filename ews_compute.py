@@ -17,33 +17,6 @@ import pandas as pd
 from ews_spec import pspec_welch, pspec_metrics
 
 
-        
-#--------------
-# roll_window
-#--------------
-
-from itertools import islice
-
-def roll_window(seq, n=2):
-    '''
-    Returns a rolling window (of length n) over data from the iterable
-    s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...
-    ''' 
-    
-    it = iter(seq)
-    result = tuple(islice(it, n))
-    if len(result) == n:
-        yield result
-    for elem in it:
-        result = result[1:] + (elem,)
-        yield result
-        
-        
-        
-#------------------
-
-
-
 
 def ews_compute(raw_series, 
             roll_window=0.25,
@@ -107,12 +80,13 @@ def ews_compute(raw_series,
     # use residuals for EWS if smooth=True, ow use raw series
     eval_series = resid_series if smooth else raw_series
     
+    # compute the size of the rolling window for EWS computation (this must be an integer)
+    rw_size=int(np.floor(roll_window * raw_series.shape[0]))
+    
     #-----------------
     ## compute standard EWS
     #-----------------
     
-    # compute the size of the rolling window (this must be an integer)
-    rw_size=int(np.floor(roll_window * raw_series.shape[0]))
     
     
     # compute the stabdard deviation as a Series and add to DataFrame
@@ -160,73 +134,50 @@ def ews_compute(raw_series,
     
    
     if 'smax' in ews or 'cf' in ews or 'aic' in ews:
+
+        
+        # number of components in residuals
+        num_comps = len(eval_series)
+        # offset to use on rolling window (make larger to save on compuatation)
+        # we set equal to the hamming offset - going smaller than this gives oscillations
+        roll_offset = int(ham_offset*ham_length)
+        # int(ham_offset*ham_length)
+        # time separation between data points
+        dt = eval_series.index[1]-eval_series.index[0]
+        
+        # initilise a dataframe to store metrics
+        df_spec_metrics = pd.DataFrame([])
+        
        
-        # make a class for rolling.apply to accept functions with multiple outputs
-        from collections import deque
-        class multi_output_function_class:
-            def __init__(self):
-                self.deque_2 = deque()
-                self.deque_3 = deque()
-                self.deque_4 = deque()
-                self.deque_5 = deque()
-                self.deque_6 = deque()
-                self.deque_7 = deque()
-                self.deque_8 = deque()
+        # count through window locations shifted by roll_offset
+        for k in np.arange(0, num_comps-rw_size, roll_offset):
             
-            def f1(self, window):
-                # compute power spectrum of window data using function pspec_welch
-                dt = eval_series.index[1]-eval_series.index[2]
-                pspec = pspec_welch(window,dt,ham_length=ham_length,ham_offset=ham_offset,w_cutoff=w_cutoff)
+            # select subset of series contained in window
+            window_series = eval_series.iloc[k:k+rw_size]
+            
+            # time value for metric (right end point of window)
+            t_point = eval_series.index[k+rw_size]            
+            
+            # compute power spectrum of window data using function pspec_welch
+            pspec = pspec_welch(window_series, dt, 
+                                ham_length=ham_length, 
+                                ham_offset=ham_offset,
+                                w_cutoff=w_cutoff)
                 
-                # compute the spectral metrics and put into a dataframe
-                df_spec_metrics = pspec_metrics(pspec,ews)
-                self.k = df_spec_metrics
-                self.deque_2.append(self.k['Coherence factor'])
-                self.deque_3.append(self.k['AIC fold'])
-                self.deque_4.append(self.k['AIC hopf'])
-                self.deque_5.append(self.k['AIC null'])
-                self.deque_6.append(self.k['Params fold'])
-                self.deque_7.append(self.k['Params hopf'])
-                self.deque_8.append(self.k['Params null'])
-                return self.k['Smax']    
-
-            def f2(self, window):
-                return self.deque_2.popleft()   
-            def f3(self, window):
-                return self.deque_3.popleft()
-            def f4(self, window):
-                return self.deque_4.popleft()
-            def f5(self, window):
-                return self.deque_5.popleft()
-            def f6(self, window):
-                return self.deque_6.popleft()
-            def f7(self, window):
-                return self.deque_7.popleft()
-            def f8(self, window):
-                return self.deque_8.popleft()            
+            # compute the spectral metrics
+            metrics = pspec_metrics(pspec,ews)
             
+            # add to dataframe
+            df_spec_metrics[t_point] = metrics
             
-            
-        # introduce a member of class: func
-        func = multi_output_function_class()
-            
-        # apply func over a rolling window
-        output = eval_series.rolling(window=rw_size).agg(
-                {'Smax':func.f1,
-                 'Coherence factor':func.f2,
-                 'AIC fold':func.f3,
-                 'AIC hopf':func.f4,
-                 'AIC null':func.f5,
-                 'Params fold':func.f6,
-                 'Params hopf':func.f7,
-                 'Params null':func.f8})
-                
+                 
+               
         # join to main DataFrame
-        df_ews = df_ews.append(output)
+        df_ews = df_ews.join(df_spec_metrics.transpose())
         
         
-        
-        
+            
+        return df_ews
 
 
 
@@ -240,23 +191,23 @@ def ews_compute(raw_series,
 
 
 
-
-
-#--------------------
-# Compute kendall taus of EWS trends
-#-----------------------
-        
-    # Put time values as their own series for correlation computation
-    time_series = pd.Series(raw_series.index, index=raw_series.index)
-    
-    # Find kendall tau correlation coefficient for each EWS (column of df_ews)
-    ktau = df_ews.corrwith(time_series)
-
-    return df_ews, ktau
-    
-# update readme file with kendall tau info.
-
-#-------------------------------------
+#
+#
+##--------------------
+## Compute kendall taus of EWS trends
+##-----------------------
+#        
+#    # Put time values as their own series for correlation computation
+#    time_series = pd.Series(raw_series.index, index=raw_series.index)
+#    
+#    # Find kendall tau correlation coefficient for each EWS (column of df_ews)
+#    ktau = df_ews.corrwith(time_series)
+#
+#    return df_ews, ktau
+#    
+## update readme file with kendall tau info.
+#
+##-------------------------------------
 
 
 

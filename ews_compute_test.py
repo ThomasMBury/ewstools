@@ -20,7 +20,7 @@ from ews_compute import ews_compute
 
 
 # create a noisy trajectory
-t=np.linspace(1,10,200)
+t=np.linspace(1,400,401)
 x=0.5*5
 xn=x+np.random.randn(len(t))*0.5
 
@@ -29,12 +29,18 @@ series = pd.Series(xn, index=t)
 
 
 # run ews_std
-df_ews, ktau = ews_compute(series, 
+
+# begin a timer
+start = time.time() 
+
+df_ews = ews_compute(series, 
                       roll_window=0.2, 
                       lag_times=[1,2,3],
-                      ham_length=20,
-                      ews=['var','ac'])
+                      ham_length=40,
+                      ews=['var','ac','smax','cf','aic'])
 
+# end timer
+end = time.time()
 
 # Note: df_ews is indexed by t and has (titled) columns csp to each EWS
 
@@ -45,6 +51,11 @@ df_ews, ktau = ews_compute(series,
 df_ews[['State variable','Smoothing','Variance', 'Lag-1 AC']].plot()
 
 # plot some spectral metrics
-#df_ews[['Coherence factor','Smax']].plot()
+df_ews[['Coherence factor','Smax']].dropna().plot()
 
+# plot AIC weights
+df_ews[['AIC fold','AIC hopf', 'AIC null']].dropna().plot()
+
+# print time taken to run ews_std
+print('ews_compute took ',end-start,' seconds to run')
 

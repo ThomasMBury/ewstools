@@ -185,7 +185,7 @@ def pspec_metrics(pspec,
         # intial parameter values and constraints for Fold fit
         fold_model.set_param_hint('sigma', value=0.11)
         # set up constraint S(wMax) < psi*S(0)
-        psi_fold = 0.25
+        psi_fold = 0.75
         wMax = max(freq_vals)
         # results in min value for lambda dependent on wMax and psi
         fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0)
