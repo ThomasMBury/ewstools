@@ -195,17 +195,19 @@ def pspec_metrics(pspec,
         # intial parameter values and constraints for Hopf fit
         hopf_model.set_param_hint('sigma', value=1)
         # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
-        psi_hopf = 0.9
+        psi_hopf = 0.25
         # introduce fixed parameters psi_hopf and wMax
         hopf_model.set_param_hint('psi',value=psi_hopf,vary=False)
         hopf_model.set_param_hint('wMax',value=wMax,vary=False)
         # let mu be a free parameter with max value 0
         hopf_model.set_param_hint('mu', value=-1, max=0)
         # introduce the dummy parameter delta = psi*S(w0)-S(0) >0
-        hopf_model.set_param_hint('delta', value=0.00001, min=0, max=0.001, vary=True)
+        hopf_model.set_param_hint('delta', value=0.001, min=0, vary=True)
         # now w0 is a fixed parameter dep. on delta
-        hopf_model.set_param_hint('w0', expr='delta + (mu/(2*sqrt(psi)))*(psi-3*psi - sqrt(psi**2-16*psi+16))',vary=False)
+        hopf_model.set_param_hint('w0', expr='delta + (mu/(2*sqrt(psi)))*(psi-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
      
+#        'delta + (mu/(2*sqrt(psi)))*(psi-3*psi + sqrt(psi**2-16*psi+16))'
+        
         # initial parameter value for Null fit        
         null_model.set_param_hint('sigma',value=1, vary=True)
                 
@@ -250,7 +252,7 @@ def pspec_metrics(pspec,
         if 'aic_params' in ews:        
             ## export fitted parameter values
             spec_ews['Params fold'] = dict((k, fold_result.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
-            spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0','delta'))
+            spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0','delta','psi'))
             spec_ews['Params null'] = null_result.values
 
     # return DataFrame of metrics
