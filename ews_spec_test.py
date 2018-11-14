@@ -19,6 +19,9 @@ import time
 from ews_spec import pspec_welch, pspec_metrics
 
 
+# set a seed for reproducibility
+np.random.seed(0)
+
 # create a noisy trajectory
 t=np.linspace(0,100,1000)
 x=0.5*5

@@ -193,20 +193,17 @@ def pspec_metrics(pspec,
         
         
         # intial parameter values and constraints for Hopf fit
-        hopf_model.set_param_hint('sigma', value=1)
+        hopf_model.set_param_hint('sigma', value=0.1)
         # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
-        psi_hopf = 0.25
+        psi_hopf = 0.1
         # introduce fixed parameters psi_hopf and wMax
         hopf_model.set_param_hint('psi',value=psi_hopf,vary=False)
-        hopf_model.set_param_hint('wMax',value=wMax,vary=False)
         # let mu be a free parameter with max value 0
-        hopf_model.set_param_hint('mu', value=-1, max=0)
-        # introduce the dummy parameter delta = psi*S(w0)-S(0) >0
-        hopf_model.set_param_hint('delta', value=0.001, min=0, vary=True)
-        # now w0 is a fixed parameter dep. on delta
-        hopf_model.set_param_hint('w0', expr='delta + (mu/(2*sqrt(psi)))*(psi-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
-     
-#        'delta + (mu/(2*sqrt(psi)))*(psi-3*psi + sqrt(psi**2-16*psi+16))'
+        hopf_model.set_param_hint('mu', value=-0.1, max=0, min=-2)
+        # introduce the dummy parameter delta = w0 - wThresh (see paper for wThresh)
+        hopf_model.set_param_hint('delta', value=0.01, min=0, vary=True)
+        # now w0 is a fixed parameter dep. on delta (w0 = delta + wThresh)
+        hopf_model.set_param_hint('w0', expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',  max=wMax,vary=False)
         
         # initial parameter value for Null fit        
         null_model.set_param_hint('sigma',value=1, vary=True)

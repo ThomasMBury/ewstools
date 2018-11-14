@@ -185,8 +185,7 @@ def ews_compute(raw_series,
             df_spec_metrics[t_point] = metrics
             
             # progress message
-            if updates and k > 0.5*(num_comps-(rw_size-1)):
-                print('Spec EWS half way')
+            print('Spec'+str(k))
                  
                
         # join to main DataFrame
