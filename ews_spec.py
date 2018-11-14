@@ -184,28 +184,28 @@ def pspec_metrics(pspec,
         ## Parameter initialisation and constraints
         
         # intial parameter values and constraints for Fold fit
-        fold_model.set_param_hint('sigma', value=0.11)
-        # set up constraint S(wMax) < psi*S(0)
-        psi_fold = 0.99
+        fold_model.set_param_hint('sigma', value=0.1)
+        # set up constraint S(wMax) < psi_fold*S(0)
+        psi_fold = 0.5
         wMax = max(freq_vals)
         # results in min value for lambda dependent on wMax and psi
-        fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0)
+        fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0, value=-1)
         
         
         # intial parameter values and constraints for Hopf fit
         hopf_model.set_param_hint('sigma', value=1)
-        # set up constraint S(0) < psi*S(w0) and w0 < wMax 
-        psi_hopf = 0.25
-        # introduce fixed parameters psi and wMax
+        # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
+        psi_hopf = 0.9
+        # introduce fixed parameters psi_hopf and wMax
         hopf_model.set_param_hint('psi',value=psi_hopf,vary=False)
         hopf_model.set_param_hint('wMax',value=wMax,vary=False)
-        # let w0 be a free parameter with max value wMax
-        hopf_model.set_param_hint('w0', value=0.5*max(freq_vals), max=max(freq_vals))
+        # let mu be a free parameter with max value 0
+        hopf_model.set_param_hint('mu', value=-1, max=0)
         # introduce the dummy parameter delta = psi*S(w0)-S(0) >0
-        hopf_model.set_param_hint('delta', value=0.01, min=0, vary=True)
-        # now mu is a fixed parameter dep. on delta
-        hopf_model.set_param_hint('mu', expr='-2*(w0-delta)/(sqrt((4-3*psi+sqrt(psi**2-16*psi+16)))/(psi))',vary=False)
-       
+        hopf_model.set_param_hint('delta', value=0.00001, min=0, max=0.001, vary=True)
+        # now w0 is a fixed parameter dep. on delta
+        hopf_model.set_param_hint('w0', expr='delta + (mu/(2*sqrt(psi)))*(psi-3*psi - sqrt(psi**2-16*psi+16))',vary=False)
+     
         # initial parameter value for Null fit        
         null_model.set_param_hint('sigma',value=1, vary=True)
                 
@@ -247,10 +247,10 @@ def pspec_metrics(pspec,
         spec_ews['AIC hopf'] = hopf_aic_weight
         spec_ews['AIC null'] = null_aic_weight
         
-        if 'aic params' in ews:        
+        if 'aic_params' in ews:        
             ## export fitted parameter values
             spec_ews['Params fold'] = dict((k, fold_result.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
-            spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0'))
+            spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0','delta'))
             spec_ews['Params null'] = null_result.values
 
     # return DataFrame of metrics

@@ -27,7 +27,8 @@ def ews_compute(raw_series,
             lag_times=[1],
             ham_length=40,
             ham_offset=0.5,
-            w_cutoff=1):
+            w_cutoff=1,
+            updates=False):
     '''
     Function to compute EWS from time-series data.   
     
@@ -50,7 +51,11 @@ def ews_compute(raw_series,
              'cf'    : Coherence factor
              'aic'   : AIC weights
              
-    lag_times : list of integers corresponding to the desired lag times for AC
+    lag_times ([1]) : list of integers corresponding to the desired lag times for AC
+    ham_length (40) : length of the Hamming window
+    ham_offset (0.5) : proportion of Hamimng window to offset by
+    w_cutoff (1) : cutoff frequency (as proportion of size of maximum frequency)
+    updates (False) : include updates on progress of function
     
     Output
     DataFrame indexed by time with columns csp to each EWS
@@ -133,6 +138,10 @@ def ews_compute(raw_series,
     if 'kurt' in ews:
         roll_kurt = eval_series.rolling(window=rw_size).kurt()
         df_ews['Kurtosis'] = roll_kurt
+        
+    # progress message
+    if updates:
+        print('Standard EWS computed')
 
     
     #-----------------
@@ -146,9 +155,7 @@ def ews_compute(raw_series,
         # number of components in residuals
         num_comps = len(eval_series)
         # offset to use on rolling window (make larger to save on compuatation)
-        # we set equal to the hamming offset - going smaller than this gives oscillations
-        roll_offset = int(ham_offset*ham_length)
-        # int(ham_offset*ham_length)
+        roll_offset = 4
         # time separation between data points
         dt = eval_series.index[1]-eval_series.index[0]
         
@@ -177,6 +184,9 @@ def ews_compute(raw_series,
             # add to dataframe
             df_spec_metrics[t_point] = metrics
             
+            # progress message
+            if updates and k > 0.5*(num_comps-(rw_size-1)):
+                print('Spec EWS half way')
                  
                
         # join to main DataFrame

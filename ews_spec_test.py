@@ -53,7 +53,7 @@ pspec.plot()
 start = time.time()
 
 # put the power spectrum into pspec_metrics
-spec_ews = pspec_metrics(pspec, ews=['smax', 'cf', 'aic'])
+spec_ews = pspec_metrics(pspec, ews=['smax', 'cf', 'aic', 'aic_params'])
 
 
 # end the timer
