@@ -17,7 +17,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time as time
 
-# import EWS function
+# import EWS functions
 from ews_compute import ews_compute
 from ews_spec import pspec_welch, pspec_metrics
 
@@ -30,8 +30,9 @@ from ews_spec import pspec_welch, pspec_metrics
 # Simulation parameters
 dt = 1
 t0 = 0
-tmax = 400
-seed = 10 # random number generation seed
+tmax = 800
+tburn = 50 # burn-in period
+seed = 2 # random number generation seed
 
 # Model: dx/dt = de_fun(x,t) + sigma dW(t)
 def de_fun(x,r,k,h,s):
@@ -39,7 +40,7 @@ def de_fun(x,r,k,h,s):
     
     
 # Model parameters
-sigma = 0.04 # noise intensity
+sigma = 0.02 # noise intensity
 r = 1 # growth rate
 k = 1 # carrying capacity
 s = 0.1 # half-saturation constant of harvesting function
@@ -52,7 +53,6 @@ x0 = 0.8197 # intial condition (equilibrium value computed in Mathematica)
 # Initialise arrays to store data
 t = np.arange(t0,tmax,dt)
 x = np.zeros(len(t))
-x[0] = x0
 
 
 # Set up control parameter h, that increases linearly in time from hl to hh
@@ -66,9 +66,17 @@ tbif = h[h > hbif].index[1]
 # Set seed
 np.random.seed(seed)
 # Create brownian increments (s.d. sqrt(dt))
+dW_burn = np.random.normal(loc=0, scale=np.sqrt(dt), size = int(tburn/dt))
 dW = np.random.normal(loc=0, scale=np.sqrt(dt), size = len(t))
 
-# Loop over time
+# Simulate burn-in period to obtain x0 (h is fixed)
+for j in range(int(tburn/dt)):
+    x0 = x0 + de_fun(x0,r,k,h[0],s)*dt + sigma*dW_burn[j]
+    
+# Initial condition post burn-in period
+x[0]=x0
+
+# Run simulation
 for i in range(len(t)-1):
     x[i+1] = x[i] + de_fun(x[i],r,k,h[i],s)*dt + sigma*dW[i]
     # make sure that state variable remains >= 0 
@@ -99,8 +107,7 @@ df_ews = ews_compute(series,
                      roll_window=rw, 
                      lag_times=[1],
                      ham_length=ham_len,
-                     ews=['var','ac','smax','aic'],
-                     updates=True)
+                     ews=['var','ac','smax','aic'])
 
 end = time.time() # end timer
 # Print time taken to run ews_std
@@ -113,8 +120,9 @@ fig1, axes = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(6,6))
 df_ews[['State variable','Smoothing']].plot(ax=axes[0],title='Early warning signals')
 df_ews['Variance'].plot(ax=axes[1],legend=True)
 df_ews['Lag-1 AC'].plot(ax=axes[1], secondary_y=True,legend=True)
-df_ews['Smax'].dropna().plot(ax=axes[2], legend=True)
-df_ews[['AIC fold','AIC hopf','AIC null']].dropna().plot(ax=axes[3])
+df_ews['Smax'].dropna().plot(ax=axes[2],legend=True)
+df_ews[['AIC fold','AIC hopf','AIC null']].dropna().plot(ax=axes[3],legend=True)
+
 
 
 
