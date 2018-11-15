@@ -30,8 +30,8 @@ from ews_spec import pspec_welch, pspec_metrics
 # Simulation parameters
 dt = 1
 t0 = 0
-tmax = 1000
-seed = 1 # random number generation seed
+tmax = 400
+seed = 10 # random number generation seed
 
 # Model: dx/dt = de_fun(x,t) + sigma dW(t)
 def de_fun(x,r,k,h,s):
@@ -87,7 +87,7 @@ series = pd.Series(x, index=t)
 # EWS parameters
 rw = 0.25 # rolling window
 bw = 0.1 # band width for Gaussian smoothing
-ham_len = 20 # length of Hamming window for spectrum computation
+ham_len = 40 # length of Hamming window for spectrum computation
 
 
 start = time.time()  # begin a timer
@@ -104,7 +104,7 @@ df_ews = ews_compute(series,
 
 end = time.time() # end timer
 # Print time taken to run ews_std
-print('The function ews_compute took ',end-start,' seconds to run\n\n')
+print('ews_compute took ',end-start,' seconds to run\n')
 
 # Note : df_ews provides a dataframe indexed by time with each column csp. to time-series (state, residuals, EWS)
 
@@ -129,7 +129,7 @@ time_series = pd.Series(series.index, index=series.index)
 ktau = df_ews.corrwith(time_series)
 
 # Print kendall tau values
-print('Kendall tau values are:\n\n', ktau[['Variance','Lag-1 AC','Smax']])
+print('Kendall tau values are:\n',ktau[['Variance','Lag-1 AC','Smax']])
 
 
 
@@ -138,7 +138,7 @@ print('Kendall tau values are:\n\n', ktau[['Variance','Lag-1 AC','Smax']])
 # Display power spectrum and fits at a given instant in time
 #------------------------------------
 
-t_pspec = 800
+t_pspec = 300
 
 # Use function pspec_welch to compute the power spectrum of the residuals at a particular time
 pspec=pspec_welch(df_ews.loc[t_pspec-rw*len(t):t_pspec,'Residuals'], dt, ham_length=ham_len, w_cutoff=1)
