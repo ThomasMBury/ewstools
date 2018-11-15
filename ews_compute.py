@@ -87,7 +87,8 @@ def ews_compute(raw_series,
         # add them to the DataFrame
         df_ews['Smoothing'] = smooth_series
         df_ews['Residuals'] = resid_series
-        
+        print(smooth_series)
+        print(resid_series)
         
     # use residuals for EWS if smooth=True, ow use raw series
     eval_series = resid_series if smooth else short_series
@@ -183,9 +184,6 @@ def ews_compute(raw_series,
             
             # add to dataframe
             df_spec_metrics[t_point] = metrics
-            
-            # progress message
-            print('Spec'+str(k))
                  
                
         # join to main DataFrame
