@@ -87,8 +87,6 @@ def ews_compute(raw_series,
         # add them to the DataFrame
         df_ews['Smoothing'] = smooth_series
         df_ews['Residuals'] = resid_series
-        print(smooth_series)
-        print(resid_series)
         
     # use residuals for EWS if smooth=True, ow use raw series
     eval_series = resid_series if smooth else short_series
@@ -156,7 +154,7 @@ def ews_compute(raw_series,
         # number of components in residuals
         num_comps = len(eval_series)
         # offset to use on rolling window (make larger to save on compuatation)
-        roll_offset = 4
+        roll_offset = 1
         # time separation between data points
         dt = eval_series.index[1]-eval_series.index[0]
         
