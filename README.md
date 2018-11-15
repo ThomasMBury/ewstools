@@ -1,6 +1,6 @@
 # early_warnings
 A module to compute early warning signals (EWS) from time-series data.
-Package requirements:
+Dependencies include:
   - standard python libraries: numpy, pandas, scipy, matplotlib
   - LMFIT: download [here](https://lmfit.github.io/lmfit-py/installation.html)
 
@@ -8,6 +8,7 @@ Package requirements:
 ## ews_compute.py
 File for function `ews_compute`.  
 `ews_compute` takes in Series data and outputs user-specified EWS in a DataFrame.
+
 
 **Input** (default value)
 - *raw_series* : pandas Series indexed by time 
@@ -24,12 +25,37 @@ File for function `ews_compute`.
   - '*smax*'  : Peak in the power spectrum
   - '*cf*'    : Coherence factor
   - '*aic*'   : AIC weights
-- lag_times ( [1] ) : list of integers corresponding to the desired lag times for AC
+- *lag_times* ( [1] ) : list of integers corresponding to the desired lag times for AC
+- *ham_length* (40) : length of the Hamming window (used to compute power spectrum)
+- *ham_offset* (0.5) : offset of Hamming windows as a proportion of *ham_length*
+- *w_cutoff* (1) : cutoff frequency (as a proportion of maximum frequency attainable from data)
     
 **Output**
 - DataFrame indexed by time with columns corresponding to each EWS
 
 
 
-## ews_compute_test.py
-An example script that runs `ews_compute`, computes kendall tau values, and plots results.
+## ews_compute_run.py
+An example script that runs `ews_compute` on times-series data of a stochastic simulation of May's 
+harvesting model. It also shows how to compute kendall tau values and plot results. This
+can be used as a template for EWS of times-series data.
+
+
+## ews_compute_runMulti.py
+An example script that runs `ews_compute` on multiple time-series data and outputs
+EWS as a distribution over realisations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

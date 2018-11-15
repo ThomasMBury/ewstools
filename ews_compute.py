@@ -27,8 +27,7 @@ def ews_compute(raw_series,
             lag_times=[1],
             ham_length=40,
             ham_offset=0.5,
-            w_cutoff=1,
-            updates=False):
+            w_cutoff=1):
     '''
     Function to compute EWS from time-series data.   
     
@@ -137,10 +136,6 @@ def ews_compute(raw_series,
     if 'kurt' in ews:
         roll_kurt = eval_series.rolling(window=rw_size).kurt()
         df_ews['Kurtosis'] = roll_kurt
-        
-    # progress message
-    if updates:
-        print('Standard EWS computed')
 
     
     #-----------------
