@@ -154,7 +154,7 @@ def ews_compute(raw_series,
         # number of components in residuals
         num_comps = len(eval_series)
         # offset to use on rolling window (make larger to save on compuatation)
-        roll_offset = 1
+        roll_offset = 10
         # time separation between data points
         dt = eval_series.index[1]-eval_series.index[0]
         

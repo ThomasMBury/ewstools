@@ -30,7 +30,7 @@ from ews_spec import pspec_welch, pspec_metrics
 # Simulation parameters
 dt = 1
 t0 = 0
-tmax = 400
+tmax = 1000
 seed = 1 # random number generation seed
 
 # Model: dx/dt = de_fun(x,t) + sigma dW(t)
@@ -111,15 +111,22 @@ df_ews[['AIC fold','AIC hopf','AIC null']].dropna().plot(ax=axes[3])
 
 
 
+#---------------------------------
+## Compute kendall tau values of EWS
+#-------------------------------------
 
-#
-#
-### Compute kendall tau values
-#        
-## Put time values as their own series for correlation computation
-#time_series = pd.Series(series.index, index=series.index)
-#    
-## Find kendall tau correlation coefficient for each EWS (column of df_ews)
-#ktau = df_ews.corrwith(time_series)
-#
+# Put time values as their own series for correlation computation
+time_series = pd.Series(series.index, index=series.index)
+    
+# Find kendall tau correlation coefficient for each EWS (column of df_ews)
+ktau = df_ews.corrwith(time_series)
+
+# Print kendall tau values
+print(ktau[['Variance','Lag-1 AC','Smax']])
+
+
+
+
+
+
 
