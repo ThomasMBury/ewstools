@@ -39,7 +39,7 @@ def de_fun(x,r,k,h,s):
     
     
 # Model parameters
-sigma = 0.02 # noise intensity
+sigma = 0.04 # noise intensity
 r = 1 # growth rate
 k = 1 # carrying capacity
 s = 0.1 # half-saturation constant of harvesting function
@@ -84,22 +84,29 @@ series = pd.Series(x, index=t)
 ## Compute EWS using ews_compute
 #------------------------------------
 
+# EWS parameters
+rw = 0.25 # rolling window
+bw = 0.1 # band width for Gaussian smoothing
+ham_len = 20 # length of Hamming window for spectrum computation
+
+
 start = time.time()  # begin a timer
 
+# execute function ews_compute
 df_ews = ews_compute(series,
-                     band_width=0.1,
+                     band_width=bw,
                      upto=tbif*1,
-                     roll_window=0.25, 
+                     roll_window=rw, 
                      lag_times=[1],
-                     ham_length=40,
+                     ham_length=ham_len,
                      ews=['var','ac','smax','aic'],
                      updates=True)
 
 end = time.time() # end timer
 # Print time taken to run ews_std
-print('ews_compute took ',end-start,' seconds to run')
+print('The function ews_compute took ',end-start,' seconds to run\n\n')
 
-
+# Note : df_ews provides a dataframe indexed by time with each column csp. to time-series (state, residuals, EWS)
 
 # Make plot of EWS
 fig, axes = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(6,6))
@@ -122,11 +129,41 @@ time_series = pd.Series(series.index, index=series.index)
 ktau = df_ews.corrwith(time_series)
 
 # Print kendall tau values
-print(ktau[['Variance','Lag-1 AC','Smax']])
+print('Kendall tau values are:\n\n', ktau[['Variance','Lag-1 AC','Smax']])
 
 
 
 
+#-------------------------------------
+# Display power spectrum and fits at a given instant in time
+#------------------------------------
+
+t_pspec = 800
+
+# Use function pspec_welch to compute the power spectrum of the residuals at a particular time
+pspec=pspec_welch(df_ews.loc[t_pspec-rw*len(t):t_pspec,'Residuals'], dt, ham_length=ham_len, w_cutoff=1)
+
+# Execute the function pspec_metrics to compute the AIC weights and fitting parameters
+spec_ews = pspec_metrics(pspec, ews=['smax', 'cf', 'aic', 'aic_params'])
+# Define the power spectrum models
+def fit_fold(w,sigma,lam):
+    return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
+        
+def fit_hopf(w,sigma,mu,w0):
+    return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
+        
+def fit_null(w,sigma):
+    return sigma**2/(2*np.pi)* w**0
+
+
+# Make plot
+w_vals = np.linspace(-max(pspec.index),max(pspec.index),100)
+
+plt.figure(2)
+pspec.plot()
+plt.plot(w_vals, fit_fold(w_vals, spec_ews['Params fold']['sigma'], spec_ews['Params fold']['lam']))
+plt.plot(w_vals, fit_hopf(w_vals, spec_ews['Params hopf']['sigma'], spec_ews['Params hopf']['mu'], spec_ews['Params hopf']['w0']))
+plt.plot(w_vals, fit_null(w_vals, spec_ews['Params null']['sigma']))
 
 
 
