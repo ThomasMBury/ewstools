@@ -109,7 +109,7 @@ print('ews_compute took ',end-start,' seconds to run\n')
 # Note : df_ews provides a dataframe indexed by time with each column csp. to time-series (state, residuals, EWS)
 
 # Make plot of EWS
-fig, axes = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(6,6))
+fig1, axes = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(6,6))
 df_ews[['State variable','Smoothing']].plot(ax=axes[0])
 df_ews['Variance'].plot(ax=axes[1])
 df_ews['Lag-1 AC'].plot(ax=axes[1], secondary_y=True)
@@ -129,7 +129,7 @@ time_series = pd.Series(series.index, index=series.index)
 ktau = df_ews.corrwith(time_series)
 
 # Print kendall tau values
-print('Kendall tau values are:\n',ktau[['Variance','Lag-1 AC','Smax']])
+print('Kendall tau values for each metric are as follows are:\n',ktau[['Variance','Lag-1 AC','Smax']])
 
 
 
@@ -159,11 +159,14 @@ def fit_null(w,sigma):
 # Make plot
 w_vals = np.linspace(-max(pspec.index),max(pspec.index),100)
 
-plt.figure(2)
-pspec.plot()
-plt.plot(w_vals, fit_fold(w_vals, spec_ews['Params fold']['sigma'], spec_ews['Params fold']['lam']))
-plt.plot(w_vals, fit_hopf(w_vals, spec_ews['Params hopf']['sigma'], spec_ews['Params hopf']['mu'], spec_ews['Params hopf']['w0']))
-plt.plot(w_vals, fit_null(w_vals, spec_ews['Params null']['sigma']))
+fig2=plt.figure(2)
+pspec.plot(label='Measured')
+plt.plot(w_vals, fit_fold(w_vals, spec_ews['Params fold']['sigma'], spec_ews['Params fold']['lam']),label='Fold fit')
+plt.plot(w_vals, fit_hopf(w_vals, spec_ews['Params hopf']['sigma'], spec_ews['Params hopf']['mu'], spec_ews['Params hopf']['w0']),label='Hopf fit')
+plt.plot(w_vals, fit_null(w_vals, spec_ews['Params null']['sigma']),label='Null fit')
+plt.ylabel('Power')
+plt.legend()
+plt.title('Power spectrum and fits at time t='+str(t_pspec))
 
 
 
