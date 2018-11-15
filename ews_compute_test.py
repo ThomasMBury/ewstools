@@ -110,11 +110,12 @@ print('ews_compute took ',end-start,' seconds to run\n')
 
 # Make plot of EWS
 fig1, axes = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(6,6))
-df_ews[['State variable','Smoothing']].plot(ax=axes[0])
-df_ews['Variance'].plot(ax=axes[1])
-df_ews['Lag-1 AC'].plot(ax=axes[1], secondary_y=True)
-df_ews['Smax'].dropna().plot(ax=axes[2])
+df_ews[['State variable','Smoothing']].plot(ax=axes[0],title='Early warning signals')
+df_ews['Variance'].plot(ax=axes[1],legend=True)
+df_ews['Lag-1 AC'].plot(ax=axes[1], secondary_y=True,legend=True)
+df_ews['Smax'].dropna().plot(ax=axes[2], legend=True)
 df_ews[['AIC fold','AIC hopf','AIC null']].dropna().plot(ax=axes[3])
+
 
 
 
@@ -167,6 +168,12 @@ plt.plot(w_vals, fit_null(w_vals, spec_ews['Params null']['sigma']),label='Null 
 plt.ylabel('Power')
 plt.legend()
 plt.title('Power spectrum and fits at time t='+str(t_pspec))
+
+
+
+
+
+
 
 
 
