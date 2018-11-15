@@ -30,10 +30,10 @@ from ews_compute import ews_compute
 # Simulation parameters
 dt = 1
 t0 = 0
-tmax = 400
+tmax = 1000
 tburn = 100 # burn-in period
 numSims = 10
-seed = 10 # random number generation seed
+seed = 5 # random number generation seed
 
 # Model: dx/dt = de_fun(x,t) + sigma dW(t)
 def de_fun(x,r,k,h,s):
@@ -106,7 +106,7 @@ for j in range(numSims):
 
 
 #----------------------
-## Executre ews_compute for each realisation
+## Execute ews_compute for each realisation
 #---------------------
 
 
@@ -117,21 +117,42 @@ appended_ews = []
 for i in range(numSims):
     df_temp = ews_compute(df_sims['Sim '+str(i+1)], 
                       roll_window=0.25, 
+                      band_width=0.1,
                       lag_times=[1], 
-                      ews=['var','ac'])
+                      ews=['var','ac','smax','aic'],
+                      ham_length=20,                     
+                      upto=tbif)
     # include a column in the dataframe for realisation number
-    df_temp['Realisation number'] = pd.Series(i*np.ones([len(t)],dtype=int),index=t)
+    df_temp['Realisation number'] = pd.Series((i+1)*np.ones([len(t)],dtype=int),index=t)
     
     # add DataFrame to list
     appended_ews.append(df_temp)
     
     # print status every 10 realisations
-    if np.remainder(i+1,10)==0:
+    if np.remainder(i+1,2)==0:
         print('Realisation '+str(i+1)+' complete')
 
 
 # concatenate EWS DataFrames - use realisation number and time as indices
 df_ews = pd.concat(appended_ews).set_index('Realisation number',append=True).reorder_levels([1,0])
+
+
+
+#------------------------
+# Some plots
+#-----------------------
+
+# plot of all variance trajectories
+df_ews.loc[:,'Variance'].unstack(level=0).plot(legend=False, title='Variance') # unstack puts index back as a column
+
+# plot of all autocorrelation trajectories
+df_ews.loc[:,'Lag-1 AC'].unstack(level=0).plot(legend=False, title='Lag-1 AC') 
+
+# plot of all smax trajectories
+df_ews.loc[:,'Smax'].unstack(level=0).dropna().plot(legend=False, title='Smax') # drop Nan values
+
+# plot of all Fold AIC trajectories
+df_ews.loc[:,'AIC fold'].unstack(level=0).dropna().plot(legend=False, title='AIC fold') # drop Nan values
 
 
 
@@ -150,19 +171,19 @@ df_ews = pd.concat(appended_ews).set_index('Realisation number',append=True).reo
 #-----------------------------------------------
 ## Examples of obtaining specific data / plots
 #------------------------------------------------
-
-
-# EWS of realisation 1 at time 2
-df_ews.loc[(1,2)] # must include () when referencing multiple indexes
-
-# Varaince of realisation 7
-df_ews.loc[7,'Variance']
-
-# plot of all variance trajectories
-df_ews.loc[:,'Variance'].unstack(level=0).plot() # unstack puts index back as a column
-
-# plot of autocorrelation and variance for a single realisation
-df_ews.loc[3,['Variance','Lag-1 AC']].plot()
+#
+#
+## EWS of realisation 1 at time 2
+#df_ews.loc[(1,2)] # must include () when referencing multiple indexes
+#
+## Varaince of realisation 7
+#df_ews.loc[7,'Variance']
+#
+## plot of all variance trajectories
+#df_ews.loc[:,'Variance'].unstack(level=0).plot() # unstack puts index back as a column
+#
+## plot of autocorrelation and variance for a single realisation
+#df_ews.loc[3,['Variance','Lag-1 AC']].plot()
 
 
 
