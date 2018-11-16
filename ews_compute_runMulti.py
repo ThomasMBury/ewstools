@@ -177,22 +177,5 @@ df_ktau.transpose().describe()
 
 
 
-#-----------------------------------------------
-## Examples of obtaining specific data / plots
-#------------------------------------------------
-
-
-## EWS of realisation 1 at time 2
-#df_ews.loc[(1,2)] # must include () when referencing multiple indexes
-#
-## Varaince of realisation 2
-#df_ews.loc[2,'Variance']
-#
-## plot of all variance trajectories
-#df_ews.loc[:,'Variance'].unstack(level=0).plot() # unstack puts index back as a column
-#
-## plot of autocorrelation and variance for a single realisation
-#df_ews.loc[3,['Variance','Lag-1 AC']].plot()
-
 
 
