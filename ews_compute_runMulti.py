@@ -14,8 +14,6 @@ and obtain a DataFrame that is indexed by both realisation number and time.
 # import python libraries
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import time as time
 
 # import EWS functions
 from ews_compute import ews_compute
@@ -30,7 +28,7 @@ from ews_compute import ews_compute
 # Simulation parameters
 dt = 1
 t0 = 0
-tmax = 400
+tmax = 1000
 tburn = 100 # burn-in period
 numSims = 10
 seed = 5 # random number generation seed
@@ -116,11 +114,11 @@ appended_ews = []
 # loop through each trajectory as an input to ews_compute
 for i in range(numSims):
     df_temp = ews_compute(df_sims['Sim '+str(i+1)], 
-                      roll_window=0.25, 
+                      roll_window=0.5, 
                       band_width=0.1,
                       lag_times=[1], 
                       ews=['var','ac','smax','aic'],
-                      ham_length=20,                     
+                      ham_length=40,                     
                       upto=tbif)
     # include a column in the dataframe for realisation number
     df_temp['Realisation number'] = pd.Series((i+1)*np.ones([len(t)],dtype=int),index=t)
@@ -184,17 +182,17 @@ df_ktau.transpose().describe()
 #------------------------------------------------
 
 
-# EWS of realisation 1 at time 2
-df_ews.loc[(1,2)] # must include () when referencing multiple indexes
-
-# Varaince of realisation 2
-df_ews.loc[2,'Variance']
-
-# plot of all variance trajectories
-df_ews.loc[:,'Variance'].unstack(level=0).plot() # unstack puts index back as a column
-
-# plot of autocorrelation and variance for a single realisation
-df_ews.loc[3,['Variance','Lag-1 AC']].plot()
+## EWS of realisation 1 at time 2
+#df_ews.loc[(1,2)] # must include () when referencing multiple indexes
+#
+## Varaince of realisation 2
+#df_ews.loc[2,'Variance']
+#
+## plot of all variance trajectories
+#df_ews.loc[:,'Variance'].unstack(level=0).plot() # unstack puts index back as a column
+#
+## plot of autocorrelation and variance for a single realisation
+#df_ews.loc[3,['Variance','Lag-1 AC']].plot()
 
 
 

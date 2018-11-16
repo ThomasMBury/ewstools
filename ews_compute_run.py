@@ -32,7 +32,7 @@ dt = 1
 t0 = 0
 tmax = 800
 tburn = 50 # burn-in period
-seed = 3 # random number generation seed
+seed = 42 # random number generation seed
 
 # Model: dx/dt = de_fun(x,t) + sigma dW(t)
 def de_fun(x,r,k,h,s):
@@ -93,7 +93,7 @@ series = pd.Series(x, index=t)
 #------------------------------------
 
 # EWS parameters
-rw = 0.25 # rolling window
+rw = 0.5 # rolling window
 bw = 0.1 # band width for Gaussian smoothing
 ham_len = 40 # length of Hamming window for spectrum computation
 
@@ -135,11 +135,11 @@ df_ews[['AIC fold','AIC hopf','AIC null']].dropna().plot(ax=axes[3],legend=True)
 time_series = pd.Series(series.index, index=series.index)
     
 # Find kendall tau correlation coefficient for each EWS
-ktau = pd.DataFrame([df_ews[x].corr(time_series,method='kendall') for x in df_ews.columns],index=df_ews.columns)
+ktau = pd.Series([df_ews[x].corr(time_series,method='kendall') for x in df_ews.columns],index=df_ews.columns)
 
 
 # Print kendall tau values
-print('Kendall tau values for each metric are as follows are:\n',ktau.loc[['Variance','Lag-1 AC','Smax']])
+print('Kendall tau values for each metric are as follows:\n',ktau.loc[['Variance','Lag-1 AC','Smax']])
 
 
 
