@@ -32,7 +32,7 @@ dt = 1
 t0 = 0
 tmax = 800
 tburn = 50 # burn-in period
-seed = 2 # random number generation seed
+seed = 3 # random number generation seed
 
 # Model: dx/dt = de_fun(x,t) + sigma dW(t)
 def de_fun(x,r,k,h,s):

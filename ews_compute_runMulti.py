@@ -30,7 +30,7 @@ from ews_compute import ews_compute
 # Simulation parameters
 dt = 1
 t0 = 0
-tmax = 1000
+tmax = 400
 tburn = 100 # burn-in period
 numSims = 10
 seed = 5 # random number generation seed
@@ -129,7 +129,7 @@ for i in range(numSims):
     appended_ews.append(df_temp)
     
     # print status every 10 realisations
-    if np.remainder(i+1,2)==0:
+    if np.remainder(i+1,1)==0:
         print('Realisation '+str(i+1)+' complete')
 
 
@@ -139,7 +139,7 @@ df_ews = pd.concat(appended_ews).set_index('Realisation number',append=True).reo
 
 
 #------------------------
-# Some plots
+# Plots of EWS
 #-----------------------
 
 # plot of all variance trajectories
@@ -161,29 +161,40 @@ df_ews.loc[:,'AIC fold'].unstack(level=0).dropna().plot(legend=False, title='AIC
 ## Compute distribution of kendall tau values
 #----------------------------
 
-# make the time values their own series and use pd.corrwith
+# make the time values their own series and use pd.corr to compute kendall tau correlation
+time_series = pd.Series(df_sims.index, index=df_sims.index)
 
+# Find kendall tau correlation coefficient for each EWS over each realisation.
+# initialise dataframe
+df_ktau = pd.DataFrame([])
+# loop over simulations
+for j in range(numSims):
+    # compute kenall tau for each EWS
+    ktau = pd.Series([df_ews.loc[j+1,x].corr(time_series,method='kendall') for x in df_ews.columns],index=df_ews.columns)
+    # add to dataframe
+    df_ktau['Sim '+str(j+1)]= ktau
 
-
+# kendall tau distribution statistics can be found using
+df_ktau.transpose().describe()
 
 
 
 #-----------------------------------------------
 ## Examples of obtaining specific data / plots
 #------------------------------------------------
-#
-#
-## EWS of realisation 1 at time 2
-#df_ews.loc[(1,2)] # must include () when referencing multiple indexes
-#
-## Varaince of realisation 7
-#df_ews.loc[7,'Variance']
-#
-## plot of all variance trajectories
-#df_ews.loc[:,'Variance'].unstack(level=0).plot() # unstack puts index back as a column
-#
-## plot of autocorrelation and variance for a single realisation
-#df_ews.loc[3,['Variance','Lag-1 AC']].plot()
+
+
+# EWS of realisation 1 at time 2
+df_ews.loc[(1,2)] # must include () when referencing multiple indexes
+
+# Varaince of realisation 2
+df_ews.loc[2,'Variance']
+
+# plot of all variance trajectories
+df_ews.loc[:,'Variance'].unstack(level=0).plot() # unstack puts index back as a column
+
+# plot of autocorrelation and variance for a single realisation
+df_ews.loc[3,['Variance','Lag-1 AC']].plot()
 
 
 
