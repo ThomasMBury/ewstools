@@ -134,11 +134,12 @@ df_ews[['AIC fold','AIC hopf','AIC null']].dropna().plot(ax=axes[3],legend=True)
 # Put time values as their own series for correlation computation
 time_series = pd.Series(series.index, index=series.index)
     
-# Find kendall tau correlation coefficient for each EWS (column of df_ews)
-ktau = df_ews.corrwith(time_series)
+# Find kendall tau correlation coefficient for each EWS
+ktau = pd.DataFrame([df_ews[x].corr(time_series,method='kendall') for x in df_ews.columns],index=df_ews.columns)
+
 
 # Print kendall tau values
-print('Kendall tau values for each metric are as follows are:\n',ktau[['Variance','Lag-1 AC','Smax']])
+print('Kendall tau values for each metric are as follows are:\n',ktau.loc[['Variance','Lag-1 AC','Smax']])
 
 
 

@@ -161,7 +161,7 @@ df_ews.loc[:,'AIC fold'].unstack(level=0).dropna().plot(legend=False, title='AIC
 ## Compute distribution of kendall tau values
 #----------------------------
 
-
+# make the time values their own series and use pd.corrwith
 
 
 
