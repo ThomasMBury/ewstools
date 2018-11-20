@@ -164,18 +164,19 @@ time_series = pd.Series(df_sims.index, index=df_sims.index)
 
 # Find kendall tau correlation coefficient for each EWS over each realisation.
 # initialise dataframe
-df_ktau = pd.DataFrame([])
+df_ktau = pd.DataFrame(columns=df_ews.columns, index=np.arange(numSims)+1,dtype=float)
 # loop over simulations
 for j in range(numSims):
     # compute kenall tau for each EWS
     ktau = pd.Series([df_ews.loc[j+1,x].corr(time_series,method='kendall') for x in df_ews.columns],index=df_ews.columns)
-    # add to dataframe
-    df_ktau['Sim '+str(j+1)]= ktau
+    # addå to dataframe
+    df_ktau.loc[j+1]= ktau
 
 # kendall tau distribution statistics can be found using
-df_ktau.transpose().describe()
+ktau_stats=df_ktau.describe()
 
-
+# make a box-plot of kendall tau metrics
+df_ktau[['Variance','Lag-1 AC','Smax']].plot(kind='box',ylim=(0,1))
 
 
 
