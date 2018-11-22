@@ -115,7 +115,7 @@ print('ews_compute took ',end-start,' seconds to run\n')
 
 # Note : df_ews provides a dataframe indexed by time with each column csp. to time-series (state, residuals, EWS)
 
-# Make plot of EWS
+# Make plot of EWS for single realisation
 fig1, axes = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(6,6))
 df_ews[['State variable','Smoothing']].plot(ax=axes[0],title='Early warning signals')
 df_ews['Variance'].plot(ax=axes[1],legend=True)

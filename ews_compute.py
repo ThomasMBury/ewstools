@@ -27,6 +27,7 @@ def ews_compute(raw_series,
             lag_times=[1],
             ham_length=40,
             ham_offset=0.5,
+            pspec_roll_offset=20, # generally ham_length*ham_offset
             w_cutoff=1):
     '''
     Function to compute EWS from time-series data.   
@@ -149,7 +150,7 @@ def ews_compute(raw_series,
         # number of components in residuals
         num_comps = len(eval_series)
         # offset to use on rolling window (make larger to save on compuatation)
-        roll_offset = int(ham_length*ham_offset)
+        roll_offset = int(pspec_roll_offset)
         # time separation between data points
         dt = eval_series.index[1]-eval_series.index[0]
         
@@ -170,7 +171,8 @@ def ews_compute(raw_series,
             pspec = pspec_welch(window_series, dt, 
                                 ham_length=ham_length, 
                                 ham_offset=ham_offset,
-                                w_cutoff=w_cutoff)
+                                w_cutoff=w_cutoff,
+                                scaling='spectrum')
                 
             # compute the spectral metrics
             metrics = pspec_metrics(pspec,ews)
@@ -186,28 +188,6 @@ def ews_compute(raw_series,
         
     # return DataFrame of EWS
     return df_ews
-        
-            
-
-
-
-
-#
-##--------------------
-## Compute kendall taus 
-##-----------------------
-#        
-#    # Put time values as their own series for correlation computation
-#    time_series = pd.Series(raw_series.index, index=raw_series.index)
-#    
-#    # Find kendall tau correlation coefficient for each EWS (column of df_ews)
-#    ktau = df_ews.corrwith(time_series)
-#
-#    return df_ews, ktau
-#    
-## update readme file with kendall tau info.
-#
-##-------------------------------------
 
 
 
