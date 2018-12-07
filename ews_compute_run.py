@@ -100,8 +100,8 @@ ham_len = 40 # length of Hamming window for spectrum computation
 
 start = time.time()  # begin a timer
 
-# execute function ews_compute
-df_ews = ews_compute(series,
+# Execute function ews_compute to obtain dictionary of EWS metrics and power spectra
+ews_dic = ews_compute(series,
                      band_width=bw,
                      upto=tbif*1,
                      roll_window=rw, 
@@ -109,9 +109,12 @@ df_ews = ews_compute(series,
                      ham_length=ham_len,
                      ews=['var','ac','smax','aic'])
 
+# The DataFrame of EWS
+df_ews = ews_dic['EWS metrics']
+
 end = time.time() # end timer
 # Print time taken to run ews_std
-print('ews_compute took ',end-start,' seconds to run\n')
+print('\n The function ews_compute took ',end-start,' seconds to run\n')
 
 # Note : df_ews provides a dataframe indexed by time with each column csp. to time-series (state, residuals, EWS)
 

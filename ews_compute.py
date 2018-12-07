@@ -186,6 +186,11 @@ def ews_compute(raw_series,
                                 ham_offset=ham_offset,
                                 w_cutoff=w_cutoff,
                                 scaling='spectrum')
+            
+            # Compute the spectral EWS using pspec_metrics
+            metrics = pspec_metrics(pspec,ews)
+            
+            ## Store power spectrum            
             # Convert the power spectrum to a DataFrame with no specific index
             pspec = pspec.to_frame().reset_index()
             # Include a column for the time-stamp
@@ -195,9 +200,7 @@ def ews_compute(raw_series,
             # Append the power spectrum list
             list_spec_append.append(pspec)
             
-            # Compute the spectral EWS using pspec_metrics
-            metrics = pspec_metrics(pspec,ews)
-            # Add to the spectral EWS DataFrame
+            # Store spectral EWS in a DataFrame
             df_spec_metrics[t_point] = metrics
                  
         # Concatenate the list of power spectra to form a spectrum DataFrame
