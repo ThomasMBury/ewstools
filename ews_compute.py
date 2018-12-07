@@ -60,7 +60,7 @@ def ews_compute(raw_series,
     
     Output: Dictionary
     'EWS metrics': DataFrame indexed by time with columns csp to each EWS
-    'Power spectrum': DataFrame of power spectra indexed by time
+    'Power spectrum': DataFrame of power spectra and the model fits indexed by time
     '''
     
     # Initialise a DataFrame to store EWS data - indexed by time

@@ -111,14 +111,20 @@ ews_dic = ews_compute(series,
 
 # The DataFrame of EWS
 df_ews = ews_dic['EWS metrics']
+# The DataFrame of power spectra
+df_pspec = ews_dic['Power spectrum']
 
 end = time.time() # end timer
 # Print time taken to run ews_std
 print('\n The function ews_compute took ',end-start,' seconds to run\n')
 
-# Note : df_ews provides a dataframe indexed by time with each column csp. to time-series (state, residuals, EWS)
 
-# Make plot of EWS for single realisation
+#-----------------------------------
+# Plot of EWS and power spectra
+#–---------------------------------
+
+
+# Grid plot of EWS
 fig1, axes = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(6,6))
 df_ews[['State variable','Smoothing']].plot(ax=axes[0],title='Early warning signals')
 df_ews['Variance'].plot(ax=axes[1],legend=True)
@@ -126,8 +132,9 @@ df_ews['Lag-1 AC'].plot(ax=axes[1], secondary_y=True,legend=True)
 df_ews['Smax'].dropna().plot(ax=axes[2],legend=True)
 df_ews[['AIC fold','AIC hopf','AIC null']].dropna().plot(ax=axes[3],legend=True)
 
-
-
+# Plot power spectra
+fig2 = plt.figure(2)
+df_pspec.unstack(level=0).plot()
 
 
 #---------------------------------
@@ -172,7 +179,7 @@ def fit_null(w,sigma):
 # Make plot
 w_vals = np.linspace(-max(pspec.index),max(pspec.index),100)
 
-fig2=plt.figure(2)
+fig3 = plt.figure(3)
 pspec.plot(label='Measured')
 plt.plot(w_vals, fit_fold(w_vals, spec_ews['Params fold']['sigma'], spec_ews['Params fold']['lam']),label='Fold fit')
 plt.plot(w_vals, fit_hopf(w_vals, spec_ews['Params hopf']['sigma'], spec_ews['Params hopf']['mu'], spec_ews['Params hopf']['w0']),label='Hopf fit')
