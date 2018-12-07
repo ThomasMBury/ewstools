@@ -31,8 +31,8 @@ dt = 1
 t0 = 0
 tmax = 800
 tburn = 50 # burn-in period
-seed = 2 # random number generation seed
-sigma = 0.05 # noise intensity
+seed = 10 # random number generation seed
+sigma = 0.02 # noise intensity
 
 # EWS parameters
 rw = 0.5 # rolling window
