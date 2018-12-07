@@ -103,17 +103,17 @@ def ews_compute(raw_series,
     ## Compute standard EWS
     #-----------------------------  
         
-    # compute the stabdard deviation as a Series and add to DataFrame
+    # Compute standard deviation as a Series and add to the DataFrame
     if 'sd' in ews:
         roll_sd = eval_series.rolling(window=rw_size).std()
         df_ews['Standard deviation'] = roll_sd
     
-    # compute the variance as a Series and add to DataFrame
+    # Compute variance as a Series and add to the DataFrame
     if 'var' in ews:
         roll_var = eval_series.rolling(window=rw_size).var()
         df_ews['Variance'] = roll_var
     
-    # compute the autocorrelation for each lag in lag_times and add to DataFrame   
+    # Compute autocorrelation for each lag in lag_times and add to the DataFrame   
     if 'ac' in ews:
         for i in range(len(lag_times)):
             roll_ac = eval_series.rolling(window=rw_size).apply(
@@ -121,7 +121,7 @@ def ews_compute(raw_series,
             df_ews['Lag-'+str(lag_times[i])+' AC'] = roll_ac
 
             
-    # compute the coefficient of variation and add to DataFrame
+    # Compute Coefficient of Variation (C.V) and add to the DataFrame
     if 'cv' in ews:
         # mean of raw_series
         roll_mean = raw_series.rolling(window=rw_size).mean()
@@ -131,66 +131,88 @@ def ews_compute(raw_series,
         roll_cv = roll_std.divide(roll_mean)
         df_ews['Coefficient of variation'] = roll_cv
 
-    # compute the skewness and add to DataFrame
+    # Compute skewness and add to the DataFrame
     if 'skew' in ews:
         roll_skew = eval_series.rolling(window=rw_size).skew()
         df_ews['Skewness'] = roll_skew
 
-    # compute the kurtosis and add to DataFrame
+    # Compute krutosis and add to DataFrame
     if 'kurt' in ews:
         roll_kurt = eval_series.rolling(window=rw_size).kurt()
         df_ews['Kurtosis'] = roll_kurt
 
+
+
+
+
     
-    #-----------------
-    ## compute spectral EWS
-    #-----------------
+    #--------------------------
+    ## Compute spectral EWS
+    #--------------------------
+    
+    ''' In this section we compute newly proposed EWS based on the power spectrum
+        of the time-series computed over a rolling window '''
     
    
+    # If any of the spectral metrics are listed in the ews vector:
     if 'smax' in ews or 'cf' in ews or 'aic' in ews:
 
         
-        # number of components in residuals
+        # Number of components in the residual time-series
         num_comps = len(eval_series)
-        # offset to use on rolling window (make larger to save on compuatation)
+        # Rolling window offset (can make larger to save on computation time)
         roll_offset = int(pspec_roll_offset)
-        # time separation between data points
+        # Time separation between data points (need for frequency values of power spectrum)
         dt = eval_series.index[1]-eval_series.index[0]
         
-        # initilise a dataframe to store metrics
+        # Initialise a DataFrame to store the spectral EWS
         df_spec_metrics = pd.DataFrame([])
+        # Initialise a list for the power spectra
+        list_spec_append = []
         
-       
-        # count through window locations shifted by roll_offset
+        
+        # Loop through window locations shifted by roll_offset
         for k in np.arange(0, num_comps-(rw_size-1), roll_offset):
             
-            # select subset of series contained in window
+            # Select subset of series contained in window
             window_series = eval_series.iloc[k:k+rw_size]
             
-            # time value for metric (right end point of window)
+            # Asisgn the time value for the metrics (right end point of window)
             t_point = eval_series.index[k+(rw_size-1)]            
             
-            # compute power spectrum of window data using function pspec_welch
+            # Compute the power spectrum using function pspec_welch
             pspec = pspec_welch(window_series, dt, 
                                 ham_length=ham_length, 
                                 ham_offset=ham_offset,
                                 w_cutoff=w_cutoff,
                                 scaling='spectrum')
-                
-            # compute the spectral metrics
-            metrics = pspec_metrics(pspec,ews)
+            # Convert the power spectrum to a DataFrame with no specific index
+            pspec = pspec.to_frame().reset_index()
+            # Include a column for the time-stamp
+            pspec['Time'] = t_point*np.ones(len(pspec))
+            # Use a multi-index of ['Time','Frequency']
+            pspec.set_index(['Time', 'Frequency'], inplace=True)
+            # Append the power spectrum list
+            list_spec_append.append(pspec)
             
-            # add to dataframe
+            # Compute the spectral EWS using pspec_metrics
+            metrics = pspec_metrics(pspec,ews)
+            # Add to the spectral EWS DataFrame
             df_spec_metrics[t_point] = metrics
                  
-               
-        # join to main DataFrame
+        # Concatenate the list of power spectra to form a spectrum DataFrame
+        df_pspec = pd.concat(list_spec_append)
+        
+        # Join the spectral EWS DataFrame to the main EWS DataFrame 
         df_ews = df_ews.join(df_spec_metrics.transpose())
         
         
         
-    # return DataFrame of EWS
-    return df_ews
+        
+    # Return a dictionary including the EWS DataFrame and the power spectrum DataFrame
+    output_dic = {'EWS metrics': df_ews, 'Power spectrum': df_pspec}
+    
+    return output_dic
 
 
 
