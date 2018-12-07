@@ -63,45 +63,46 @@ def ews_compute(raw_series,
     'Power spectrum': DataFrame of power spectra indexed by time
     '''
     
-
-    # initialise a DataFrame to store EWS data - indexed by time
+    # Initialise a DataFrame to store EWS data - indexed by time
     df_ews = pd.DataFrame(raw_series)
     df_ews.columns = ['State variable']
     df_ews.index.rename('Time', inplace=True)
     
-    # select the portion of the data to evaluate EWS on
+    # Select portion of data where EWS are evaluated (e.g only up to bifurcation)
     if upto == 'Full':
         short_series = raw_series
     else: short_series = raw_series.loc[:upto]
+
+    #------------------------------
+    ## Data detrending
+    #–------------------------------
     
-    ## detrend the data
-    
-    # compute the size of the bandwidth
+    # Compute the absolute size of the bandwidth given it as a proportion of data length.
     bw_size=short_series.shape[0]*band_width   
     
-    # compute smoothed data and residuals
+    # Compute smoothed data and residuals if smooth=True.
     if smooth:
         smooth_data = gf(short_series.values, sigma=bw_size, mode='reflect')
         smooth_series = pd.Series(smooth_data, index=short_series.index)
         residuals = short_series.values - smooth_data
         resid_series = pd.Series(residuals,index=short_series.index)
     
-        # add them to the DataFrame
+        # Add smoothed data and residuals to the EWS DataFrame
         df_ews['Smoothing'] = smooth_series
         df_ews['Residuals'] = resid_series
         
-    # use residuals for EWS if smooth=True, ow use raw series
+    # Use the residuals for EWS if smooth=True. Otherwise use the raw series
     eval_series = resid_series if smooth else short_series
     
-    # compute the size of the rolling window for EWS computation (this must be an integer)
+    # Compute the rolling window size (integer value)
     rw_size=int(np.floor(roll_window * raw_series.shape[0]))
     
-    #-----------------
-    ## compute standard EWS
-    #-----------------
     
     
-    
+    #----------------------------
+    ## Compute standard EWS
+    #-----------------------------  
+        
     # compute the stabdard deviation as a Series and add to DataFrame
     if 'sd' in ews:
         roll_sd = eval_series.rolling(window=rw_size).std()
