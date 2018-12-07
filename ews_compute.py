@@ -13,7 +13,7 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter as gf
 import pandas as pd
 
-# import local modules
+# import local module
 from ews_spec import pspec_welch, pspec_metrics
 
 
