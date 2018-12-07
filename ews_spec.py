@@ -113,8 +113,9 @@ def pspec_metrics(pspec,
         'aic_params' : Parameters of best fit spectra
         
                  
-    Output
-    Series of spectral metrics 
+    Output: 
+    Series of spectral metrics
+    
     
     '''
     

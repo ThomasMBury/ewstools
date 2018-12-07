@@ -58,8 +58,9 @@ def ews_compute(raw_series,
     w_cutoff (1) : cutoff frequency (as proportion of size of maximum frequency)
     updates (False) : include updates on progress of function
     
-    Output
-    DataFrame indexed by time with columns csp to each EWS
+    Output: Dictionary
+    'EWS metrics': DataFrame indexed by time with columns csp to each EWS
+    'Power spectrum': DataFrame of power spectra indexed by time
     '''
     
 
