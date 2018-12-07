@@ -15,7 +15,7 @@ from scipy.ndimage.filters import gaussian_filter as gf
 import pandas as pd
 
 # import local module
-from ews_spec import pspec_welch, pspec_metrics
+from ews_spec import pspec_welch, pspec_metrics, fit_fold, fit_hopf, fit_null
 
 
 
@@ -190,15 +190,44 @@ def ews_compute(raw_series,
             # Compute the spectral EWS using pspec_metrics
             metrics = pspec_metrics(pspec,ews)
             
-            ## Store power spectrum            
-            # Convert the power spectrum to a DataFrame with no specific index
-            pspec = pspec.to_frame().reset_index()
+            
+            ## Obtain best power spectrum fits
+            # Create fine-scale frequency values
+            wVals = np.linspace(min(pspec.index), max(pspec.index),100)
+            # Fold fit
+            pspec_fold = fit_fold(wVals, metrics['Params fold']['sigma'],
+                 metrics['Params fold']['lam'])
+            # Hopf fit
+            pspec_hopf = fit_hopf(wVals, metrics['Params hopf']['sigma'],
+                 metrics['Params hopf']['mu'],
+                 metrics['Params hopf']['w0'])
+            # Null fit
+            pspec_null = fit_null(wVals, metrics['Params null']['sigma'])
+            
+            ## Put spectrum fits into a dataframe
+            dic_temp = {'Time': t_point*np.ones(len(wVals)), 
+                        'Frequency': wVals,
+                        'Fit fold': pspec_fold,
+                        'Fit hopf': pspec_hopf, 
+                        'Fit null': pspec_null}
+            df_pspec_fits = pd.DataFrame(dic_temp)
+            # Set the multi-index
+            df_pspec_fits.set_index(['Time','Frequency'], inplace=True)
+                        
+            ## Put empirical power spectrum into a DataFrame and remove indexes         
+            df_pspec_empirical = pspec.to_frame().reset_index()
+            # Rename column
+            df_pspec_empirical.rename(columns={'Power spectrum': 'Empirical'}, inplace=True)
             # Include a column for the time-stamp
-            pspec['Time'] = t_point*np.ones(len(pspec))
+            df_pspec_empirical['Time'] = t_point*np.ones(len(pspec))
             # Use a multi-index of ['Time','Frequency']
-            pspec.set_index(['Time', 'Frequency'], inplace=True)
-            # Append the power spectrum list
-            list_spec_append.append(pspec)
+            df_pspec_empirical.set_index(['Time', 'Frequency'], inplace=True)
+            
+            ## Concatenate the empirical spectrum and the fits into one DataFrame
+            df_pspec_temp = pd.concat([df_pspec_empirical, df_pspec_fits], axis=1)
+                        
+            # Add spectrum DataFrame to the list  
+            list_spec_append.append(df_pspec_temp)
             
             # Store spectral EWS in a DataFrame
             df_spec_metrics[t_point] = metrics

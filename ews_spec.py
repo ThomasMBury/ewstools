@@ -89,6 +89,23 @@ def pspec_welch(yVals,
 
 
 
+#-----------------------------------------
+## Analytical forms for power spectra
+#-----------------------------------------
+    
+
+def fit_fold(w,sigma,lam):
+    return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
+
+def fit_hopf(w,sigma,mu,w0):
+    return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
+
+def fit_null(w,sigma):
+    return sigma**2/(2*np.pi) * w**0
+
+
+
+
 #--------------------------
 ## pspec_metrics
 #-------------------------
@@ -110,7 +127,6 @@ def pspec_metrics(pspec,
         'smax' : peak in the power spectrum
         'cf' : coherence factor
         'aic' : Hopf, Fold and Null AIC weights
-        'aic_params' : Parameters of best fit spectra
         
                  
     Output: 
@@ -166,16 +182,6 @@ def pspec_metrics(pspec,
         # put frequency values and power values as a list to use LMFIT
         freq_vals = pspec.index.tolist()
         power_vals = pspec.tolist()
-        
-        # define models to fit
-        def fit_fold(w,sigma,lam):
-            return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
-        
-        def fit_hopf(w,sigma,mu,w0):
-            return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
-        
-        def fit_null(w,sigma):
-            return sigma**2/(2*np.pi) * w**0
     
         # assign to Model objects
         fold_model = Model(fit_fold)
@@ -256,12 +262,11 @@ def pspec_metrics(pspec,
         spec_ews['AIC fold'] = fold_aic_weight
         spec_ews['AIC hopf'] = hopf_aic_weight
         spec_ews['AIC null'] = null_aic_weight
-        
-        if 'aic_params' in ews:        
-            ## export fitted parameter values
-            spec_ews['Params fold'] = dict((k, fold_result.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
-            spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0','delta','psi'))
-            spec_ews['Params null'] = null_result.values
+            
+        ## export fitted parameter values
+        spec_ews['Params fold'] = dict((k, fold_result.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
+        spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0','delta','psi'))
+        spec_ews['Params null'] = null_result.values
 
     # return DataFrame of metrics
     return spec_ews
