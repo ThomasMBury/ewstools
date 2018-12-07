@@ -5,8 +5,8 @@ Created on Thu Nov  1 21:21:29 2018
 
 @author: tb460
 
-Script to execute the function ews_compute on a stochastic simulation
-of May's harvesting model with additive white noise.
+Script to execute the function ews_compute on a stochastic trajectory of
+May's harvesting model and visualise the EWS.
 
 """
 
@@ -15,24 +15,34 @@ of May's harvesting model with additive white noise.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import time as time
 
 # import EWS functions
 from ews_compute import ews_compute
-from ews_spec import pspec_welch, pspec_metrics
+
+
+#---------------------
+# Global parameters
+#–--------------------
+
+# Simulation parameters
+dt = 1
+t0 = 0
+tmax = 400
+tburn = 50 # burn-in period
+seed = 1 # random number generation seed
+
+# EWS parameters
+rw = 0.5 # rolling window
+bw = 0.1 # band width for Gaussian smoothing
+ham_len = 40 # length of Hamming window for spectrum computation
+
 
 
 #--------------------
 # Stochastic simulation of May's harvesting model
 #----------------------
-
-
-# Simulation parameters
-dt = 1
-t0 = 0
-tmax = 800
-tburn = 50 # burn-in period
-seed = 42 # random number generation seed
 
 # Model: dx/dt = de_fun(x,t) + sigma dW(t)
 def de_fun(x,r,k,h,s):
@@ -92,10 +102,6 @@ series = pd.Series(x, index=t)
 ## Compute EWS using ews_compute
 #------------------------------------
 
-# EWS parameters
-rw = 0.5 # rolling window
-bw = 0.1 # band width for Gaussian smoothing
-ham_len = 40 # length of Hamming window for spectrum computation
 
 
 start = time.time()  # begin a timer
@@ -103,7 +109,7 @@ start = time.time()  # begin a timer
 # Execute function ews_compute to obtain dictionary of EWS metrics and power spectra
 ews_dic = ews_compute(series,
                      band_width=bw,
-                     upto=tbif*1,
+                     upto=tbif*1.1,
                      roll_window=rw, 
                      lag_times=[1],
                      ham_length=ham_len,
@@ -120,11 +126,11 @@ print('\n The function ews_compute took ',end-start,' seconds to run\n')
 
 
 #-----------------------------------
-# Plot of EWS and power spectra
+# Plots of EWS and power spectra
 #–---------------------------------
 
 
-# Grid plot of EWS
+## Grid plot of EWS
 fig1, axes = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(6,6))
 df_ews[['State variable','Smoothing']].plot(ax=axes[0],title='Early warning signals')
 df_ews['Variance'].plot(ax=axes[1],legend=True)
@@ -133,9 +139,28 @@ df_ews['Smax'].dropna().plot(ax=axes[2],legend=True)
 df_ews[['AIC fold','AIC hopf','AIC null']].dropna().plot(ax=axes[3],legend=True)
 
 
-# Grid plot of power spectra and fits
+## Grid plot of power spectra and fits
+g = sns.FacetGrid(df_pspec.reset_index(), 
+                  col='Time',
+                  col_wrap=3,
+                  sharey=False,
+                  aspect=1.5,
+                  size=1.8
+                  )
 
+g.map(plt.plot, 'Frequency', 'Empirical', color='k', linewidth=2)
+g.map(plt.plot, 'Frequency', 'Fit fold', color='b', linestyle='dashed', linewidth=1)
+g.map(plt.plot, 'Frequency', 'Fit hopf', color='r', linestyle='dashed', linewidth=1)
+g.map(plt.plot, 'Frequency', 'Fit null', color='g', linestyle='dashed', linewidth=1)
 
+# Axes properties
+axes = g.axes
+# Set y labels
+for ax in axes[::3]:
+    ax.set_ylabel('Power')
+# Set y limit as max power over all time
+for ax in axes:
+    ax.set_ylim(top=max(df_pspec['Empirical']))
 
 
 

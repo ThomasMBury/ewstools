@@ -51,17 +51,17 @@ def pspec_welch(yVals,
 
     ## Assign properties of *series* to parameters
     
-    # compute the sampling frequency 
+    # Compute the sampling frequency 
     fs = 1/dt
-    # number of data points
+    # Number of data points
     num_points = len(yVals)
-    # if ham_length given as a proportion - compute number of data points in ham_length
+    # If ham_length given as a proportion - compute number of data points in ham_length
     if 0 < ham_length <= 1:
         ham_length = num_points * ham_length
-    # compute number of points in offset
+    # Compute number of points in offset
     ham_offset_points = int(ham_offset*ham_length)
         
-    ## compute the periodogram using Welch's method (scipy.signal function)
+    ## Compute the periodogram using Welch's method (scipy.signal function)
     pspec_raw = signal.welch(yVals,
                                fs,
                                nperseg=ham_length,
@@ -69,7 +69,7 @@ def pspec_welch(yVals,
                                return_onesided=False,
                                scaling=scaling)
     
-    # put into a pandas series and index by frequency (scaled by 2*pi)
+    # Put into a pandas series and index by frequency (scaled by 2*pi)
     pspec_series = pd.Series(pspec_raw[1], index=2*np.pi*pspec_raw[0], name='Power spectrum')
     pspec_series.index.name = 'Frequency'
     
@@ -78,6 +78,9 @@ def pspec_welch(yVals,
     
     # append power spectrum with first value (by symmetry)
     pspec_series.at[-min(pspec_series.index)] = pspec_series.iat[0]
+    
+    # remove zero-frequency component
+    pspec_series.drop(0, inplace=True)
     
     # impose cutoff frequency
     wmax = w_cutoff*max(pspec_series.index) # cutoff frequency
