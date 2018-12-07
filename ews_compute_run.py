@@ -29,9 +29,10 @@ from ews_compute import ews_compute
 # Simulation parameters
 dt = 1
 t0 = 0
-tmax = 400
+tmax = 800
 tburn = 50 # burn-in period
-seed = 1 # random number generation seed
+seed = 2 # random number generation seed
+sigma = 0.05 # noise intensity
 
 # EWS parameters
 rw = 0.5 # rolling window
@@ -50,7 +51,7 @@ def de_fun(x,r,k,h,s):
     
     
 # Model parameters
-sigma = 0.02 # noise intensity
+
 r = 1 # growth rate
 k = 1 # carrying capacity
 s = 0.1 # half-saturation constant of harvesting function
@@ -109,7 +110,7 @@ start = time.time()  # begin a timer
 # Execute function ews_compute to obtain dictionary of EWS metrics and power spectra
 ews_dic = ews_compute(series,
                      band_width=bw,
-                     upto=tbif*1.1,
+                     upto=tbif*1,
                      roll_window=rw, 
                      lag_times=[1],
                      ham_length=ham_len,
@@ -160,64 +161,24 @@ for ax in axes[::3]:
     ax.set_ylabel('Power')
 # Set y limit as max power over all time
 for ax in axes:
-    ax.set_ylim(top=max(df_pspec['Empirical']))
+    ax.set_ylim(top=1.05*max(df_pspec['Empirical']), bottom=0)
 
 
 
-#
-##---------------------------------
-### Compute kendall tau values of EWS
-##-------------------------------------
-#
-## Put time values as their own series for correlation computation
-#time_series = pd.Series(series.index, index=series.index)
-#    
-## Find kendall tau correlation coefficient for each EWS
-#ktau = pd.Series([df_ews[x].corr(time_series,method='kendall') for x in df_ews.columns],index=df_ews.columns)
-#
-#
-## Print kendall tau values
-#print('Kendall tau values for each metric are as follows:\n',ktau.loc[['Variance','Lag-1 AC','Smax']])
-#
+
+#---------------------------------
+## Compute kendall tau values of EWS
+#-------------------------------------
+
+# Put time values as their own series for correlation computation
+time_series = pd.Series(series.index, index=series.index)
+    
+# Find kendall tau correlation coefficient for each EWS
+ktau = pd.Series([df_ews[x].corr(time_series,method='kendall') for x in ['Variance', 'Lag-1 AC', 'Smax']], index=['Variance', 'Lag-1 AC', 'Smax'])
 
 
-#
-##-------------------------------------
-## Display power spectrum and fits at a given instant in time
-##------------------------------------
-#
-#t_pspec = 300
-#
-## Use function pspec_welch to compute the power spectrum of the residuals at a particular time
-#pspec=pspec_welch(df_ews.loc[t_pspec-rw*len(t):t_pspec,'Residuals'], dt, ham_length=ham_len, w_cutoff=1)
-#
-## Execute the function pspec_metrics to compute the AIC weights and fitting parameters
-#spec_ews = pspec_metrics(pspec, ews=['smax', 'cf', 'aic', 'aic_params'])
-## Define the power spectrum models
-#def fit_fold(w,sigma,lam):
-#    return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
-#        
-#def fit_hopf(w,sigma,mu,w0):
-#    return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
-#        
-#def fit_null(w,sigma):
-#    return sigma**2/(2*np.pi)* w**0
-#
-#
-## Make plot
-#w_vals = np.linspace(-max(pspec.index),max(pspec.index),100)
-#
-#fig3 = plt.figure(3)
-#pspec.plot(label='Measured')
-#plt.plot(w_vals, fit_fold(w_vals, spec_ews['Params fold']['sigma'], spec_ews['Params fold']['lam']),label='Fold fit')
-#plt.plot(w_vals, fit_hopf(w_vals, spec_ews['Params hopf']['sigma'], spec_ews['Params hopf']['mu'], spec_ews['Params hopf']['w0']),label='Hopf fit')
-#plt.plot(w_vals, fit_null(w_vals, spec_ews['Params null']['sigma']),label='Null fit')
-#plt.ylabel('Power')
-#plt.legend()
-#plt.title('Power spectrum and fits at time t='+str(t_pspec))
-#
-
-
+# Print kendall tau values
+print('\nKendall tau values for each metric are as follows:\n',ktau)
 
 
 
