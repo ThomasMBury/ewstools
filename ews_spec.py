@@ -13,6 +13,7 @@ import numpy as np
 from scipy import signal
 import pandas as pd
 from lmfit import Model
+from scipy.interpolate import interp1d
 
         
 #--------------------------------
@@ -191,18 +192,28 @@ def pspec_metrics(pspec,
         fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0, value=-1)
         
         
+        
+        
+        
+        
         # intial parameter values and constraints for Hopf fit
-        hopf_model.set_param_hint('sigma', value=0.05)
+        
+        # The initial parameter values are chosen based on the peak in the power
+        # spectrum and the area underneath
+        smax = max(pspec)
+        area = sum(pspec)*(freq_vals[1]-freq_vals[0])
+        
+        hopf_model.set_param_hint('sigma', value=0.5*np.sqrt(area), min=0)
         # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
-        psi_hopf = 0.5
+        psi_hopf = 0.25
         # introduce fixed parameters psi_hopf and wMax
-        hopf_model.set_param_hint('psi',value=psi_hopf,vary=False)
+        hopf_model.set_param_hint('psi', value=psi_hopf, vary=False)
         # let mu be a free parameter with max value 0
-        hopf_model.set_param_hint('mu', value=-0.5, max=0)
+        hopf_model.set_param_hint('mu', value=-0.3*np.sqrt(area)/np.sqrt(4*np.pi*smax), max=0, min=-1, vary=True)
         # introduce the dummy parameter delta = w0 - wThresh (see paper for wThresh)
-        hopf_model.set_param_hint('delta', value=0.01, min=0, vary=True)
+        hopf_model.set_param_hint('delta', value=0.005, min=0, max=2, vary=True)
         # now w0 is a fixed parameter dep. on delta (w0 = delta + wThresh)
-        hopf_model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',max=wMax,vary=False)
+        hopf_model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
         
         # initial parameter value for Null fit        
         null_model.set_param_hint('sigma',value=1, vary=True)
@@ -254,7 +265,7 @@ def pspec_metrics(pspec,
     # return DataFrame of metrics
     return spec_ews
 
-
+    
    
     
 
