@@ -3,9 +3,10 @@
 """
 Created on Thu Nov  1 19:11:58 2018
 
-@author: tb460
+@author: Thomas Bury
 
-A module containing functions to compute the EWS from time-series data.
+Function to compute EWS from time-series data
+
 """
 
 # import required python modules
