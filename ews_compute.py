@@ -166,8 +166,8 @@ def ews_compute(raw_series,
         # Time separation between data points (need for frequency values of power spectrum)
         dt = eval_series.index[1]-eval_series.index[0]
         
-        # Initialise a DataFrame to store the spectral EWS
-        df_spec_metrics = pd.DataFrame([])
+        # Initialise a list for the spectral EWS
+        list_metrics_append = []
         # Initialise a list for the power spectra
         list_spec_append = []
         
@@ -176,26 +176,29 @@ def ews_compute(raw_series,
         for k in np.arange(0, num_comps-(rw_size-1), roll_offset):
             
             # Select subset of series contained in window
-            window_series = eval_series.iloc[k:k+rw_size]
-            
+            window_series = eval_series.iloc[k:k+rw_size]           
             # Asisgn the time value for the metrics (right end point of window)
             t_point = eval_series.index[k+(rw_size-1)]            
             
-            # Compute the power spectrum using function pspec_welch
+            ## Compute the power spectrum using function pspec_welch
             pspec = pspec_welch(window_series, dt, 
                                 ham_length=ham_length, 
                                 ham_offset=ham_offset,
                                 w_cutoff=w_cutoff,
                                 scaling='spectrum')
             
-            # Compute the spectral EWS using pspec_metrics
+            
+            ## Compute the spectral EWS using pspec_metrics (dictionary)
             metrics = pspec_metrics(pspec,ews)
+            # Add the time-stamp
+            metrics['Time'] = t_point
+            # Add metrics (dictionary) to the list
+            list_metrics_append.append(metrics)
             
             
-            
-            ## Obtain best power spectrum fits
+            ## Compute best power spectrum fits
             # Create fine-scale frequency values
-            wVals = np.linspace(min(pspec.index), max(pspec.index),100)
+            wVals = np.linspace(min(pspec.index), max(pspec.index), 100)
             # Fold fit
             pspec_fold = fit_fold(wVals, metrics['Params fold']['sigma'],
                  metrics['Params fold']['lam'])
@@ -216,7 +219,8 @@ def ews_compute(raw_series,
             # Set the multi-index
             df_pspec_fits.set_index(['Time','Frequency'], inplace=True)
                         
-            ## Put empirical power spectrum into a DataFrame and remove indexes         
+            ## Put empirical power spectrum and fits into the same DataFrames
+            # Put empirical power spectrum into a DataFrame and remove indexes         
             df_pspec_empirical = pspec.to_frame().reset_index()
             # Rename column
             df_pspec_empirical.rename(columns={'Power spectrum': 'Empirical'}, inplace=True)
@@ -224,21 +228,23 @@ def ews_compute(raw_series,
             df_pspec_empirical['Time'] = t_point*np.ones(len(pspec))
             # Use a multi-index of ['Time','Frequency']
             df_pspec_empirical.set_index(['Time', 'Frequency'], inplace=True)
-            
-            ## Concatenate the empirical spectrum and the fits into one DataFrame
+            # Concatenate the empirical spectrum and the fits into one DataFrame
             df_pspec_temp = pd.concat([df_pspec_empirical, df_pspec_fits], axis=1)
-                        
             # Add spectrum DataFrame to the list  
             list_spec_append.append(df_pspec_temp)
             
-            # Store spectral EWS in a DataFrame
-            df_spec_metrics[t_point] = metrics
+            
                  
-        # Concatenate the list of power spectra to form a spectrum DataFrame
+        # Concatenate the list of power spectra DataFrames to form a single DataFrame
         df_pspec = pd.concat(list_spec_append)
         
+        # Create a DataFrame out of the multiple dictionaries consisting of the spectral metrics
+        df_spec_metrics = pd.DataFrame(list_metrics_append)
+        df_spec_metrics.set_index('Time', inplace=True)
+
+        
         # Join the spectral EWS DataFrame to the main EWS DataFrame 
-        df_ews = df_ews.join(df_spec_metrics.transpose())
+        df_ews = df_ews.join(df_spec_metrics)
         
         
         
