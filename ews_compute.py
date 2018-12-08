@@ -55,6 +55,7 @@ def ews_compute(raw_series,
     lag_times ([1]) : list of integers corresponding to the desired lag times for AC
     ham_length (40) : length of the Hamming window
     ham_offset (0.5) : proportion of Hamimng window to offset by
+    pspec_roll_offset (20) : offset of rolling window for pspec computation
     w_cutoff (1) : cutoff frequency (as proportion of size of maximum frequency)
     updates (False) : include updates on progress of function
     

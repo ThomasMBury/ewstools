@@ -27,17 +27,19 @@ from ews_compute import ews_compute
 #–--------------------
 
 # Simulation parameters
-dt = 1
+dt = 0.1 # time step for simulation
 t0 = 0
 tmax = 800
 tburn = 50 # burn-in period
-seed = 10 # random number generation seed
-sigma = 0.02 # noise intensity
+seed = 0 # random number generation seed
+sigma = 0.01 # noise intensity
 
 # EWS parameters
+dt2 = 1 # resolution of time-series for EWS computation
 rw = 0.5 # rolling window
 bw = 0.1 # band width for Gaussian smoothing
 ham_len = 40 # length of Hamming window for spectrum computation
+pspec_roll_offset = 20 # offset of rolling window when computing power spectrum
 
 
 
@@ -89,7 +91,7 @@ x[0]=x0
 
 # Run simulation
 for i in range(len(t)-1):
-    x[i+1] = x[i] + de_fun(x[i],r,k,h[i],s)*dt + sigma*dW[i]
+    x[i+1] = x[i] + de_fun(x[i],r,k,h[t[i]],s)*dt + sigma*dW[i]
     # make sure that state variable remains >= 0 
     if x[i+1] < 0:
         x[i+1] = 0
@@ -103,9 +105,11 @@ series = pd.Series(x, index=t)
 ## Compute EWS using ews_compute
 #------------------------------------
 
+# Filter time-series to have spacing dt2
+series = series.loc[::int(dt2/dt)]
 
-
-start = time.time()  # begin a timer
+# Begin a timer
+start = time.time()  
 
 # Execute function ews_compute to obtain dictionary of EWS metrics and power spectra
 ews_dic = ews_compute(series,
@@ -114,6 +118,7 @@ ews_dic = ews_compute(series,
                      roll_window=rw, 
                      lag_times=[1],
                      ham_length=ham_len,
+                     pspec_roll_offset=pspec_roll_offset,
                      ews=['var','ac','smax','aic'])
 
 # The DataFrame of EWS
