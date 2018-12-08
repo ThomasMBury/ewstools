@@ -27,7 +27,7 @@ from ews_compute import ews_compute
 #–--------------------
 
 # Simulation parameters
-dt = 0.1 # time step for simulation
+dt = 0.01 # time step for simulation
 t0 = 0
 tmax = 800
 tburn = 50 # burn-in period

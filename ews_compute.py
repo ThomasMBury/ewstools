@@ -192,6 +192,7 @@ def ews_compute(raw_series,
             metrics = pspec_metrics(pspec,ews)
             
             
+            
             ## Obtain best power spectrum fits
             # Create fine-scale frequency values
             wVals = np.linspace(min(pspec.index), max(pspec.index),100)

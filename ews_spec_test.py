@@ -81,11 +81,6 @@ plt.plot(w_vals, fit_fold(w_vals, spec_ews['Params fold']['sigma'], spec_ews['Pa
 plt.plot(w_vals, fit_hopf(w_vals, spec_ews['Params hopf']['sigma'], spec_ews['Params hopf']['mu'], spec_ews['Params hopf']['w0']))
 plt.plot(w_vals, fit_null(w_vals, spec_ews['Params null']['sigma']))
 
-
-
-
-print(spec_ews)
-
 # print time elapsed for functions to run
 print('spec_metrics took ', end - start,' seconds')
 

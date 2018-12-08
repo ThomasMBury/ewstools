@@ -79,8 +79,8 @@ def pspec_welch(yVals,
     # append power spectrum with first value (by symmetry)
     pspec_series.at[-min(pspec_series.index)] = pspec_series.iat[0]
     
-    # remove zero-frequency component
-    pspec_series.drop(0, inplace=True)
+#    # remove zero-frequency component
+#    pspec_series.drop(0, inplace=True)
     
     # impose cutoff frequency
     wmax = w_cutoff*max(pspec_series.index) # cutoff frequency
@@ -133,14 +133,14 @@ def pspec_metrics(pspec,
         
                  
     Output: 
-    Series of spectral metrics
+    A dictionary of spectral metrics obtained from pspec
     
     
     '''
     
     
-    # initialise a Series for EWS
-    spec_ews = pd.Series([])
+    # initialise a dictionary for EWS
+    spec_ews = {}
     
     # compute smax
     if 'smax' in ews:
