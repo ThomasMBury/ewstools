@@ -22,7 +22,7 @@ from scipy.interpolate import interp1d
 
 def pspec_welch(yVals,
                 dt,
-                ham_length,
+                ham_length=40,
                 ham_offset=0.5,
                 w_cutoff=1,
                 scaling='spectrum'):
