@@ -13,7 +13,6 @@ import numpy as np
 from scipy import signal
 import pandas as pd
 from lmfit import Model
-from scipy.interpolate import interp1d
 
         
 #--------------------------------
@@ -213,13 +212,18 @@ def pspec_metrics(pspec,
         smax = max(pspec)
         area = sum(pspec)*(freq_vals[1]-freq_vals[0])
         
-        hopf_model.set_param_hint('sigma', value=0.5*np.sqrt(area), min=0)
+        # Initial guesses for optimisation
+        sigma_init = 0.5*np.sqrt(area)
+        mu_init = -0.3*np.sqrt(area)/np.sqrt(4*np.pi*smax)
+        
+        # Set parameter hints
+        hopf_model.set_param_hint('sigma', value=sigma_init, min=0)
         # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
-        psi_hopf = 0.25
+        psi_hopf = 0.1
         # introduce fixed parameters psi_hopf and wMax
         hopf_model.set_param_hint('psi', value=psi_hopf, vary=False)
         # let mu be a free parameter with max value 0
-        hopf_model.set_param_hint('mu', value=-0.3*np.sqrt(area)/np.sqrt(4*np.pi*smax), max=0, min=-1, vary=True)
+        hopf_model.set_param_hint('mu', value=mu_init, max=0, min=-1, vary=True)
         # introduce the dummy parameter delta = w0 - wThresh (see paper for wThresh)
         hopf_model.set_param_hint('delta', value=0.005, min=0, max=2, vary=True)
         # now w0 is a fixed parameter dep. on delta (w0 = delta + wThresh)
