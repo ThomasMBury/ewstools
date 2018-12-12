@@ -57,6 +57,9 @@ def pspec_welch(yVals,
     # If ham_length given as a proportion - compute number of data points in ham_length
     if 0 < ham_length <= 1:
         ham_length = num_points * ham_length
+    # If Hamming length given is less than the length of the t-series, make ham_length=length of tseries.
+    if ham_length <= num_points:
+        ham_length = num_points
     # Compute number of points in offset
     ham_offset_points = int(ham_offset*ham_length)
         
@@ -192,20 +195,20 @@ def pspec_metrics(pspec,
         
         ## Parameter initialisation and constraints
         
-        # intial parameter values and constraints for Fold fit
-        fold_model.set_param_hint('sigma', value=0.1)
+        ## Initial parameter values and constraints for Fold fit
+        fold_model.set_param_hint('sigma', value=0.1, min=0, max=1)
         # set up constraint S(wMax) < psi_fold*S(0)
         psi_fold = 0.5
         wMax = max(freq_vals)
         # results in min value for lambda dependent on wMax and psi
-        fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0, value=-1)
+        fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0, value=-0.1)
+        
+        
+
         
         
         
-        
-        
-        
-        # intial parameter values and constraints for Hopf fit
+        ## Intial parameter values and constraints for Hopf fit
         
         # The initial parameter values are chosen based on the peak in the power
         # spectrum and the area underneath
@@ -217,9 +220,9 @@ def pspec_metrics(pspec,
         mu_init = -0.3*np.sqrt(area)/np.sqrt(4*np.pi*smax)
         
         # Set parameter hints
-        hopf_model.set_param_hint('sigma', value=sigma_init, min=0)
+        hopf_model.set_param_hint('sigma', value=sigma_init, min=0, max=1)
         # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
-        psi_hopf = 0.1
+        psi_hopf = 0.2
         # introduce fixed parameters psi_hopf and wMax
         hopf_model.set_param_hint('psi', value=psi_hopf, vary=False)
         # let mu be a free parameter with max value 0
@@ -229,8 +232,8 @@ def pspec_metrics(pspec,
         # now w0 is a fixed parameter dep. on delta (w0 = delta + wThresh)
         hopf_model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
         
-        # initial parameter value for Null fit        
-        null_model.set_param_hint('sigma',value=1, vary=True)
+        ## Initial parameter value for Null fit        
+        null_model.set_param_hint('sigma',value=0.5, vary=True, min=0, max=1)
                 
         # assign initial parameter values and constraints
         fold_params = fold_model.make_params()
@@ -239,9 +242,10 @@ def pspec_metrics(pspec,
         
         
         # fit each model to the power spectrum
-        fold_result = fold_model.fit(power_vals, fold_params, w=freq_vals)
+        method = 'least_squares'
+        fold_result = fold_model.fit(power_vals, fold_params, w=freq_vals, method=method)
         hopf_result = hopf_model.fit(power_vals, hopf_params, w=freq_vals)
-        null_result = null_model.fit(power_vals, null_params, w=freq_vals)
+        null_result = null_model.fit(power_vals, null_params, w=freq_vals, method=method)
         
         ## Compute AIC weights
         # get AIC statistics
