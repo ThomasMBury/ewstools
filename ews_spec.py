@@ -58,7 +58,7 @@ def pspec_welch(yVals,
     if 0 < ham_length <= 1:
         ham_length = num_points * ham_length
     # If Hamming length given is less than the length of the t-series, make ham_length=length of tseries.
-    if ham_length <= num_points:
+    if ham_length >= num_points:
         ham_length = num_points
     # Compute number of points in offset
     ham_offset_points = int(ham_offset*ham_length)
@@ -194,9 +194,14 @@ def pspec_metrics(pspec,
         null_model = Model(fit_null)
         
         ## Parameter initialisation and constraints
-        
+ 
+        # The initial parameter values are chosen based on the peak in the power
+        # spectrum and the area underneath
+        smax = max(pspec)
+        area = sum(pspec)*(freq_vals[1]-freq_vals[0])
+       
         ## Initial parameter values and constraints for Fold fit
-        fold_model.set_param_hint('sigma', value=0.1, min=0, max=1)
+        fold_model.set_param_hint('sigma', value=0.1, min=0, max=2*np.sqrt(area))
         # set up constraint S(wMax) < psi_fold*S(0)
         psi_fold = 0.5
         wMax = max(freq_vals)
@@ -209,18 +214,11 @@ def pspec_metrics(pspec,
         
         
         ## Intial parameter values and constraints for Hopf fit
-        
-        # The initial parameter values are chosen based on the peak in the power
-        # spectrum and the area underneath
-        smax = max(pspec)
-        area = sum(pspec)*(freq_vals[1]-freq_vals[0])
-        
-        # Initial guesses for optimisation
         sigma_init = 0.5*np.sqrt(area)
         mu_init = -0.3*np.sqrt(area)/np.sqrt(4*np.pi*smax)
         
         # Set parameter hints
-        hopf_model.set_param_hint('sigma', value=sigma_init, min=0, max=1)
+        hopf_model.set_param_hint('sigma', value=sigma_init, min=0, max=2*np.sqrt(area))
         # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
         psi_hopf = 0.2
         # introduce fixed parameters psi_hopf and wMax
@@ -233,7 +231,7 @@ def pspec_metrics(pspec,
         hopf_model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
         
         ## Initial parameter value for Null fit        
-        null_model.set_param_hint('sigma',value=0.5, vary=True, min=0, max=1)
+        null_model.set_param_hint('sigma',value=0.5, vary=True, min=0, max=2*np.sqrt(area))
                 
         # assign initial parameter values and constraints
         fold_params = fold_model.make_params()

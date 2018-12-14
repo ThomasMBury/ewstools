@@ -39,7 +39,7 @@ def ews_compute(raw_series,
     of the length of the data)
     smooth (True) : if True, series data is detrended with a Gaussian kernel
     upto ('Full') : if 'Full', use entire time-series, ow input time up to which EWS are to be evaluated
-    band_width (0.2) : bandwidth of Gaussian kernel
+    band_width (0.2) : bandwidth of Gaussian kernel (taken as a proportion if in (0,1), otherwise taken as absolute)
     ews (['var,'ac'] : list of strings corresponding to the desired EWS.
          Options include
              'var'   : Variance
@@ -78,8 +78,11 @@ def ews_compute(raw_series,
     ## Data detrending
     #–------------------------------
     
-    # Compute the absolute size of the bandwidth given it as a proportion of data length.
-    bw_size=short_series.shape[0]*band_width   
+    # Compute the absolute size of the bandwidth if it is given as a proportion
+    if 0 < band_width < 1:
+        bw_size = short_series.shape[0]*band_width
+    else:
+        bw_size = band_width
     
     # Compute smoothed data and residuals if smooth=True.
     if smooth:
