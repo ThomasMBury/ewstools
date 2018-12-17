@@ -201,7 +201,8 @@ def pspec_metrics(pspec,
         area = sum(pspec)*(freq_vals[1]-freq_vals[0])
        
         ## Initial parameter values and constraints for Fold fit
-        fold_model.set_param_hint('sigma', value=0.1, min=0, max=2*np.sqrt(area))
+        sigma_init = 0.5*np.sqrt(area)
+        fold_model.set_param_hint('sigma', value=0.1, min=0, max=sigma_init)
         # set up constraint S(wMax) < psi_fold*S(0)
         psi_fold = 0.5
         wMax = max(freq_vals)
@@ -209,12 +210,7 @@ def pspec_metrics(pspec,
         fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0, value=-0.1)
         
         
-
-        
-        
-        
         ## Intial parameter values and constraints for Hopf fit
-        sigma_init = 0.5*np.sqrt(area)
         mu_init = -0.3*np.sqrt(area)/np.sqrt(4*np.pi*smax)
         
         # Set parameter hints
@@ -231,7 +227,7 @@ def pspec_metrics(pspec,
         hopf_model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
         
         ## Initial parameter value for Null fit        
-        null_model.set_param_hint('sigma',value=0.5, vary=True, min=0, max=2*np.sqrt(area))
+        null_model.set_param_hint('sigma',value=0.5, vary=True, min=0, max=sigma_init)
                 
         # assign initial parameter values and constraints
         fold_params = fold_model.make_params()
