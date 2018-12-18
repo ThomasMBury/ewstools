@@ -99,15 +99,165 @@ def pspec_welch(yVals,
 #-----------------------------------------
     
 
-def fit_fold(w,sigma,lam):
+def psd_fold(w,sigma,lam):
     return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
 
-def fit_hopf(w,sigma,mu,w0):
+def psd_hopf(w,sigma,mu,w0):
     return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
 
-def fit_null(w,sigma):
+def psd_null(w,sigma):
     return sigma**2/(2*np.pi) * w**0
 
+
+
+#------------------------------------
+## Functions to fit analytical forms to empirical power spectrum
+#–------------------------------------
+    
+# Fold fit
+def fit_fold(pspec,init):
+    '''
+    Input:
+        pspec: power spectrum data as a Series indexed by frequency
+        init: Initial parameter guesses [sigma_init, lambda_init]
+        
+    Output:
+        Dictionary with fitted model and AIC score
+    '''
+    
+    
+    # Put frequency values and power values as a list to use LMFIT
+    freq_vals = pspec.index.tolist()
+    power_vals = pspec.tolist()
+    
+    sigma_init, lambda_init = init
+    # Assign model object
+    model = Model(psd_fold)
+    # Set up constraint S(wMax) < psi_fold*S(0)
+    psi_fold = 0.5
+    wMax = max(freq_vals)
+    # Parameter constraints for sigma
+    model.set_param_hint('sigma', value=sigma_init, min=0, max=10*sigma_init)
+    # Parameter constraints for lambda
+    model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0, value=lambda_init)
+    
+    # Assign initial parameter values and constraints
+    params = model.make_params()        
+    # Fit model to the empircal spectrum
+    result = model.fit(power_vals, params, w=freq_vals)
+    # Compute AIC score
+    aic = result.aic
+    
+    # Export AIC score and model fit
+    return [aic, result]
+
+
+
+# Function to fit Hopf model to empirical specrum with specified initial parameter guess
+def fit_hopf(pspec, init):
+    '''
+    Input:
+        pspec: power spectrum data as a Series indexed by frequency
+        init: Initial parameter guesses [sigma_init, mu_init, delta_fit]
+        
+    Output:
+        Dictionary with fitted model and AIC score
+    '''
+    
+    # Put frequency values and power values as a list to use LMFIT
+    freq_vals = pspec.index.tolist()
+    power_vals = pspec.tolist()
+    
+    sigma_init, mu_init, delta_init = init
+    # Assign model object 
+    model = Model(psd_hopf)
+    
+    model.set_param_hint('sigma', value=sigma_init, min=0, max=10*sigma_init)
+    # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
+    psi_hopf = 0.2
+    # introduce fixed parameters psi_hopf and wMax
+    model.set_param_hint('psi', value=psi_hopf, vary=False)
+    # let mu be a free parameter with max value 0
+    model.set_param_hint('mu', value=mu_init, max=0, min=-1, vary=True)
+    # introduce the dummy parameter delta = w0 - wThresh (see paper for wThresh)
+    model.set_param_hint('delta', value = delta_init, min=0, max=2, vary=True)
+    # now w0 is a fixed parameter dep. on delta (w0 = delta + wThresh)
+    model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
+    
+    # Assign initial parameter values and constraints
+    params = model.make_params()        
+    # Fit model to the empircal spectrum
+    result = model.fit(power_vals, params, w=freq_vals)
+    # Compute AIC score
+    aic = result.aic
+    
+    # Export AIC score and model fit
+    return [aic, result]
+
+
+
+# Function to fit Null model to empirical specrum with specified initial parameter guess
+def fit_null(pspec, init):
+    '''
+    Input:
+        pspec: power spectrum data as a Series indexed by frequency
+        init: Initial parameter guesses [sigma_init]
+        
+    Output:
+        Dictionary with fitted model and AIC score
+    '''
+    
+    # Put frequency values and power values as a list to use LMFIT
+    freq_vals = pspec.index.tolist()
+    power_vals = pspec.tolist()
+    
+    sigma_init = init[0]
+    
+    # Assign model object
+    model = Model(psd_null)
+    
+    # Initial parameter value for Null fit        
+    model.set_param_hint('sigma', value=sigma_init, vary=True, min=0, max=10*sigma_init)
+    
+    # Assign initial parameter values and constraints
+    params = model.make_params()        
+    # Fit model to the empircal spectrum
+    result = model.fit(power_vals, params, w=freq_vals)
+    # Compute AIC score
+    aic = result.aic
+    
+    # Export AIC score and model fit
+    return [aic, result]
+
+
+
+
+#-----------------------------
+## Function to compute n AIC weights from n AIC scores
+#–----------------------------
+
+def aic_weights(aic_scores):
+    '''
+    Input:
+        aic_scores: array of AIC scores
+    Output:
+        Array of the corresponding AIC weights
+    '''
+    
+    # Best AIC score
+    aic_best = min(aic_scores)
+    
+    # Differences in score from best model
+    aic_diff = aic_scores - aic_best
+    
+    # Likelihoods for each model
+    llhd = np.exp(-(1/2)*aic_diff)
+    
+    # Normalise to get AIC weights
+    return llhd/sum(llhd)
+    
+    
+    
 
 
 
@@ -141,10 +291,10 @@ def pspec_metrics(pspec,
     '''
     
     
-    # initialise a dictionary for EWS
+    # Initialise a dictionary for EWS
     spec_ews = {}
     
-    # compute smax
+    # Compute Smax
     if 'smax' in ews:
         smax = max(pspec)
         # add to DataFrame
@@ -152,7 +302,7 @@ def pspec_metrics(pspec,
         
         
         
-    # compute coherence factor
+    ## Compute the coherence factor
     if 'cf' in ews:
         
         # frequency at which peak occurs
@@ -181,97 +331,57 @@ def pspec_metrics(pspec,
         spec_ews['Coherence factor'] = coher_factor
     
 
-    # fit analytic forms and compute AIC weights
+    # Fit analytic forms and compute AIC weights
     if 'aic' in ews:
+
+        # Choose initial parameter guesses
         
-        # put frequency values and power values as a list to use LMFIT
-        freq_vals = pspec.index.tolist()
-        power_vals = pspec.tolist()
-    
-        # assign to Model objects
-        fold_model = Model(fit_fold)
-        hopf_model = Model(fit_hopf)
-        null_model = Model(fit_null)
         
-        ## Parameter initialisation and constraints
- 
         # The initial parameter values are chosen based on the peak in the power
         # spectrum and the area underneath
+        
+        # Peak in power spectrum
         smax = max(pspec)
-        area = sum(pspec)*(freq_vals[1]-freq_vals[0])
-       
+        # Area underneath power spectrum
+        area = sum(pspec)*(pspec.index[1]-pspec.index[0])
+        
+        
+                       
         ## Initial parameter values and constraints for Fold fit
         sigma_init = 0.5*np.sqrt(area)
-        fold_model.set_param_hint('sigma', value=sigma_init, min=0, max=10*sigma_init)
-        # set up constraint S(wMax) < psi_fold*S(0)
-        psi_fold = 0.5
-        wMax = max(freq_vals)
-        # results in min value for lambda dependent on wMax and psi
-        fold_model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0, value=-0.1)
+        lambda_init = -0.01
+        init_fold = [sigma_init, lambda_init]
         
         
-        ## Intial parameter values and constraints for Hopf fit
+        ## Initial parameter values and constraints for Hopf fit
         mu_init = -0.3*np.sqrt(area)/np.sqrt(4*np.pi*smax)
+        delta_init = 0.01
+        init_hopf = [sigma_init, mu_init, delta_init]
+
+        ## Initial parameter value for Null fit
+        init_null = [sigma_init]
+
+        # Compute fits and AIC scores
+        [aic_fold, model_fold] = fit_fold(pspec, init_fold)
+        [aic_hopf, model_hopf] = fit_hopf(pspec, init_hopf)
+        [aic_null, model_null] = fit_null(pspec, init_null)
+
+       
+        # Compute AIC weights
+        aicw_fold, aicw_hopf, aicw_null = aic_weights([aic_fold, aic_hopf, aic_null])
         
-        # Set parameter hints
-        hopf_model.set_param_hint('sigma', value=sigma_init, min=0, max=10*sigma_init)
-        # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
-        psi_hopf = 0.2
-        # introduce fixed parameters psi_hopf and wMax
-        hopf_model.set_param_hint('psi', value=psi_hopf, vary=False)
-        # let mu be a free parameter with max value 0
-        hopf_model.set_param_hint('mu', value=mu_init, max=0, min=-1, vary=True)
-        # introduce the dummy parameter delta = w0 - wThresh (see paper for wThresh)
-        hopf_model.set_param_hint('delta', value=0.005, min=0, max=2, vary=True)
-        # now w0 is a fixed parameter dep. on delta (w0 = delta + wThresh)
-        hopf_model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
-        
-        ## Initial parameter value for Null fit        
-        null_model.set_param_hint('sigma',value=sigma_init, vary=True, min=0, max=10*sigma_init)
-                
-        # assign initial parameter values and constraints
-        fold_params = fold_model.make_params()
-        hopf_params = hopf_model.make_params()
-        null_params = null_model.make_params()
-        
-        
-        # fit each model to the power spectrum
-        method = 'least_squares'
-        fold_result = fold_model.fit(power_vals, fold_params, w=freq_vals, method=method)
-        hopf_result = hopf_model.fit(power_vals, hopf_params, w=freq_vals)
-        null_result = null_model.fit(power_vals, null_params, w=freq_vals, method=method)
-        
-        ## Compute AIC weights
-        # get AIC statistics
-        fold_aic = fold_result.aic
-        hopf_aic = hopf_result.aic
-        null_aic = null_result.aic
-        
-        # compute AIC deviations from best model
-        fold_aic_diff = fold_aic - min(fold_aic,hopf_aic,null_aic)
-        hopf_aic_diff = hopf_aic - min(fold_aic,hopf_aic,null_aic)
-        null_aic_diff = null_aic - min(fold_aic,hopf_aic,null_aic)
-        
-        # compute relative likelihoods of each model
-        fold_llhd = np.exp(-(1/2)*fold_aic_diff)
-        hopf_llhd = np.exp(-(1/2)*hopf_aic_diff)
-        null_llhd = np.exp(-(1/2)*null_aic_diff)
-        llhd_sum = fold_llhd + hopf_llhd + null_llhd
-        
-        # compute AIC weights
-        fold_aic_weight = fold_llhd/llhd_sum
-        hopf_aic_weight = hopf_llhd/llhd_sum
-        null_aic_weight = null_llhd/llhd_sum
                
         # add to dataframe
-        spec_ews['AIC fold'] = fold_aic_weight
-        spec_ews['AIC hopf'] = hopf_aic_weight
-        spec_ews['AIC null'] = null_aic_weight
-            
+        spec_ews['AIC fold'] = aicw_fold
+        spec_ews['AIC hopf'] = aicw_hopf
+        spec_ews['AIC null'] = aicw_null
+        
+        print(model_fold)
+        
         ## export fitted parameter values
-        spec_ews['Params fold'] = dict((k, fold_result.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
-        spec_ews['Params hopf'] = dict((k, hopf_result.values[k]) for k in ('sigma','mu','w0','delta','psi'))
-        spec_ews['Params null'] = null_result.values
+        spec_ews['Params fold'] = dict((k, model_fold.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
+        spec_ews['Params hopf'] = dict((k, model_hopf.values[k]) for k in ('sigma','mu','w0','delta','psi'))
+        spec_ews['Params null'] = model_null.values
 
     # return DataFrame of metrics
     return spec_ews

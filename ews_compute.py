@@ -15,7 +15,7 @@ from scipy.ndimage.filters import gaussian_filter as gf
 import pandas as pd
 
 # import local module
-from ews_spec import pspec_welch, pspec_metrics, fit_fold, fit_hopf, fit_null
+from ews_spec import pspec_welch, pspec_metrics, psd_fold, psd_hopf, psd_null
 
 
 
@@ -205,14 +205,14 @@ def ews_compute(raw_series,
             # Create fine-scale frequency values
             wVals = np.linspace(min(pspec.index), max(pspec.index), 100)
             # Fold fit
-            pspec_fold = fit_fold(wVals, metrics['Params fold']['sigma'],
+            pspec_fold = psd_fold(wVals, metrics['Params fold']['sigma'],
                  metrics['Params fold']['lam'])
             # Hopf fit
-            pspec_hopf = fit_hopf(wVals, metrics['Params hopf']['sigma'],
+            pspec_hopf = psd_hopf(wVals, metrics['Params hopf']['sigma'],
                  metrics['Params hopf']['mu'],
                  metrics['Params hopf']['w0'])
             # Null fit
-            pspec_null = fit_null(wVals, metrics['Params null']['sigma'])
+            pspec_null = psd_null(wVals, metrics['Params null']['sigma'])
             
             ## Put spectrum fits into a dataframe
             dic_temp = {'Time': t_point*np.ones(len(wVals)), 
