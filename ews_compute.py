@@ -250,10 +250,37 @@ def ews_compute(raw_series,
         df_ews = df_ews.join(df_spec_metrics)
         
         
+    
+    #--------------------------
+    ## Compute kendall tau values
+    #--------------------------
+    
+    ''' In this section we compute the kendall correlation coefficients for each EWS
+        with respect to time. Values close to one indicate high correlation (i.e. EWS
+        increasing with time), values close to zero indicate no significant correlation,
+        and values close to negative one indicate high negative correlation (i.e. EWS
+        decreasing with time).'''
         
+                                                                             
+    # Put time values as their own series for correlation computation
+    time_vals = pd.Series(df_ews.index, index=df_ews.index)
+
+    # List of EWS for kendall tau computation (get rid of irrelevant columns)
+    list_ews = df_ews.columns.drop(['State variable','Smoothing','Residuals','Params fold','Params hopf','Params null','AIC fold', 'AIC hopf'])
+    
+    # Find kendall Kendall tau for each metric in the DataFrame and store as a Series
+    ktau = pd.Series([df_ews[x].corr(time_vals, method='kendall') for x in list_ews], index=list_ews)
         
-    # Return a dictionary including the EWS DataFrame and the power spectrum DataFrame
-    output_dic = {'EWS metrics': df_ews, 'Power spectrum': df_pspec}
+                                                                             
+                                                                             
+                                                                             
+ 
+    #----------------------
+    ## Final output
+    #–----------------------
+       
+    # Ouptut a dictionary containing EWS DataFrame, power spectra DataFrame, and Series of Kendall tau values
+    output_dic = {'EWS metrics': df_ews, 'Power spectrum': df_pspec, 'Kendall tau': ktau}
     
     return output_dic
 

@@ -31,14 +31,14 @@ dt = 0.01 # time step for simulation
 t0 = 0
 tmax = 800
 tburn = 50 # burn-in period
-seed = 0 # random number generation seed
-sigma = 0.01 # noise intensity
+seed = 3 # random number generation seed
+sigma = 0.02 # noise intensity
 
 # EWS parameters
 dt2 = 1 # resolution of time-series for EWS computation
-rw = 0.5 # rolling window
+rw = 0.4 # rolling window
 bw = 0.1 # band width for Gaussian smoothing
-ham_len = 40 # length of Hamming window for spectrum computation
+ham_len = 80 # length of Hamming window for spectrum computation
 pspec_roll_offset = 20 # offset of rolling window when computing power spectrum
 
 
@@ -167,6 +167,7 @@ for ax in axes[::3]:
 # Set y limit as max power over all time
 for ax in axes:
     ax.set_ylim(top=1.05*max(df_pspec['Empirical']), bottom=0)
+    ax.set_xlim(left=-np.pi, right=np.pi)
 
 
 
