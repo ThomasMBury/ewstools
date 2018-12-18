@@ -266,12 +266,11 @@ def ews_compute(raw_series,
     time_vals = pd.Series(df_ews.index, index=df_ews.index)
 
     # List of EWS for kendall tau computation (get rid of irrelevant columns)
-    list_ews = df_ews.columns.drop(['State variable','Smoothing','Residuals','Params fold','Params hopf','Params null','AIC fold', 'AIC hopf'])
+    list_ews = df_ews.columns.drop(['State variable','Smoothing','Residuals','Params fold','Params hopf','Params null','AIC fold', 'AIC hopf','AIC null'])
     
-    # Find kendall Kendall tau for each metric in the DataFrame and store as a Series
-    ktau = pd.Series([df_ews[x].corr(time_vals, method='kendall') for x in list_ews], index=list_ews)
-        
-                                                                             
+    # Find Kendall tau for each EWS and store in a DataFrame
+    dic_ktau = {x:df_ews[x].corr(time_vals, method='kendall') for x in list_ews} # temporary dictionary
+    df_ktau = pd.DataFrame(dic_ktau, index=[0]) # DataFrame (easier for concatenation purposes)
                                                                              
                                                                              
  
@@ -279,8 +278,8 @@ def ews_compute(raw_series,
     ## Final output
     #–----------------------
        
-    # Ouptut a dictionary containing EWS DataFrame, power spectra DataFrame, and Series of Kendall tau values
-    output_dic = {'EWS metrics': df_ews, 'Power spectrum': df_pspec, 'Kendall tau': ktau}
+    # Ouptut a dictionary containing EWS DataFrame, power spectra DataFrame, and Kendall tau values
+    output_dic = {'EWS metrics': df_ews, 'Power spectrum': df_pspec, 'Kendall tau': df_ktau}
     
     return output_dic
 

@@ -37,8 +37,8 @@ sigma = 0.02 # noise intensity
 # EWS parameters
 dt2 = 1 # resolution of time-series for EWS computation
 rw = 0.4 # rolling window
-bw = 0.1 # band width for Gaussian smoothing
-ham_len = 80 # length of Hamming window for spectrum computation
+bw = 0.05 # band width for Gaussian smoothing
+ham_len = 40 # length of Hamming window for spectrum computation
 pspec_roll_offset = 20 # offset of rolling window when computing power spectrum
 
 
@@ -125,6 +125,8 @@ ews_dic = ews_compute(series,
 df_ews = ews_dic['EWS metrics']
 # The DataFrame of power spectra
 df_pspec = ews_dic['Power spectrum']
+# The Series of Kendall tau values
+ktau = ews_dic['Kendall tau']
 
 end = time.time() # end timer
 # Print time taken to run ews_std
@@ -171,23 +173,8 @@ for ax in axes:
 
 
 
-
-#---------------------------------
-## Compute kendall tau values of EWS
-#-------------------------------------
-
-# Put time values as their own series for correlation computation
-time_series = pd.Series(series.index, index=series.index)
-    
-# Find kendall tau correlation coefficient for each EWS
-ktau = pd.Series([df_ews[x].corr(time_series,method='kendall') for x in ['Variance', 'Lag-1 AC', 'Smax']], index=['Variance', 'Lag-1 AC', 'Smax'])
-
-
 # Print kendall tau values
-print('\nKendall tau values for each metric are as follows:\n',ktau)
-
-
-
+print('\nKendall tau values are as follows:\n', ktau)
 
 
 
