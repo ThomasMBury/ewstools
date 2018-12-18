@@ -174,7 +174,7 @@ for ax in axes:
 
 
 # Print kendall tau values
-print('\nKendall tau values are as follows:\n', ktau)
+print('\nKendall tau values are as follows:\n', ktau.iloc[0])
 
 
 

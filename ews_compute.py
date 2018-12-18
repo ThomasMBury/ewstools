@@ -62,6 +62,8 @@ def ews_compute(raw_series,
     Output: Dictionary
     'EWS metrics': DataFrame indexed by time with columns csp to each EWS
     'Power spectrum': DataFrame of power spectra and the model fits indexed by time
+    'Kendall tau': DataFrame of the kendall tau values for each EWS metric (those that are expected to increase)
+    
     '''
     
     # Initialise a DataFrame to store EWS data - indexed by time
