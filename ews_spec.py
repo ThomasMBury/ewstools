@@ -204,7 +204,7 @@ def fit_null(pspec, init):
         init: Initial parameter guesses [sigma_init]
         
     Output:
-        Dictionary with fitted model and AIC score
+        List with fitted model and AIC score
     '''
     
     # Put frequency values and power values as a list to use LMFIT
@@ -343,7 +343,7 @@ def pspec_metrics(pspec,
         
         # Sweep values (as proportion of baseline guess)
 #        sweep_vals = np.array([0.2,1,1.5])
-        sweep_vals = np.array([1])
+        sweep_vals = np.array([0.5,1,1.5])
         
         # Baseline parameter guesses (derived from empirical spectrum)
         sigma_init = np.sqrt(2/(np.pi*smax))*area
@@ -383,8 +383,7 @@ def pspec_metrics(pspec,
         array_temp = np.array(fold_aic_fits)
         # Pick out the best model
         [aic_fold, model_fold] = array_temp[array_temp[:,0].argmin()]    
-                
-        print(fold_aic_fits)    
+                   
         
         ## Hopf
         
@@ -405,7 +404,8 @@ def pspec_metrics(pspec,
         array_temp = np.array(hopf_aic_fits)
         # Pick out the best model
         [aic_hopf, model_hopf] = array_temp[array_temp[:,0].argmin()]       
-                
+               
+#        print(hopf_aic_fits)
         
         ## Null
                 
