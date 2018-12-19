@@ -147,8 +147,18 @@ df_ews['Smax'].dropna().plot(ax=axes[2],legend=True)
 df_ews[['AIC fold','AIC hopf','AIC null']].dropna().plot(ax=axes[3],legend=True)
 
 
-## Grid plot of power spectra and fits
-g = sns.FacetGrid(df_pspec.reset_index(), 
+## Define function to make grid plot for evolution of the power spectrum in time
+def plot_pspec_grid(t_display):
+    '''
+    Inputs:
+        tVals: the time values at which to display the power spectrum
+        plot_num: the realisation number to use
+        var: the state varialbe to use
+    
+    Output: a grid plot of the power spectra and their best fits
+    '''
+    
+    g = sns.FacetGrid(df_pspec.loc[t_display].reset_index(), 
                   col='Time',
                   col_wrap=3,
                   sharey=False,
@@ -156,22 +166,25 @@ g = sns.FacetGrid(df_pspec.reset_index(),
                   size=1.8
                   )
 
-g.map(plt.plot, 'Frequency', 'Empirical', color='k', linewidth=2)
-g.map(plt.plot, 'Frequency', 'Fit fold', color='b', linestyle='dashed', linewidth=1)
-g.map(plt.plot, 'Frequency', 'Fit hopf', color='r', linestyle='dashed', linewidth=1)
-g.map(plt.plot, 'Frequency', 'Fit null', color='g', linestyle='dashed', linewidth=1)
+    g.map(plt.plot, 'Frequency', 'Empirical', color='k', linewidth=2)
+    g.map(plt.plot, 'Frequency', 'Fit fold', color='b', linestyle='dashed', linewidth=1)
+    g.map(plt.plot, 'Frequency', 'Fit hopf', color='r', linestyle='dashed', linewidth=1)
+    g.map(plt.plot, 'Frequency', 'Fit null', color='g', linestyle='dashed', linewidth=1)
+    # Axes properties 
+    axes = g.axes
+    # Set y labels
+    for ax in axes[::3]:
+        ax.set_ylabel('Power')
+        # Set y limit as max power over all time
+        for ax in axes:
+            ax.set_ylim(top=1.05*max(df_pspec['Empirical']), bottom=0)
+    return g
 
-# Axes properties
-axes = g.axes
-# Set y labels
-for ax in axes[::3]:
-    ax.set_ylabel('Power')
-# Set y limit as max power over all time
-for ax in axes:
-    ax.set_ylim(top=1.05*max(df_pspec['Empirical']), bottom=0)
-    ax.set_xlim(left=-np.pi, right=np.pi)
+#  Choose time values at which to display power spectrum
+t_display = df_pspec.index.levels[0][::3].values
 
-
+# Plot
+plot_pspec = plot_pspec_grid(t_display)
 
 # Print kendall tau values
 print('\nKendall tau values are as follows:\n', ktau.iloc[0])

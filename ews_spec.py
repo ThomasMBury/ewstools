@@ -342,8 +342,8 @@ def pspec_metrics(pspec,
         ## Initial parameter guesses (do a sweep over initial guesses and pick convergence with best AIC score)        
         
         # Sweep values (as proportion of baseline guess)
-#        sweep_vals = np.array([0.2,1,1.5])
-        sweep_vals = np.array([0.5,1,1.5])
+        sweep=False
+        sweep_vals = np.array([0.2,1,2]) if sweep else np.array([1])
         
         # Baseline parameter guesses (derived from empirical spectrum)
         sigma_init = np.sqrt(2/(np.pi*smax))*area
