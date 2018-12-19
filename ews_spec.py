@@ -331,54 +331,115 @@ def pspec_metrics(pspec,
         spec_ews['Coherence factor'] = coher_factor
     
 
-    # Fit analytic forms and compute AIC weights
+    ## Compute AIC weights of fitted analytical forms
     if 'aic' in ews:
 
-        # Choose initial parameter guesses
-        
-        
-        # The initial parameter values are chosen based on the peak in the power
-        # spectrum and the area underneath
-        
         # Peak in power spectrum
         smax = max(pspec)
-        # Area underneath power spectrum
+        # Area underneath power spectrum (~ variance)
         area = sum(pspec)*(pspec.index[1]-pspec.index[0])
         
+        ## Initial parameter guesses (do a sweep over initial guesses and pick convergence with best AIC score)        
         
-                       
-        ## Initial parameter values and constraints for Fold fit
-        sigma_init = 0.5*np.sqrt(area)
-        lambda_init = -0.01
-        init_fold = [sigma_init, lambda_init]
+        # Sweep values (as proportion of baseline guess)
+#        sweep_vals = np.array([0.2,1,1.5])
+        sweep_vals = np.array([1])
+        
+        # Baseline parameter guesses (derived from empirical spectrum)
+        sigma_init = np.sqrt(2/(np.pi*smax))*area
+        lambda_init = -area/(np.pi*smax)
+        mu_init = -area/(np.pi*smax)
+        delta_init = 0.01 
         
         
-        ## Initial parameter values and constraints for Hopf fit
-        mu_init = -0.3*np.sqrt(area)/np.sqrt(4*np.pi*smax)
-        delta_init = 0.01
-        init_hopf = [sigma_init, mu_init, delta_init]
+        # Arrays of initial values
+        init_fold_array = {'sigma': sweep_vals*sigma_init,
+                     'lambda': sweep_vals*lambda_init}
+        
+        init_hopf_array = {'sigma': sweep_vals*sigma_init,
+                     'mu': sweep_vals*mu_init,
+                     'delta': sweep_vals*delta_init}
 
-        ## Initial parameter value for Null fit
-        init_null = [sigma_init]
+        init_null_array = {'sigma': sweep_vals*sigma_init}
 
-        # Compute fits and AIC scores
-        [aic_fold, model_fold] = fit_fold(pspec, init_fold)
-        [aic_hopf, model_hopf] = fit_hopf(pspec, init_hopf)
-        [aic_null, model_null] = fit_null(pspec, init_null)
 
+        ## Compute AIC values and fits
+        
+        ## Fold
+        
+        # Initialise list to store AIC and model fits
+        fold_aic_fits = []
+
+        # Sweep over initial parameter guesses and pick best convergence
+        for i in range(len(init_fold_array['sigma'])):
+            for j in range(len(init_fold_array['lambda'])):
+                # Initial parameter guess
+                init_fold = [init_fold_array['sigma'][i],init_fold_array['lambda'][j]]
+                # Compute fold fit and AIC score
+                [aic_temp, model_temp] = fit_fold(pspec, init_fold)
+                # Store in list
+                fold_aic_fits.append([aic_temp, model_temp])
+        # Put list into array
+        array_temp = np.array(fold_aic_fits)
+        # Pick out the best model
+        [aic_fold, model_fold] = array_temp[array_temp[:,0].argmin()]    
+                
+        print(fold_aic_fits)    
+        
+        ## Hopf
+        
+        # Initialise list to store AIC and model fits
+        hopf_aic_fits = []
+
+        # Sweep over initial parameter guesses and pick best convergence
+        for i in range(len(init_hopf_array['sigma'])):
+            for j in range(len(init_hopf_array['mu'])):
+                for k in range(len(init_hopf_array['delta'])):
+                    # Initial parameter guess
+                    init_hopf = [init_hopf_array['sigma'][i],init_hopf_array['mu'][j],init_hopf_array['delta'][k]]
+                    # Compute fold fit and AIC score
+                    [aic_temp, model_temp] = fit_hopf(pspec, init_hopf)
+                    # Store in list
+                    hopf_aic_fits.append([aic_temp, model_temp])
+        # Put list into array
+        array_temp = np.array(hopf_aic_fits)
+        # Pick out the best model
+        [aic_hopf, model_hopf] = array_temp[array_temp[:,0].argmin()]       
+                
+        
+        ## Null
+                
+        # Initialise list to store AIC and model fits
+        null_aic_fits = []
+
+        # Sweep over initial parameter guesses and pick best convergence
+        for i in range(len(init_null_array['sigma'])):
+                # Initial parameter guess
+                init_null = [init_null_array['sigma'][i]]
+                # Compute fold fit and AIC score
+                [aic_temp, model_temp] = fit_null(pspec, init_null)
+                # Store in list
+                null_aic_fits.append([aic_temp, model_temp])
+        # Put list into array
+        array_temp = np.array(null_aic_fits)
+        # Pick out the best model
+        [aic_null, model_null] = array_temp[array_temp[:,0].argmin()]   
        
-        # Compute AIC weights
+        
+        # Compute AIC weights from the AIC scores
         aicw_fold, aicw_hopf, aicw_null = aic_weights([aic_fold, aic_hopf, aic_null])
         
+        
+#       # Print AIC weights
+#        print([aic_fold,aic_hopf,aic_null])
                
         # add to dataframe
         spec_ews['AIC fold'] = aicw_fold
         spec_ews['AIC hopf'] = aicw_hopf
         spec_ews['AIC null'] = aicw_null
         
-        print(model_fold)
         
-        ## export fitted parameter values
+        # export fitted parameter values
         spec_ews['Params fold'] = dict((k, model_fold.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
         spec_ews['Params hopf'] = dict((k, model_hopf.values[k]) for k in ('sigma','mu','w0','delta','psi'))
         spec_ews['Params null'] = model_null.values

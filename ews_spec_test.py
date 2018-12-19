@@ -39,7 +39,7 @@ series = pd.Series(xn, index=t)
 # compute the power spectrum of the series
 yVals = series.values
 dt = series.index[1]-series.index[2]
-pspec=pspec_welch(yVals, dt, ham_length=40, w_cutoff=1)
+pspec=pspec_welch(yVals, dt, ham_length=20, w_cutoff=1)
 
 
 # make a plot
