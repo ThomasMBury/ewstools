@@ -115,7 +115,7 @@ def psd_null(w,sigma):
 #–--------------------------------\
     
 # Function to compute the initialisation value for mu when fitting Shopf
-def mu_init(smax, stot, wdom):
+def mu_init_fun(smax, stot, wdom):
     
     # define chunky term (use \ to continue eqn to new line)
     def alpha(smax, stot, wdom):
@@ -133,20 +133,20 @@ def mu_init(smax, stot, wdom):
  
     
 # Function to compute the initialisation value for sigma when fitting Shopf
-def sigma_init_hopf(smax,stot,wdom):
+def sigma_init_hopf_fun(smax,stot,wdom):
     return np.sqrt(
-            -2*mu_init(smax,stot,wdom)*stot)
+            -2*mu_init_fun(smax,stot,wdom)*stot)
 
     
 # Function to compute the initialisation value for sigma when fitting Sfold
-def sigma_init_fold(smax,stot):
+def sigma_init_fold_fun(smax,stot):
     return np.sqrt(
             2*stot**2/(np.pi*smax)
             )
 
 
 # Function to compute the initialisation value for lambda when fitting Sfold
-def lambda_init(smax,stot):
+def lambda_init_fun(smax,stot):
     return -stot/(np.pi*smax)
 
 
@@ -209,20 +209,37 @@ def fit_hopf(pspec, init):
     freq_vals = pspec.index.tolist()
     power_vals = pspec.tolist()
     
-    sigma_init, mu_init, delta_init = init
+    # Assign labels to initialisation values
+    sigma_init, mu_init, w0_init = init
+    
+    # If any labels are nan, resort to default values 
+    if np.isnan(sigma_init) or np.isnan(mu_init) or np.isnan(w0_init):
+        sigma_init, mu_init, w0_init = [1,-0.1,1]
+    
+    # Constraint parameter
+    psi_hopf = 0.2
+    
+    # Compute initialisation value for the dummy variable delta (direct map with w0)
+    # It must be positive to adhere to constraint - thus if negative set to 0.
+    delta_init = max(
+            w0_init + (mu_init/(2*np.sqrt(psi_hopf)))*np.sqrt(4-3*psi_hopf + np.sqrt(psi_hopf**2-16*psi_hopf+16)),
+            0.0001)
+    
+    print([sigma_init,mu_init,w0_init,delta_init])
     # Assign model object 
     model = Model(psd_hopf)
     
+    ## Set initialisations parameters in model attributes
+    
+    # Sigma must be positive, and set a (high) upper bound to avoid runaway computation
     model.set_param_hint('sigma', value=sigma_init, min=0, max=10*sigma_init)
-    # set up constraint S(0) < psi_hopf*S(w0) and w0 < wMax 
-    psi_hopf = 0.2
-    # introduce fixed parameters psi_hopf and wMax
+    # Psi is a fixed parameter (not used in optimisation)
     model.set_param_hint('psi', value=psi_hopf, vary=False)
-    # let mu be a free parameter with max value 0
-    model.set_param_hint('mu', value=mu_init, max=0, min=-1, vary=True)
-    # introduce the dummy parameter delta = w0 - wThresh (see paper for wThresh)
-    model.set_param_hint('delta', value = delta_init, min=0, max=2, vary=True)
-    # now w0 is a fixed parameter dep. on delta (w0 = delta + wThresh)
+    # Mu must be negative 
+    model.set_param_hint('mu', value=mu_init, max=0, min=10*mu_init, vary=True)
+    # Delta is a dummy parameter, satisfying d = w0 - wThresh (see paper for wThresh). It is allowed to vary, in place of w0.
+    model.set_param_hint('delta', value = delta_init, min=0, vary=True)
+    # w0 is a fixed parameter dependent on delta (w0 = delta + wThresh)
     model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
     
     # Assign initial parameter values and constraints
@@ -374,34 +391,42 @@ def pspec_metrics(pspec,
 
     ## Compute AIC weights of fitted analytical forms
     if 'aic' in ews:
-
-        # Peak in power spectrum
-        smax = max(pspec)
-        # Area underneath power spectrum (~ variance)
-        area = sum(pspec)*(pspec.index[1]-pspec.index[0])
         
-        ## Initial parameter guesses (do a sweep over initial guesses and pick convergence with best AIC score)        
+        # Compute the empirical metrics that allow us to choose sensible initialisation parameters
+        # Peak in power spectrum
+        smax = pspec.max()
+        # Area underneath power spectrum (~ variance)
+        stot = pspec.sum()*(pspec.index[1]-pspec.index[0])
+        # Dominant frequency (take positive value)
+        wdom = abs(pspec.idxmax())
+        
+        ## Create array of initialisation parmaeters        
         
         # Sweep values (as proportion of baseline guess)
-        sweep=False
+        sweep=True
         sweep_vals = np.array([0.2,1,2]) if sweep else np.array([1])
         
-        # Baseline parameter guesses (derived from empirical spectrum)
-        sigma_init = np.sqrt(2/(np.pi*smax))*area
-        lambda_init = -area/(np.pi*smax)
-        mu_init = -area/(np.pi*smax)
-        delta_init = 0.01 
+        # Baseline parameter initialisations (computed using empirical spectrum)
+        # Sfold
+        sigma_init_fold = sigma_init_fold_fun(smax,stot)
+        lambda_init = lambda_init_fun(smax,stot)
+        # Shopf
+        sigma_init_hopf = sigma_init_hopf_fun(smax,stot,wdom)
+        mu_init = mu_init_fun(smax,stot,wdom)
+        w0_init = wdom
+        # Snull
+        sigma_init_null = np.sqrt(stot)
         
         
         # Arrays of initial values
-        init_fold_array = {'sigma': sweep_vals*sigma_init,
+        init_fold_array = {'sigma': sweep_vals*sigma_init_fold,
                      'lambda': sweep_vals*lambda_init}
         
-        init_hopf_array = {'sigma': sweep_vals*sigma_init,
+        init_hopf_array = {'sigma': sweep_vals*sigma_init_hopf,
                      'mu': sweep_vals*mu_init,
-                     'delta': sweep_vals*delta_init}
+                     'w0': sweep_vals*w0_init}
 
-        init_null_array = {'sigma': sweep_vals*sigma_init}
+        init_null_array = {'sigma': sweep_vals*sigma_init_null}
 
 
         ## Compute AIC values and fits
@@ -434,9 +459,9 @@ def pspec_metrics(pspec,
         # Sweep over initial parameter guesses and pick best convergence
         for i in range(len(init_hopf_array['sigma'])):
             for j in range(len(init_hopf_array['mu'])):
-                for k in range(len(init_hopf_array['delta'])):
+                for k in range(len(init_hopf_array['w0'])):
                     # Initial parameter guess
-                    init_hopf = [init_hopf_array['sigma'][i],init_hopf_array['mu'][j],init_hopf_array['delta'][k]]
+                    init_hopf = [init_hopf_array['sigma'][i],init_hopf_array['mu'][j],init_hopf_array['w0'][k]]
                     # Compute fold fit and AIC score
                     [aic_temp, model_temp] = fit_hopf(pspec, init_hopf)
                     # Store in list
@@ -446,7 +471,6 @@ def pspec_metrics(pspec,
         # Pick out the best model
         [aic_hopf, model_hopf] = array_temp[array_temp[:,0].argmin()]       
                
-#        print(hopf_aic_fits)
         
         ## Null
                 

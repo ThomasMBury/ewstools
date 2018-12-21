@@ -201,7 +201,7 @@ def ews_compute(raw_series,
             list_metrics_append.append(metrics)
             
             
-            ## Compute best power spectrum fits
+            ## Obtain power spectrum fits as an array for plotting
             # Create fine-scale frequency values
             wVals = np.linspace(min(pspec.index), max(pspec.index), 100)
             # Fold fit
