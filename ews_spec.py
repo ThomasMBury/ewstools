@@ -110,6 +110,47 @@ def psd_null(w,sigma):
 
 
 
+#--------------------------------
+## Functions to find initalisation parameters for optimisation procedure
+#–--------------------------------\
+    
+# Function to compute the initialisation value for mu when fitting Shopf
+def mu_init(smax, stot, wdom):
+    
+    # define chunky term (use \ to continue eqn to new line)
+    def alpha(smax, stot, wdom):
+        return -stot**3 \
+        - 9*(np.pi**2)*(wdom**2)*(smax**2)*stot \
+        +3*np.pi*np.sqrt(
+                192*(np.pi**4)*(wdom**6)*(smax**6) \
+                -39*(np.pi**2)*(wdom**4)*(smax**4)*(stot**2) \
+                +6*(wdom**2)*(smax**2)*(stot**4) \
+                )
+        
+    return  -(1/(3*np.pi*smax))*(stot \
+             -alpha(smax,stot,wdom)**(1/3) \
+             -(stot**2-12*(np.pi**2)*(wdom**2)*(smax**2))/(alpha(smax,stot,wdom)**(1/3)))
+ 
+    
+# Function to compute the initialisation value for sigma when fitting Shopf
+def sigma_init_hopf(smax,stot,wdom):
+    return np.sqrt(
+            -2*mu_init(smax,stot,wdom)*stot)
+
+    
+# Function to compute the initialisation value for sigma when fitting Sfold
+def sigma_init_fold(smax,stot):
+    return np.sqrt(
+            2*stot**2/(np.pi*smax)
+            )
+
+
+# Function to compute the initialisation value for lambda when fitting Sfold
+def lambda_init(smax,stot):
+    return -stot/(np.pi*smax)
+
+
+
 #------------------------------------
 ## Functions to fit analytical forms to empirical power spectrum
 #–------------------------------------
@@ -122,7 +163,7 @@ def fit_fold(pspec,init):
         init: Initial parameter guesses [sigma_init, lambda_init]
         
     Output:
-        Dictionary with fitted model and AIC score
+        List containing fitted model and AIC score
     '''
     
     
@@ -161,7 +202,7 @@ def fit_hopf(pspec, init):
         init: Initial parameter guesses [sigma_init, mu_init, delta_fit]
         
     Output:
-        Dictionary with fitted model and AIC score
+        List containing fitted model and AIC score
     '''
     
     # Put frequency values and power values as a list to use LMFIT
@@ -204,7 +245,7 @@ def fit_null(pspec, init):
         init: Initial parameter guesses [sigma_init]
         
     Output:
-        List with fitted model and AIC score
+        List containing fitted model and AIC score
     '''
     
     # Put frequency values and power values as a list to use LMFIT
