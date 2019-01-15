@@ -129,7 +129,7 @@ def mu_init_fun(smax, stot, wdom):
         
     return  -(1/(3*np.pi*smax))*(stot \
              -alpha(smax,stot,wdom)**(1/3) \
-             -(stot**2-12*(np.pi**2)*(wdom**2)*(smax**2))/(alpha(smax,stot,wdom)**(1/3)))
+             +(stot**2-12*(np.pi**2)*(wdom**2)*(smax**2))/(alpha(smax,stot,wdom)**(1/3)))
  
     
 # Function to compute the initialisation value for sigma when fitting Shopf
@@ -143,6 +143,7 @@ def sigma_init_fold_fun(smax,stot):
     return np.sqrt(
             2*stot**2/(np.pi*smax)
             )
+
 
 
 # Function to compute the initialisation value for lambda when fitting Sfold
@@ -225,6 +226,7 @@ def fit_hopf(pspec, init):
             w0_init + (mu_init/(2*np.sqrt(psi_hopf)))*np.sqrt(4-3*psi_hopf + np.sqrt(psi_hopf**2-16*psi_hopf+16)),
             0.0001)
     
+    # Print initialisation values
     print([sigma_init,mu_init,w0_init,delta_init])
     # Assign model object 
     model = Model(psd_hopf)
