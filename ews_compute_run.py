@@ -39,7 +39,7 @@ dt2 = 1 # resolution of time-series for EWS computation
 rw = 0.4 # rolling window
 bw = 0.05 # band width for Gaussian smoothing
 ham_len = 40 # length of Hamming window for spectrum computation
-pspec_roll_offset = 20 # offset of rolling window when computing power spectrum
+pspec_roll_offset = 40 # offset of rolling window when computing power spectrum
 
 
 
@@ -163,7 +163,7 @@ def plot_pspec_grid(t_display):
                   col_wrap=3,
                   sharey=False,
                   aspect=1.5,
-                  size=1.8
+                  height=1.8
                   )
 
     g.map(plt.plot, 'Frequency', 'Empirical', color='k', linewidth=2)
@@ -181,7 +181,7 @@ def plot_pspec_grid(t_display):
     return g
 
 #  Choose time values at which to display power spectrum
-t_display = df_pspec.index.levels[0][::3].values
+t_display = df_pspec.index.levels[0][::].values
 
 # Plot
 plot_pspec = plot_pspec_grid(t_display)

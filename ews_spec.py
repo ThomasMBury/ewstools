@@ -112,23 +112,23 @@ def psd_null(w,sigma):
 
 #--------------------------------
 ## Functions to find initalisation parameters for optimisation procedure
-#–--------------------------------\
+#–--------------------------------
     
 # Function to compute the initialisation value for mu when fitting Shopf
 def mu_init_fun(smax, stot, wdom):
     
     # define chunky term (use \ to continue eqn to new line)
     def alpha(smax, stot, wdom):
-        return -stot**3 \
-        - 9*(np.pi**2)*(wdom**2)*(smax**2)*stot \
+        return stot**3 \
+        + 9*(np.pi**2)*(wdom**2)*(smax**2)*stot \
         +3*np.pi*np.sqrt(
-                192*(np.pi**4)*(wdom**6)*(smax**6) \
-                -39*(np.pi**2)*(wdom**4)*(smax**4)*(stot**2) \
-                +6*(wdom**2)*(smax**2)*(stot**4) \
+                64*(np.pi**4)*(wdom**6)*(smax**6) \
+                -13*(np.pi**2)*(wdom**4)*(smax**4)*(stot**2) \
+                +2*(wdom**2)*(smax**2)*(stot**4) \
                 )
         
     return  -(1/(3*np.pi*smax))*(stot \
-             -alpha(smax,stot,wdom)**(1/3) \
+             +alpha(smax,stot,wdom)**(1/3) \
              +(stot**2-12*(np.pi**2)*(wdom**2)*(smax**2))/(alpha(smax,stot,wdom)**(1/3)))
  
     
@@ -213,6 +213,7 @@ def fit_hopf(pspec, init):
     # Assign labels to initialisation values
     sigma_init, mu_init, w0_init = init
     
+    
     # If any labels are nan, resort to default values 
     if np.isnan(sigma_init) or np.isnan(mu_init) or np.isnan(w0_init):
         sigma_init, mu_init, w0_init = [1,-0.1,1]
@@ -226,19 +227,18 @@ def fit_hopf(pspec, init):
             w0_init + (mu_init/(2*np.sqrt(psi_hopf)))*np.sqrt(4-3*psi_hopf + np.sqrt(psi_hopf**2-16*psi_hopf+16)),
             0.0001)
     
-    # Print initialisation values
-    print([sigma_init,mu_init,w0_init,delta_init])
+
     # Assign model object 
     model = Model(psd_hopf)
     
     ## Set initialisations parameters in model attributes
     
     # Sigma must be positive, and set a (high) upper bound to avoid runaway computation
-    model.set_param_hint('sigma', value=sigma_init, min=0, max=10*sigma_init)
+    model.set_param_hint('sigma', value=sigma_init, min=0)
     # Psi is a fixed parameter (not used in optimisation)
     model.set_param_hint('psi', value=psi_hopf, vary=False)
     # Mu must be negative 
-    model.set_param_hint('mu', value=mu_init, max=0, min=10*mu_init, vary=True)
+    model.set_param_hint('mu', value=mu_init, max=0, vary=True)
     # Delta is a dummy parameter, satisfying d = w0 - wThresh (see paper for wThresh). It is allowed to vary, in place of w0.
     model.set_param_hint('delta', value = delta_init, min=0, vary=True)
     # w0 is a fixed parameter dependent on delta (w0 = delta + wThresh)
@@ -405,7 +405,7 @@ def pspec_metrics(pspec,
         ## Create array of initialisation parmaeters        
         
         # Sweep values (as proportion of baseline guess)
-        sweep=True
+        sweep=False
         sweep_vals = np.array([0.2,1,2]) if sweep else np.array([1])
         
         # Baseline parameter initialisations (computed using empirical spectrum)
@@ -418,6 +418,10 @@ def pspec_metrics(pspec,
         w0_init = wdom
         # Snull
         sigma_init_null = np.sqrt(stot)
+        
+        # Print initialisation params
+        print('\nInitial parameter guesses')
+        print([sigma_init_hopf,mu_init,w0_init])
         
         
         # Arrays of initial values
@@ -472,7 +476,9 @@ def pspec_metrics(pspec,
         array_temp = np.array(hopf_aic_fits)
         # Pick out the best model
         [aic_hopf, model_hopf] = array_temp[array_temp[:,0].argmin()]       
-               
+        
+        
+        
         
         ## Null
                 
@@ -510,6 +516,10 @@ def pspec_metrics(pspec,
         spec_ews['Params fold'] = dict((k, model_fold.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
         spec_ews['Params hopf'] = dict((k, model_hopf.values[k]) for k in ('sigma','mu','w0','delta','psi'))
         spec_ews['Params null'] = model_null.values
+
+        # Print fitted parameter values
+        print('Fitted parameter values')
+        print([model_hopf.values[k] for k in ['sigma','mu','w0']])
 
     # return DataFrame of metrics
     return spec_ews
