@@ -121,7 +121,7 @@ def mu_init_fun(smax, stot, wdom):
     def alpha(smax, stot, wdom):
         return stot**3 \
         + 9*(np.pi**2)*(wdom**2)*(smax**2)*stot \
-        +3*np.pi*np.sqrt(
+        +3*np.sqrt(3)*np.pi*np.sqrt(
                 64*(np.pi**4)*(wdom**6)*(smax**6) \
                 -13*(np.pi**2)*(wdom**4)*(smax**4)*(stot**2) \
                 +2*(wdom**2)*(smax**2)*(stot**4) \
@@ -328,7 +328,8 @@ def aic_weights(aic_scores):
 
 
 def pspec_metrics(pspec,
-                  ews = ['smax','cf','aic']):
+                  ews = ['smax','cf','aic'],
+                  sweep = False):
 
 
     '''
@@ -342,7 +343,9 @@ def pspec_metrics(pspec,
         'smax' : peak in the power spectrum
         'cf' : coherence factor
         'aic' : Hopf, Fold and Null AIC weights
-        
+    sweep (False) : Boolean to determine whether or not to sweep over many 
+    initialisation parameters, or just use the single initialisation that 
+    is derived from measured metrics (see Methods section).
                  
     Output: 
     A dictionary of spectral metrics obtained from pspec
@@ -402,11 +405,14 @@ def pspec_metrics(pspec,
         # Dominant frequency (take positive value)
         wdom = abs(pspec.idxmax())
         
+#        # Print metrics
+#        print('\nSpectrum metrics [smax, stot, wdom]')
+#        print([smax, stot, wdom])
+        
         ## Create array of initialisation parmaeters        
         
-        # Sweep values (as proportion of baseline guess)
-        sweep=False
-        sweep_vals = np.array([0.2,1,2]) if sweep else np.array([1])
+        # Sweep values (as proportion of baseline guess) if sweep = True
+        sweep_vals = np.array([0.5,1,1.5]) if sweep else np.array([1])
         
         # Baseline parameter initialisations (computed using empirical spectrum)
         # Sfold
@@ -419,9 +425,9 @@ def pspec_metrics(pspec,
         # Snull
         sigma_init_null = np.sqrt(stot)
         
-        # Print initialisation params
-        print('\nInitial parameter guesses')
-        print([sigma_init_hopf,mu_init,w0_init])
+#        # Print the derived initialisation parameters
+#        print('Initial parameter guesses for the Hopf fit [sigma, mu, w0]')
+#        print([sigma_init_hopf,mu_init,w0_init])
         
         
         # Arrays of initial values
@@ -517,9 +523,9 @@ def pspec_metrics(pspec,
         spec_ews['Params hopf'] = dict((k, model_hopf.values[k]) for k in ('sigma','mu','w0','delta','psi'))
         spec_ews['Params null'] = model_null.values
 
-        # Print fitted parameter values
-        print('Fitted parameter values')
-        print([model_hopf.values[k] for k in ['sigma','mu','w0']])
+#        # Print fitted parameter values
+#        print('Fitted parameter values after optimisation [sigma, mu, w0]')
+#        print([model_hopf.values[k] for k in ['sigma','mu','w0']])
 
     # return DataFrame of metrics
     return spec_ews

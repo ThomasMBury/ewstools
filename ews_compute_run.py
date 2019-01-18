@@ -29,17 +29,17 @@ from ews_compute import ews_compute
 # Simulation parameters
 dt = 0.01 # time step for simulation
 t0 = 0
-tmax = 800
+tmax = 4000
 tburn = 50 # burn-in period
 seed = 3 # random number generation seed
 sigma = 0.02 # noise intensity
 
 # EWS parameters
 dt2 = 1 # resolution of time-series for EWS computation
-rw = 0.4 # rolling window
+rw = 0.5 # rolling window
 bw = 0.05 # band width for Gaussian smoothing
 ham_len = 40 # length of Hamming window for spectrum computation
-pspec_roll_offset = 40 # offset of rolling window when computing power spectrum
+pspec_roll_offset = 80 # offset of rolling window when computing power spectrum
 
 
 

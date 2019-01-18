@@ -19,7 +19,7 @@ from ews_spec import pspec_welch, pspec_metrics, psd_fold, psd_hopf, psd_null
 
 
 
-def ews_compute(raw_series, 
+def ews_compute(raw_series,
             roll_window=0.25,
             smooth=True,
             upto='Full',
@@ -81,7 +81,7 @@ def ews_compute(raw_series,
     #–------------------------------
     
     # Compute the absolute size of the bandwidth if it is given as a proportion
-    if 0 < band_width < 1:
+    if 0 < band_width <= 1:
         bw_size = short_series.shape[0]*band_width
     else:
         bw_size = band_width
@@ -123,7 +123,8 @@ def ews_compute(raw_series,
     if 'ac' in ews:
         for i in range(len(lag_times)):
             roll_ac = eval_series.rolling(window=rw_size).apply(
-        func=lambda x: pd.Series(x).autocorr(lag=lag_times[i]))
+        func=lambda x: pd.Series(x).autocorr(lag=lag_times[i]),
+        raw=True)
             df_ews['Lag-'+str(lag_times[i])+' AC'] = roll_ac
 
             
@@ -194,7 +195,7 @@ def ews_compute(raw_series,
             
             
             ## Compute the spectral EWS using pspec_metrics (dictionary)
-            metrics = pspec_metrics(pspec,ews)
+            metrics = pspec_metrics(pspec, ews)
             # Add the time-stamp
             metrics['Time'] = t_point
             # Add metrics (dictionary) to the list
