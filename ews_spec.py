@@ -329,7 +329,7 @@ def aic_weights(aic_scores):
 
 def pspec_metrics(pspec,
                   ews = ['smax','cf','aic'],
-                  sweep = False):
+                  sweep = True):
 
 
     '''
@@ -404,6 +404,8 @@ def pspec_metrics(pspec,
         stot = pspec.sum()*(pspec.index[1]-pspec.index[0])
         # Dominant frequency (take positive value)
         wdom = abs(pspec.idxmax())
+        
+        # If stot=0 then there is no variation - set aic_null=1
         
 #        # Print metrics
 #        print('\nSpectrum metrics [smax, stot, wdom]')

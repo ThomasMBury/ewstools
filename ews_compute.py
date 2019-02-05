@@ -177,7 +177,6 @@ def ews_compute(raw_series,
         # Initialise a list for the power spectra
         list_spec_append = []
         
-        
         # Loop through window locations shifted by roll_offset
         for k in np.arange(0, num_comps-(rw_size-1), roll_offset):
             
@@ -202,47 +201,49 @@ def ews_compute(raw_series,
             list_metrics_append.append(metrics)
             
             
-            ## Obtain power spectrum fits as an array for plotting
-            # Create fine-scale frequency values
-            wVals = np.linspace(min(pspec.index), max(pspec.index), 100)
-            # Fold fit
-            pspec_fold = psd_fold(wVals, metrics['Params fold']['sigma'],
-                 metrics['Params fold']['lam'])
-            # Hopf fit
-            pspec_hopf = psd_hopf(wVals, metrics['Params hopf']['sigma'],
-                 metrics['Params hopf']['mu'],
-                 metrics['Params hopf']['w0'])
-            # Null fit
-            pspec_null = psd_null(wVals, metrics['Params null']['sigma'])
-            
-            ## Put spectrum fits into a dataframe
-            dic_temp = {'Time': t_point*np.ones(len(wVals)), 
-                        'Frequency': wVals,
-                        'Fit fold': pspec_fold,
-                        'Fit hopf': pspec_hopf, 
-                        'Fit null': pspec_null}
-            df_pspec_fits = pd.DataFrame(dic_temp)
-            # Set the multi-index
-            df_pspec_fits.set_index(['Time','Frequency'], inplace=True)
-                        
-            ## Put empirical power spectrum and fits into the same DataFrames
-            # Put empirical power spectrum into a DataFrame and remove indexes         
-            df_pspec_empirical = pspec.to_frame().reset_index()
-            # Rename column
-            df_pspec_empirical.rename(columns={'Power spectrum': 'Empirical'}, inplace=True)
-            # Include a column for the time-stamp
-            df_pspec_empirical['Time'] = t_point*np.ones(len(pspec))
-            # Use a multi-index of ['Time','Frequency']
-            df_pspec_empirical.set_index(['Time', 'Frequency'], inplace=True)
-            # Concatenate the empirical spectrum and the fits into one DataFrame
-            df_pspec_temp = pd.concat([df_pspec_empirical, df_pspec_fits], axis=1)
-            # Add spectrum DataFrame to the list  
-            list_spec_append.append(df_pspec_temp)
+            if 'aic' in ews:
+                
+                ## Obtain power spectrum fits as an array for plotting
+                # Create fine-scale frequency values
+                wVals = np.linspace(min(pspec.index), max(pspec.index), 100)
+                # Fold fit
+                pspec_fold = psd_fold(wVals, metrics['Params fold']['sigma'],
+                     metrics['Params fold']['lam'])
+                # Hopf fit
+                pspec_hopf = psd_hopf(wVals, metrics['Params hopf']['sigma'],
+                     metrics['Params hopf']['mu'],
+                     metrics['Params hopf']['w0'])
+                # Null fit
+                pspec_null = psd_null(wVals, metrics['Params null']['sigma'])
+                
+                ## Put spectrum fits into a dataframe
+                dic_temp = {'Time': t_point*np.ones(len(wVals)), 
+                            'Frequency': wVals,
+                            'Fit fold': pspec_fold,
+                            'Fit hopf': pspec_hopf, 
+                            'Fit null': pspec_null}
+                df_pspec_fits = pd.DataFrame(dic_temp)
+                # Set the multi-index
+                df_pspec_fits.set_index(['Time','Frequency'], inplace=True)
+                            
+                ## Put empirical power spectrum and fits into the same DataFrames
+                # Put empirical power spectrum into a DataFrame and remove indexes         
+                df_pspec_empirical = pspec.to_frame().reset_index()
+                # Rename column
+                df_pspec_empirical.rename(columns={'Power spectrum': 'Empirical'}, inplace=True)
+                # Include a column for the time-stamp
+                df_pspec_empirical['Time'] = t_point*np.ones(len(pspec))
+                # Use a multi-index of ['Time','Frequency']
+                df_pspec_empirical.set_index(['Time', 'Frequency'], inplace=True)
+                # Concatenate the empirical spectrum and the fits into one DataFrame
+                df_pspec_temp = pd.concat([df_pspec_empirical, df_pspec_fits], axis=1)
+                # Add spectrum DataFrame to the list  
+                list_spec_append.append(df_pspec_temp)
             
             
                  
         # Concatenate the list of power spectra DataFrames to form a single DataFrame
-        df_pspec = pd.concat(list_spec_append)
+        df_pspec = pd.concat(list_spec_append) if 'aic' in ews else 0
         
         # Create a DataFrame out of the multiple dictionaries consisting of the spectral metrics
         df_spec_metrics = pd.DataFrame(list_metrics_append)
@@ -251,6 +252,9 @@ def ews_compute(raw_series,
         
         # Join the spectral EWS DataFrame to the main EWS DataFrame 
         df_ews = df_ews.join(df_spec_metrics)
+        
+        # Include Smax normalised by Variance
+        df_ews['Smax/Var'] = df_ews['Smax']/df_ews['Variance']
         
         
     
@@ -268,8 +272,9 @@ def ews_compute(raw_series,
     # Put time values as their own series for correlation computation
     time_vals = pd.Series(df_ews.index, index=df_ews.index)
 
-    # List of EWS for kendall tau computation (get rid of irrelevant columns)
-    list_ews = df_ews.columns.drop(['State variable','Smoothing','Residuals','Params fold','Params hopf','Params null','AIC fold', 'AIC hopf','AIC null'])
+    # List of EWS for kendall tau computation
+    ktau_metrics = ['Variance','Standard deviation','Kurtosis','Coefficient of variation','Smax','Smax/Var'] + ['Lag-'+str(i)+' AC' for i in lag_times]
+    list_ews = df_ews[ ktau_metrics ]
     
     # Find Kendall tau for each EWS and store in a DataFrame
     dic_ktau = {x:df_ews[x].corr(time_vals, method='kendall') for x in list_ews} # temporary dictionary
