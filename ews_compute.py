@@ -35,7 +35,7 @@ def ews_compute(raw_series,
     '''
     Function to compute EWS from time-series data.   
     
-    Input (default value)
+    Inputs (default value):
     raw_series : pandas Series indexed by time 
     roll_windopw (0.25) : size of the rolling window (as a proportion
     of the length of the data)
@@ -62,7 +62,7 @@ def ews_compute(raw_series,
     sweep (False) : whether to sweep over a range of intialisation parameters
                     when optimising to compute AIC scores (longer computation)
     
-    Output: Dictionary
+    Outputs: Dictionary
     'EWS metrics': DataFrame indexed by time with columns csp to each EWS
     'Power spectrum': DataFrame of power spectra and the model fits indexed by time
     'Kendall tau': DataFrame of the kendall tau values for each EWS metric (those that are expected to increase)
