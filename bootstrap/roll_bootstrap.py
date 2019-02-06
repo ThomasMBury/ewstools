@@ -97,7 +97,7 @@ def block_bootstrap(series,
 
 
 #------------------------------------
-# Block bootstrap over a rolling window
+# Block bootstrap a non-stationary time-series over a rolling window
 #-----------------------------------------
     
 
