@@ -5,7 +5,8 @@ Created on Thu Nov  1 19:11:58 2018
 
 @author: Thomas Bury
 
-Function to compute EWS from time-series data
+Function to compute EWS from time-series data with bootstrapping for confidence
+intervals
 
 """
 
@@ -20,7 +21,7 @@ from ews_spec import pspec_welch, pspec_metrics, psd_fold, psd_hopf, psd_null
 
 
 
-def ews_compute(raw_series,
+def ews_bootstrap(raw_series,
             roll_window=0.25,
             smooth=True,
             upto='Full',
