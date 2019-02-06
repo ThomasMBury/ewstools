@@ -329,7 +329,7 @@ def aic_weights(aic_scores):
 
 def pspec_metrics(pspec,
                   ews = ['smax','cf','aic'],
-                  sweep = True):
+                  sweep = False):
 
 
     '''

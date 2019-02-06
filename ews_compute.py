@@ -29,7 +29,8 @@ def ews_compute(raw_series,
             ham_length=40,
             ham_offset=0.5,
             pspec_roll_offset=20, # generally ham_length*ham_offset
-            w_cutoff=1):
+            w_cutoff=1,
+            sweep=False):
     '''
     Function to compute EWS from time-series data.   
     
@@ -57,7 +58,8 @@ def ews_compute(raw_series,
     ham_offset (0.5) : proportion of Hamimng window to offset by
     pspec_roll_offset (20) : offset of rolling window for pspec computation
     w_cutoff (1) : cutoff frequency (as proportion of size of maximum frequency)
-    updates (False) : include updates on progress of function
+    sweep (False) : whether to sweep over a range of intialisation parameters
+                    when optimising to compute AIC scores (longer computation)
     
     Output: Dictionary
     'EWS metrics': DataFrame indexed by time with columns csp to each EWS
@@ -106,7 +108,7 @@ def ews_compute(raw_series,
     
     
     #----------------------------
-    ## Compute standard EWS
+    ## Compute temporal EWS
     #-----------------------------  
         
     # Compute standard deviation as a Series and add to the DataFrame
@@ -143,7 +145,7 @@ def ews_compute(raw_series,
         roll_skew = eval_series.rolling(window=rw_size).skew()
         df_ews['Skewness'] = roll_skew
 
-    # Compute krutosis and add to DataFrame
+    # Compute Kurtosis and add to DataFrame
     if 'kurt' in ews:
         roll_kurt = eval_series.rolling(window=rw_size).kurt()
         df_ews['Kurtosis'] = roll_kurt
@@ -194,7 +196,7 @@ def ews_compute(raw_series,
             
             
             ## Compute the spectral EWS using pspec_metrics (dictionary)
-            metrics = pspec_metrics(pspec, ews)
+            metrics = pspec_metrics(pspec, ews, sweep)
             # Add the time-stamp
             metrics['Time'] = t_point
             # Add metrics (dictionary) to the list
@@ -272,12 +274,14 @@ def ews_compute(raw_series,
     # Put time values as their own series for correlation computation
     time_vals = pd.Series(df_ews.index, index=df_ews.index)
 
-    # List of EWS for kendall tau computation
+    # List of EWS that can be used for Kendall tau computation
     ktau_metrics = ['Variance','Standard deviation','Kurtosis','Coefficient of variation','Smax','Smax/Var'] + ['Lag-'+str(i)+' AC' for i in lag_times]
-    list_ews = df_ews[ ktau_metrics ]
+    # Find intersection with this list and EWS computed
+    ews_list = df_ews.columns.values.tolist()
+    ktau_metrics = list( set(ews_list) & set(ktau_metrics) )
     
     # Find Kendall tau for each EWS and store in a DataFrame
-    dic_ktau = {x:df_ews[x].corr(time_vals, method='kendall') for x in list_ews} # temporary dictionary
+    dic_ktau = {x:df_ews[x].corr(time_vals, method='kendall') for x in ktau_metrics} # temporary dictionary
     df_ktau = pd.DataFrame(dic_ktau, index=[0]) # DataFrame (easier for concatenation purposes)
                                                                              
                                                                              
