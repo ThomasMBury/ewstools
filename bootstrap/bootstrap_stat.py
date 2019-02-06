@@ -88,11 +88,32 @@ def segment_bootstrap(raw_series,
     
     
     
-    
-    
     # Compute the rolling window size (integer value)
-    rw_size=int(np.floor(roll_window * raw_series.shape[0]))    
+    rw_size=int(np.floor(roll_window * raw_series.shape[0]))
+
+
+
+
+    # Bootstrap residuals using stationary bootstrap
+    block_size = 10
+    bs = StationaryBootstrap(block_size, residuals)
+    n_samples = 100
     
+    # List of sample time-series from residuals
+    list_samples = []
+    
+    count = 1
+    for data in bs.bootstrap(n_samples):
+        
+        df_temp = pd.DataFrame({'sample': count, 
+                                'twin': series.index.values,
+                                'x': data[0][0]})
+        list_samples.append(df_temp)
+        count += 1
+        
+    # Concatenate list of samples
+    df_samples = pd.concat(list_samples)
+    df_samples.set_index(['sample','twin'], inplace=True)
 
 
 
