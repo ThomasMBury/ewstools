@@ -119,7 +119,60 @@ def segment_bootstrap(raw_series,
 
 
 
+# Function to take in stationary series and output (block) bootstrap samples
+def block_bootstrap(series,
+              n_samples,
+              type = 'Stationary',
+              block_size = 10
+              ):
 
+    '''
+    Computes bootstrapped samples of series.
+    
+    Inputs:
+        series: pandas Series indexed by time
+        n_samples: # bootstrapped samples to output
+        type ('Stationary'): type of bootstrapping to perform.
+            Options include ['Stationary', 'Circular']
+        block_size: # size of resampling blocks. Should be big enough to
+            capture important frequencies in the series
+            
+    Ouput:
+        DataFrame indexed by sample number and time
+        
+    
+    '''
+
+    # Set up list for sampled time-series
+    list_samples = []
+    
+    # Stationary bootstrapping
+    if type == 'Stationary':
+        bs = StationaryBootstrap(block_size, series)
+                
+        # Count for sample number
+        count = 1
+        for data in bs.bootstrap(n_samples):
+            
+            df_temp = pd.DataFrame({'sample': count, 
+                                    'time': series.index.values,
+                                    'x': data[0][0]})
+            list_samples.append(df_temp)
+            count += 1
+            
+        
+    
+
+    # Concatenate list of samples
+    df_samples = pd.concat(list_samples)
+    df_samples.set_index(['sample','time'], inplace=True)
+
+    
+    # Output DataFrame of samples
+    return df_samples
+
+    
+    
 
 
 
