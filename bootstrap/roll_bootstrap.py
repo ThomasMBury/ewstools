@@ -121,7 +121,7 @@ def roll_bootstrap(raw_series,
         raw_series - pandas Series indexed by time
         span (0.1) - proportion of data used for Loess filtering
         roll_windopw (0.25) - size of the rolling window (as a proportion
-                     of the lenght of the data)
+                     of the length of the data)
         roll_offset (1) - number of points to shift the rolling window
             upon each iteration (reduce to increase computation time)
         upto ('Full') - if 'Full', use entire time-series, ow input time up 
@@ -179,6 +179,9 @@ def roll_bootstrap(raw_series,
     # Initialise a list for the sample residuals at each time point
     list_samples = []
     
+    # Counter
+    i=0
+    
     # Loop through window locations shifted by roll_offset
     for k in np.arange(0, num_comps-(rw_size-1), roll_offset):
         
@@ -192,20 +195,21 @@ def roll_bootstrap(raw_series,
                                           bs_type, block_size)
         
         # Add column with real time (end of window)
-        df_samples_temp['realtime'] = t_point
+        df_samples_temp['Time'] = t_point
                 
         # Reorganise index
         df_samples_temp.reset_index(inplace=True)
-        df_samples_temp.set_index(['realtime','sample','time'], inplace=True)
-        df_samples_temp.index.rename(['realtime','sample','wintime'],inplace=True)
+        df_samples_temp.set_index(['Time','sample','time'], inplace=True)
+        df_samples_temp.index.rename(['Time','Sample','Wintime'],inplace=True)
         
         # Append the list of samples
         list_samples.append(df_samples_temp)
         
         # Print update
-        if int(t_point):
+        if i % 1 ==0:
             print('Bootstrap samples for window at t = %.2f complete' % (t_point))
- 
+            
+        i += 1
     
 
 
