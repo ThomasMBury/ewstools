@@ -40,7 +40,7 @@ from ews_compute import ews_compute
 # Simulation parameters
 dt = 1 # time-step (must be 1 since discrete-time system)
 t0 = 0
-tmax = 800
+tmax = 200
 tburn = 100 # burn-in period
 seed = 0 # random number generation seedaa
 sigma = 0.05 # noise intensity
@@ -132,9 +132,24 @@ df_traj = pd.DataFrame(data).set_index('Time')
 # Compute EWS (moments) without bootstrapping
 #-------------------------------------
 
+# Time-series data as a pandas Series
+series = df_traj['x']
+        
+# Put into ews_compute
+ews_dic = ews_compute(series,
+                      smooth = 'Gaussian',
+                      span = 0.1,
+                      roll_window = 0.25, 
+                      lag_times = lags, 
+                      ews = ['var','skew','kurt'],
+                      ham_length = ham_length,
+                      ham_offset = ham_offset,
+                      pspec_roll_offset = pspec_roll_offset,
+                      upto=tcrit,
+                      sweep=False)
 
-
-
+# DataFrame of EWS
+df_ews = ews_dic['EWS metrics']
 
 
 

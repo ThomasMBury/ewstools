@@ -119,7 +119,7 @@ def ews_compute(raw_series,
         df_ews['Residuals'] = resid_series
         
     # Use the short_series EWS if smooth='None'. Otherwise use reiduals.
-    eval_series = short_series if smooth == 'None' else residuals
+    eval_series = short_series if smooth == 'None' else resid_series
     
     # Compute the rolling window size (integer value)
     rw_size=int(np.floor(roll_window * raw_series.shape[0]))
@@ -310,7 +310,13 @@ def ews_compute(raw_series,
     #–----------------------
        
     # Ouptut a dictionary containing EWS DataFrame, power spectra DataFrame, and Kendall tau values
-    output_dic = {'EWS metrics': df_ews, 'Power spectrum': df_pspec, 'Kendall tau': df_ktau}
+    output_dic = {'EWS metrics': df_ews, 'Kendall tau': df_ktau}
+    
+    # Add df_pspec to dictionary if it was computed
+    if 'smax' in ews or 'cf' in ews or 'aic' in ews:
+        output_dic['Power spectrum'] = df_pspec
+        
+    
     
     return output_dic
 

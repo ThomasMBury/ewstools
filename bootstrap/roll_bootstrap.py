@@ -161,7 +161,7 @@ def roll_bootstrap(raw_series,
     
     
     # Smooth the series and compute the residuals
-    smooth_data = lowess(series.values, series.index.values, frac=0.5)[:,1]
+    smooth_data = lowess(series.values, series.index.values, frac=span)[:,1]
     residuals = series.values - smooth_data
     resid_series = pd.Series(residuals, index=series.index)
 
