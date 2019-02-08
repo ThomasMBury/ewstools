@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Feb  8 11:09:11 2019
+
+Simulate the Ricker model and evaluate the EWS that correspond to moments
+(Variance, Skewness, Kurtosis) using bootstrapping. Compare with no bootstrapping.
+Does bootstrapping give us more information? Confidence intervals?
+
+
+@author: Thomas Bury
+"""
+
+
+
+
