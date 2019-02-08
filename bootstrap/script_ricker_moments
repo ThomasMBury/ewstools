@@ -14,3 +14,137 @@ Does bootstrapping give us more information? Confidence intervals?
 
 
 
+# Import python libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+
+# Import bootstrap module
+from roll_bootstrap import roll_bootstrap
+
+# Import EWS module
+import sys
+sys.path.append('../../early_warnings')
+from ews_compute import ews_compute
+
+
+
+
+#--------------------------------
+# Global parameters
+#–-----------------------------
+
+
+# Simulation parameters
+dt = 1 # time-step (must be 1 since discrete-time system)
+t0 = 0
+tmax = 800
+tburn = 100 # burn-in period
+seed = 0 # random number generation seedaa
+sigma = 0.05 # noise intensity
+
+
+
+# Bootstrapping parameters
+block_size = 10 # size of blocks used to resample time-series
+bs_type = 'Stationary' # type of bootstrapping
+n_samples = 10 # number of bootstrapping samples to take
+roll_offset = 10 # rolling window offset
+
+
+# EWS parameters
+dt2 = 1 # spacing between time-series for EWS computation
+rw = 0.5 # rolling window
+span = 0.1 # proportion of data for Loess filtering
+
+lags = [1,2,3] # autocorrelation lag times
+ews = ['var','ac','sd','cv','skew','kurt','smax','aic','cf'] # EWS to compute
+ham_length = 40 # number of data points in Hamming window
+ham_offset = 0.5 # proportion of Hamming window to offset by upon each iteration
+pspec_roll_offset = 20 # offset for rolling window when doing spectrum metrics
+
+
+
+
+#----------------------------------
+# Simulate transient realisation of Ricker model
+#----------------------------------
+
+    
+# Model parameters
+r = 0.75 # growth rate
+k = 10 # carrying capacity
+h = 0.75 # half-saturation constant of harvesting function
+bl = 0 # bifurcation parameter (harvesting) low
+bh = 3 # bifurcation parameter (harvesting) high
+bcrit = 2.364 # bifurcation point (computed in Mathematica)
+x0 = 0.8 # initial condition
+
+def de_fun(x,r,k,f,h,xi):
+    return x*np.exp(r*(1-x/k)+xi) - f*x**2/(x**2+h**2)
+
+
+# Initialise arrays to store single time-series data
+t = np.arange(t0,tmax,dt)
+x = np.zeros(len(t))
+
+# Set bifurcation parameter b, that increases linearly in time from bl to bh
+b = pd.Series(np.linspace(bl,bh,len(t)),index=t)
+# Time at which bifurcation occurs
+tcrit = b[b > bcrit].index[1]
+
+## Implement Euler Maryuyama for stocahstic simulation
+
+# Set seed
+np.random.seed(seed)
+   
+
+# Create brownian increments (s.d. sqrt(dt))
+dW_burn = np.random.normal(loc=0, scale=sigma*np.sqrt(dt), size = int(tburn/dt))
+dW = np.random.normal(loc=0, scale=sigma*np.sqrt(dt), size = len(t))
+
+# Run burn-in period on x0
+for i in range(int(tburn/dt)):
+    x0 = de_fun(x0,r,k,bl,h,dW_burn[i])
+    
+# Initial condition post burn-in period
+x[0]=x0
+
+# Run simulation
+for i in range(len(t)-1):
+    x[i+1] = de_fun(x[i],r,k,b.iloc[i], h,dW[i])
+    # make sure that state variable remains >= 0
+    if x[i+1] < 0:
+        x[i+1] = 0
+        
+# Trajectory data stored in a DataFrame indexed by time
+data = { 'Time': t,
+            'x': x}
+df_traj = pd.DataFrame(data).set_index('Time')
+
+
+
+
+
+#--------------------------------
+# Compute EWS (moments) without bootstrapping
+#-------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

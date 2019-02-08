@@ -12,19 +12,23 @@ Function to compute EWS from time-series data
 # Import Python modules
 import numpy as np
 import pandas as pd
-from scipy.ndimage.filters import gaussian_filter as gf
 
+# Modules for filtering timeseries
+from statsmodels.nonparametric.smoothers_lowess import lowess
+from scipy.ndimage.filters import gaussian_filter as gf
 
 # Import local module
 from ews_spec import pspec_welch, pspec_metrics, psd_fold, psd_hopf, psd_null
 
 
 
+
 def ews_compute(raw_series,
             roll_window=0.25,
-            smooth=True,
-            upto='Full',
+            smooth='Lowess',
+            span=0.1,
             band_width=0.2,
+            upto='Full',
             ews=['var','ac'], 
             lag_times=[1],
             ham_length=40,
@@ -39,9 +43,13 @@ def ews_compute(raw_series,
     raw_series : pandas Series indexed by time 
     roll_windopw (0.25) : size of the rolling window (as a proportion
     of the length of the data)
-    smooth (True) : if True, series data is detrended with a Gaussian kernel
-    upto ('Full') : if 'Full', use entire time-series, ow input time up to which EWS are to be evaluated
+    smooth ('Lowess') : type of detrending to perform. Options include
+        'Gaussian' - Gaussian kernel
+        'Lowess' - Lowess smoothing
+        'None' - No detrending
     band_width (0.2) : bandwidth of Gaussian kernel (taken as a proportion if in (0,1), otherwise taken as absolute)
+    span (0.1) - window size used for Lowess filtering (proportion of data)
+    upto ('Full') : if 'Full', use entire time-series, ow input time up to which EWS are to be evaluated
     ews (['var,'ac'] : list of strings corresponding to the desired EWS.
          Options include
              'var'   : Variance
@@ -89,8 +97,8 @@ def ews_compute(raw_series,
     else:
         bw_size = band_width
     
-    # Compute smoothed data and residuals if smooth=True.
-    if smooth:
+    # Compute smoothed data and residuals
+    if 'Gaussian':
         smooth_data = gf(short_series.values, sigma=bw_size, mode='reflect')
         smooth_series = pd.Series(smooth_data, index=short_series.index)
         residuals = short_series.values - smooth_data
@@ -99,9 +107,19 @@ def ews_compute(raw_series,
         # Add smoothed data and residuals to the EWS DataFrame
         df_ews['Smoothing'] = smooth_series
         df_ews['Residuals'] = resid_series
+    
+    if 'Lowess':
+        smooth_data = lowess(short_series.values, short_series.index.values, frac=span)[:,1]
+        smooth_series = pd.Series(smooth_data, index=short_series.index)
+        residuals = short_series.values - smooth_data
+        resid_series = pd.Series(residuals, index=short_series.index)
+    
+        # Add smoothed data and residuals to the EWS DataFrame
+        df_ews['Smoothing'] = smooth_series
+        df_ews['Residuals'] = resid_series
         
-    # Use the residuals for EWS if smooth=True. Otherwise use the raw series
-    eval_series = resid_series if smooth else short_series
+    # Use the short_series EWS if smooth='None'. Otherwise use reiduals.
+    eval_series = short_series if smooth == 'None' else residuals
     
     # Compute the rolling window size (integer value)
     rw_size=int(np.floor(roll_window * raw_series.shape[0]))
