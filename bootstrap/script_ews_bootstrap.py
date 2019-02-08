@@ -36,7 +36,7 @@ from ews_compute import ews_compute
 # Simulation parameters
 dt = 1 # time-step (must be 1 since discrete-time system)
 t0 = 0
-tmax = 200
+tmax = 800
 tburn = 100 # burn-in period
 numSims = 1
 seed = 0 # random number generation seedaa
@@ -47,8 +47,8 @@ sigma = 0.05 # noise intensity
 # Bootstrapping parameters
 block_size = 10 # size of blocks used to resample time-series
 bs_type = 'Stationary' # type of bootstrapping
-n_samples = 4 # number of bootstrapping samples to take
-roll_offset = 5 # rolling window offset
+n_samples = 10 # number of bootstrapping samples to take
+roll_offset = 10 # rolling window offset
 
 
 # EWS parameters
