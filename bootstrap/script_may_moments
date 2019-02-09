@@ -3,7 +3,7 @@
 """
 Created on Fri Feb  8 11:09:11 2019
 
-Simulate the Ricker model and evaluate the EWS that correspond to moments
+Simulate May's harvesting model and evaluate the EWS that correspond to moments
 (Variance, Skewness, Kurtosis) using bootstrapping. Compare with no bootstrapping.
 Does bootstrapping give us more information? Confidence intervals?
 
@@ -38,14 +38,15 @@ from ews_compute import ews_compute
 
 
 # Simulation parameters
-dt = 1 # time-step (must be 1 since discrete-time system)
+dt = 0.01 # time step
 t0 = 0
-tmax = 200
+tmax = 400
 tburn = 100 # burn-in period
-seed = 2 # random number generation seedaa
+seed = 10 # random number generation seedaa
 sigma = 0.02 # noise intensity
 
 # EWS parameters
+dt2 = 1
 span = 0.5
 rw = 0.5
 ews = ['var','sd']
@@ -53,28 +54,30 @@ ews = ['var','sd']
 # Bootstrapping parameters
 block_size = 1 # size of blocks used to resample time-series
 bs_type = 'Stationary' # type of bootstrapping
-n_samples = 5 # number of bootstrapping samples to take
-roll_offset = 20 # rolling window offset
+n_samples = 100 # number of bootstrapping samples to take
+roll_offset = 2 # rolling window offset
 
 
 
 
 #----------------------------------
-# Simulate transient realisation of Ricker model
+# Simulate transient realisation of May's harvesting model
 #----------------------------------
 
     
-# Model parameters
-r = 0.75 # growth rate
-k = 10 # carrying capacity
-h = 0.75 # half-saturation constant of harvesting function
-bl = 0 # bifurcation parameter (harvesting) low
-bh = 3 # bifurcation parameter (harvesting) high
-bcrit = 2.364 # bifurcation point (computed in Mathematica)
-x0 = 0.8 # initial condition
+# Model
 
-def de_fun(x,r,k,f,h,xi):
-    return x*np.exp(r*(1-x/k)+xi) - f*x**2/(x**2+h**2)
+def de_fun(x,r,k,h,s):
+    return r*x*(1-x/k)  - h*(x**2/(s**2 + x**2))
+    
+# Model parameters
+r = 1 # growth rate
+k = 1 # carrying capacity
+s = 0.1 # half-saturation constant of harvesting function
+bl = 0.15 # bifurcation parameter low
+bh = 0.28 # bifurcation parameter high
+bcrit = 0.260437 # bifurcation point (computed in Mathematica)
+x0 = 0.8197 # intial condition (equilibrium value computed in Mathematica)
 
 
 # Initialise arrays to store single time-series data
@@ -97,14 +100,14 @@ dW = np.random.normal(loc=0, scale=sigma*np.sqrt(dt), size = len(t))
 
 # Run burn-in period on x0
 for i in range(int(tburn/dt)):
-    x0 = de_fun(x0,r,k,bl,h,dW_burn[i])
+    x0 = x0 + de_fun(x0,r,k,b[0],s)*dt + dW_burn[i]
     
 # Initial condition post burn-in period
 x[0]=x0
 
 # Run simulation
 for i in range(len(t)-1):
-    x[i+1] = de_fun(x[i],r,k,b.iloc[i], h,dW[i])
+    x[i+1] = x[i] + de_fun(x[i],r,k, b.iloc[i], s)*dt + dW[i]
     # make sure that state variable remains >= 0
     if x[i+1] < 0:
         x[i+1] = 0
@@ -122,14 +125,17 @@ df_traj = pd.DataFrame(data).set_index('Time')
 # Compute EWS (moments) without bootstrapping
 #-------------------------------------
 
+# Filter time-series to have time-spacing dt2
+df_traj_filt = df_traj.loc[::int(dt2/dt)]
+
 # Time-series data as a pandas Series
-series = df_traj['x']
+series = df_traj_filt['x']
         
 # Put into ews_compute
 ews_dic = ews_compute(series,
                       smooth = 'Lowess',
                       span = span,
-                      roll_window = 0.5,
+                      roll_window = rw,
                       upto = tcrit,
                       ews = ews)
 
@@ -184,8 +190,8 @@ for t in tVals:
         series_temp = df_samples.loc[t].loc[sample]['x']
         
         ews_dic = ews_compute(series_temp,
-                          roll_window = 1, 
-                          band_width = 1,
+                          smooth='None',
+                          roll_window = 1,
                           ews = ews,
                           upto='Full')
         
@@ -222,7 +228,7 @@ df_ews_boot = pd.concat(list_df_ews).reset_index(drop=True).set_index(['Time','S
 ## Plot of variance of bootstrapped samples
 # Put DataFrame in form for Seaborn plot
 data = df_ews_boot.reset_index().melt(id_vars = 'Time',
-                         value_vars = ('Variance'),
+                         value_vars = 'Variance',
                          var_name = 'EWS',
                          value_name = 'Magnitude')
 # Make plot with error bars
@@ -236,8 +242,17 @@ var_plot = sns.relplot(x="Time",
 
 
 
+# Quantiles to compute
+quantiles = [0.05,0.25,0.5,0.75,0.95]
 
+# DataFrame of quantiles for each EWS
+df_quant = df_ews_boot.groupby(level=0).quantile(quantiles, axis=0)
+# Rename and reorder index of DataFrame
+df_quant.index.rename(['Time','Quantile'], inplace=True)
+df_quant = df_quant.reorder_levels(['Quantile','Time']).sort_index()
 
+# Plot of quantiles
+df_quant.loc[0.05:0.95]['Variance'].unstack(level=0).plot()
 
 
 

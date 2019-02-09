@@ -203,7 +203,7 @@ for t in tVals:
                           ham_length = ham_length,
                           ham_offset = ham_offset,
                           pspec_roll_offset = pspec_roll_offset,
-                          upto=tcrit,
+                          upto=1,
                           sweep=False)
         
         # The DataFrame of EWS
