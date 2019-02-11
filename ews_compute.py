@@ -96,6 +96,12 @@ def ews_compute(raw_series,
         bw_size = short_series.shape[0]*band_width
     else:
         bw_size = band_width
+        
+    # Compute the Lowess span as a proportion if given as absolute
+    if not 0 < span <= 1:
+        span = span/short_series.shape[0]
+    else:
+        span = span
     
     # Compute smoothed data and residuals
     if 'Gaussian':
