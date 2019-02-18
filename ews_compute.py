@@ -103,8 +103,9 @@ def ews_compute(raw_series,
     else:
         span = span
     
+    
     # Compute smoothed data and residuals
-    if 'Gaussian':
+    if  smooth == 'Gaussian':
         smooth_data = gf(short_series.values, sigma=bw_size, mode='reflect')
         smooth_series = pd.Series(smooth_data, index=short_series.index)
         residuals = short_series.values - smooth_data
@@ -114,7 +115,7 @@ def ews_compute(raw_series,
         df_ews['Smoothing'] = smooth_series
         df_ews['Residuals'] = resid_series
     
-    if 'Lowess':
+    if  smooth == 'Lowess':
         smooth_data = lowess(short_series.values, short_series.index.values, frac=span)[:,1]
         smooth_series = pd.Series(smooth_data, index=short_series.index)
         residuals = short_series.values - smooth_data
@@ -270,7 +271,7 @@ def ews_compute(raw_series,
             
                  
         # Concatenate the list of power spectra DataFrames to form a single DataFrame
-        df_pspec = pd.concat(list_spec_append) if 'aic' in ews else 0
+        df_pspec = pd.concat(list_spec_append) if 'aic' in ews else pd.DataFrame()
         
         # Create a DataFrame out of the multiple dictionaries consisting of the spectral metrics
         df_spec_metrics = pd.DataFrame(list_metrics_append)
