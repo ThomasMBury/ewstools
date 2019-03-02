@@ -1,4 +1,4 @@
-# early_warnings
+# ewstools
 A module to compute early warning signals (EWS) from time-series data.
 Dependencies include:
   - standard python libraries: numpy, pandas, scipy, matplotlib
