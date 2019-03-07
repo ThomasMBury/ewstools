@@ -1,10 +1,11 @@
 Metadata-Version: 2.1
 Name: ewstools
 Version: 0.0.1
-Summary: Compute early warning signals from time-series data
+Summary: A package with tools to compute early warning signals (EWS) 
+    from time-series data
 Home-page: https://github.com/ThomasMBury/ewstools
 Author: Thomas M Bury
-Author-email: tbury@uwaterloo.ca
+Author-email: tombury182@gmail.com
 License: UNKNOWN
 Description: # ewstools
         A module to compute early warning signals (EWS) from time-series data.
