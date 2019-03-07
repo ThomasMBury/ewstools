@@ -1,5 +1,14 @@
+# List of packages to include when developing
+# To install into conda virtual env, use
+# ~/anaconda3/envs/env_ewstools/bin/pip install -r requirements_dev.txt
+
 pip==19.0.3
 wheel==0.33.1
 twine==1.13.0
 pandas>=0.24
 numpy>=1.15
+black==18.9b0
+pytest==4.3.0
+
+
+
