@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ewstools
-Version: 0.0.2
+Version: 0.0.3
 Summary: A package with tools to compute early warning signals (EWS) 
     from time-series data
 Home-page: https://github.com/ThomasMBury/ewstools
