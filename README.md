@@ -2,7 +2,6 @@
 [![Build Status](https://travis-ci.com/ThomasMBury/ewstools.svg?branch=master)](https://travis-ci.com/ThomasMBury/ewstools)
 [![Coverage Status](https://coveralls.io/repos/github/ThomasMBury/ewstools/badge.svg?branch=master)](https://coveralls.io/github/ThomasMBury/ewstools?branch=master)
 
-
 # ewstools
 **Python package for computing, analysing and visualising early warning signals (EWS)
 in time-series data. Includes a novel approach to characterise bifurcations using EWS.**
