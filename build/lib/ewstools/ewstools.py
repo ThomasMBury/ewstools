@@ -7,6 +7,6 @@ def convert(my_name):
         None
     """
 
-    print("I'll convert a notebook for you some day, %s")% (my_name)
+    print("I'll convert a notebook for you some day, %s" % (my_name))
     
 # convert('Tammy')
