@@ -5,4 +5,6 @@ install:
   - pip install -r requirements_dev.txt
   - pip install -e .
 script:
-  - pytest
+  — pytest --cov=my_package_name
+after_success:
+  - coveralls
