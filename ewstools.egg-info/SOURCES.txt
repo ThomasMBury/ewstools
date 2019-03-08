@@ -5,7 +5,7 @@ ewstools/ews_compute.py
 ewstools/ews_compute_run.py
 ewstools/ews_compute_runMulti.py
 ewstools/ews_spec.py
-ewstools/ews_spec_test.py
+ewstools/ews_spec_run.py
 ewstools/ewstools.py
 ewstools.egg-info/PKG-INFO
 ewstools.egg-info/SOURCES.txt
