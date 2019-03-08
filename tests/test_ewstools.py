@@ -28,12 +28,16 @@ def test_convert(capsys):
 def test_pspec_welch():
     n_points = 100
     dt = 1
+    ham_length = 40
     yVals = np.random.normal(0,1,n_points)
     pspec = ews.pspec_welch(yVals, dt)
-    pspec.shape
     
     assert type(pspec) == pd.Series
-    assert pspec.shape == (n_points,) or pspec.shape == (n_points+1,)
+    assert pspec.shape in [(n_points,),
+                           (n_points+1,),
+                           (ham_length,),
+                           (ham_length+1,)
+                           ]
 
 
 
