@@ -22,7 +22,6 @@ from ews_spec import pspec_welch, pspec_metrics, psd_fold, psd_hopf, psd_null
 
 
 
-
 def ews_compute(raw_series,
             roll_window=0.25,
             smooth='Lowess',

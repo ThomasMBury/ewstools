@@ -31,8 +31,26 @@
 #################################################################################################################
 
 
+#---------------------------------
+# Import relevant packages
+#--------------------------------
+
+# For numeric computation and DataFrames
+import numpy as np
+import pandas as pd
+
+# To compute power spectrum using Welch's method
+from scipy import signal
+
+# For detrending time-series
+from statsmodels.nonparametric.smoothers_lowess import lowess
+from scipy.ndimage.filters import gaussian_filter as gf
+
+# For fitting power spectrum models and computing AIC weights
+from lmfit import Model
 
 
+# Demo function
 def convert(my_name):
     """
     Print a line about converting a notebook.
@@ -45,6 +63,10 @@ def convert(my_name):
     print("I'll convert a notebook for you some day, %s" % (my_name))
 
 
+#------------------------------
+# Main functions
+#–-----------------------------
+
 def ews_compute(raw_series,
             roll_window=0.4,
             smooth='Lowess',
@@ -55,31 +77,36 @@ def ews_compute(raw_series,
             lag_times=[1],
             ham_length=40,
             ham_offset=0.5,
-            pspec_roll_offset=20, # generally ham_length*ham_offset
+            pspec_roll_offset=20,
             w_cutoff=1,
             sweep=False):
     '''
     Compute temporal and spectral EWS from time-series data.  
     
-    Args:
-        raw_series (pd.Series): Time-series data to analyse. Make sure this
-            is indexed by time.
-        roll_window (float): Rolling window size as a proportion of the length
-            of the time-series data. Defaults to 0.4.
-        smooth (str): Detrending options including
+    Args
+    --------
+    raw_series: pd.Series
+        Time-series data to analyse. Indexed by time.
+    roll_window: float (0.4)
+        Rolling window size as a proportion of the length of the time-series 
+        data.
+    smooth: str ('Lowess')
+        Detrending options including
             'Gaussian' : Gaussian smoothing
             'Lowess'   : Lowess smoothing
             'None'     : No detrending
-            Defualts to 'Lowess'.
-        band_width (float): bandwidth of Gaussian kernel  if Gaussian smoothing
-            chosen. Taken as a proportion of time-series length if in (0,1), 
-            otherwise taken as absolute. Defaults to 0.2.
-        span (float): span of time-series data used for Lowess filtering.
-            Taken as a proportion of time-series length if in (0,1), 
-            otherwise taken as absolute. Defaults to 0.1.
-        upto (int/str): Time up to which EWS are computed. Enter 'Full' to use
-            the entire time-series. Otherwise enter a time value.
-        ews (list): List of EWS to compute. Options include
+    band_width: float (0.2)
+        Bandwidth of Gaussian kernel. Taken as a proportion of time-series length if in (0,1), 
+            otherwise taken as absolute.
+    span: float (0.1)
+        Span of time-series data used for Lowess filtering. Taken as a 
+        proportion of time-series length if in (0,1), otherwise taken as 
+        absolute.
+    upto: int or str ('Full')
+        Time up to which EWS are computed. Enter 'Full' to use
+        the entire time-series. Otherwise enter a time value.
+    ews: list of str (['var', 'ac'])
+        List of EWS to compute. Options include
              'var'   : Variance
              'ac'    : Autocorrelation
              'sd'    : Standard deviation
@@ -89,34 +116,37 @@ def ews_compute(raw_series,
              'smax'  : Peak in the power spectrum
              'cf'    : Coherence factor
              'aic'   : AIC weights
-             Defaults to ['var, 'ac'].
-        lag_times (list): List of lag times (int) at which to compute
-            autocorrelation. Defualts to [1].
-        ham_length (int): Length of the Hamming window used to compute the
-            power spectrum. Defaults to 40.
-        ham_offset (float): Hamming offset as a proportion of the Hamming
-            window size. Defaults to 0.5.
-        pspec_roll_offset (int): Rolling window offset used when computing
-            power spectra. Power spectrum computation is relatively expensive
-            so this is rarely taken as 1 (as is the case for the other EWS).
-            Defaults to 20.
-        w_cutoff (float): Cutoff frequency used in power spectrum. Given as a 
-            proportion of the maximum permissable frequency in the empirical
-            power spectrum. Defaults to 1.
-        sweep (bool): Choose 'True' to sweep over a range of intialisation 
-            parameters when optimising to compute AIC scores, at the expense of 
-            longer computation. Otherwise intialisation parameter is taken as the
-            'best guess'. Defaults to 'False'.
+    lag_times: list of int ([1])
+        List of lag times at which to compute autocorrelation.
+    ham_length: int (40)
+        Length of the Hamming window used to compute the power spectrum.
+    ham_offset: float (0.5)
+        Hamming offset as a proportion of the Hamming window size.
+    pspec_roll_offset: int (20)
+        Rolling window offset used when computing power spectra. Power spectrum 
+        computation is relatively expensive so this is rarely taken as 1 
+        (as is the case for the other EWS).
+    w_cutoff: float (1)
+        Cutoff frequency used in power spectrum. Given as a proportion of the 
+        maximum permissable frequency in the empirical power spectrum.
+    sweep: bool ('False')
+        Choose 'True' to sweep over a range of intialisation 
+        parameters when optimising to compute AIC scores, at the expense of 
+        longer computation. Otherwise intialisation parameter is taken as the
+        'best guess'.
     
-    Returns: 
-        dict: A dictionary with three components.
-            'EWS metrics' (pd.DataFrame): A pandas DataFrame indexed by time
-            with columns corresopnding to each EWS.
-            'Power spectrum' (pd.DataFrame): A DataFrame of the measured power
-            spectra and the best fits used to give the AIC weights. Indexed
-            by time.
-            'Kendall tau' (pd.DataFrame): A DataFrame of the Kendall tau values 
-            for each EWS metric.
+    
+    Returns
+    ------------
+    dict: A dictionary with three components.
+        'EWS metrics': pd.DataFrame
+            A pandas DataFrame indexed by time with columns corresopnding 
+            to each EWS.
+        'Power spectrum': pd.DataFrame
+            A DataFrame of the measured power spectra and the best fits used 
+            to give the AIC weights. Indexed by time.
+        'Kendall tau': pd.DataFrame
+            A DataFrame of the Kendall tau values for each EWS metric.
     
     '''
     
@@ -130,10 +160,9 @@ def ews_compute(raw_series,
         short_series = raw_series
     else: short_series = raw_series.loc[:upto]
 
-    #------------------------------
-    ## Data detrending
-    #–------------------------------
-    
+
+    #------Data detrending--------
+
     # Compute the absolute size of the bandwidth if it is given as a proportion
     if 0 < band_width <= 1:
         bw_size = short_series.shape[0]*band_width
@@ -176,9 +205,7 @@ def ews_compute(raw_series,
     
     
     
-    #----------------------------
-    ## Compute temporal EWS
-    #-----------------------------  
+    #------------ Compute temporal EWS---------------#
         
     # Compute standard deviation as a Series and add to the DataFrame
     if 'sd' in ews:
@@ -222,11 +249,8 @@ def ews_compute(raw_series,
 
 
 
-
     
-    #--------------------------
-    ## Compute spectral EWS
-    #--------------------------
+    #------------Compute spectral EWS-------------#
     
     ''' In this section we compute newly proposed EWS based on the power spectrum
         of the time-series computed over a rolling window '''
@@ -329,9 +353,7 @@ def ews_compute(raw_series,
         
         
     
-    #--------------------------
-    ## Compute kendall tau values
-    #--------------------------
+    #------------Compute Kendall tau coefficients----------------#
     
     ''' In this section we compute the kendall correlation coefficients for each EWS
         with respect to time. Values close to one indicate high correlation (i.e. EWS
@@ -355,9 +377,7 @@ def ews_compute(raw_series,
                                                                              
                                                                              
  
-    #----------------------
-    ## Final output
-    #–----------------------
+    #-------------Organise final output and return--------------#
        
     # Ouptut a dictionary containing EWS DataFrame, power spectra DataFrame, and Kendall tau values
     output_dic = {'EWS metrics': df_ews, 'Kendall tau': df_ktau}
@@ -366,15 +386,536 @@ def ews_compute(raw_series,
     if 'smax' in ews or 'cf' in ews or 'aic' in ews:
         output_dic['Power spectrum'] = df_pspec
         
-    
-    
     return output_dic
 
 
 
+
+#------------------------------
+# Helper functions
+#–-----------------------------
+
+def pspec_welch(yVals,
+                dt,
+                ham_length=40,
+                ham_offset=0.5,
+                w_cutoff=1,
+                scaling='spectrum'):
+
+
+    '''
+    Compute the power spectrum of yVals using Welch's method.
+    This involves computing the periodogram with overlapping Hamming windows.
+    
+    Args:
+        yVals (array) : Time-series values
+        dt (float): Seperation between time-series points
+        ham_length (int) : Length of Hamming window (number of data points).
+            Defaults to 40.
+        ham_offset (float) : Hamming offest as a proportion of the Hamming
+            window size. Defaults to 0.5.
+        w_cutoff (float): Cutoff frequency used in power spectrum. Given as a 
+            proportion of the maximum permissable frequency in the empirical
+            power spectrum. Defaults to 1.
+        scaling (str): Choose between
+            'spectrum' : computes the power spectrum
+            'density'  : computes the power spectral density, which is
+                normalised (area underneath =1).          
+            
+    Returns:
+        pd.Series: Power values indexed by frequency
+        
+    '''
+
+    ## Assign properties of *series* to parameters
+    
+    # Compute the sampling frequency 
+    fs = 1/dt
+    # Number of data points
+    num_points = len(yVals)
+    # If ham_length given as a proportion - compute number of data points in ham_length
+    if 0 < ham_length <= 1:
+        ham_length = num_points * ham_length
+    # If Hamming length given is less than the length of the t-series, make ham_length=length of tseries.
+    if ham_length >= num_points:
+        ham_length = num_points
+    # Compute number of points in offset
+    ham_offset_points = int(ham_offset*ham_length)
+        
+    ## Compute the periodogram using Welch's method (scipy.signal function)
+    pspec_raw = signal.welch(yVals,
+                               fs,
+                               nperseg=ham_length,
+                               noverlap=ham_offset_points,
+                               return_onesided=False,
+                               scaling=scaling)
+    
+    # Put into a pandas series and index by frequency (scaled by 2*pi)
+    pspec_series = pd.Series(pspec_raw[1], index=2*np.pi*pspec_raw[0], name='Power spectrum')
+    pspec_series.index.name = 'Frequency'
+    
+    # sort into ascending frequency
+    pspec_series.sort_index(inplace=True)
+    
+    # append power spectrum with first value (by symmetry)
+    pspec_series.at[-min(pspec_series.index)] = pspec_series.iat[0]
+    
+#    # remove zero-frequency component
+#    pspec_series.drop(0, inplace=True)
+    
+    # impose cutoff frequency
+    wmax = w_cutoff*max(pspec_series.index) # cutoff frequency
+    pspec_output = pspec_series[-wmax:wmax] # subset of power spectrum
+    
+    
+    return pspec_output
+
+
+
+
+
+#-----------------------------------------
+## Analytical forms for power spectra
+#-----------------------------------------
+    
+
+def psd_fold(w,sigma,lam):
+    return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
+
+def psd_hopf(w,sigma,mu,w0):
+    return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
+
+def psd_null(w,sigma):
+    return sigma**2/(2*np.pi) * w**0
     
     
     
+
+
+#--------------------------------
+## Functions to find initalisation parameters for optimisation procedure
+#–--------------------------------
+    
+# Function to compute the initialisation value for mu when fitting Shopf
+def mu_init_fun(smax, stot, wdom):
+    
+    # define chunky term (use \ to continue eqn to new line)
+    def alpha(smax, stot, wdom):
+        return stot**3 \
+        + 9*(np.pi**2)*(wdom**2)*(smax**2)*stot \
+        +3*np.sqrt(3)*np.pi*np.sqrt(
+                64*(np.pi**4)*(wdom**6)*(smax**6) \
+                -13*(np.pi**2)*(wdom**4)*(smax**4)*(stot**2) \
+                +2*(wdom**2)*(smax**2)*(stot**4) \
+                )
+        
+    return  -(1/(3*np.pi*smax))*(stot \
+             +alpha(smax,stot,wdom)**(1/3) \
+             +(stot**2-12*(np.pi**2)*(wdom**2)*(smax**2))/(alpha(smax,stot,wdom)**(1/3)))
+ 
+    
+# Function to compute the initialisation value for sigma when fitting Shopf
+def sigma_init_hopf_fun(smax,stot,wdom):
+    return np.sqrt(
+            -2*mu_init_fun(smax,stot,wdom)*stot)
+
+    
+# Function to compute the initialisation value for sigma when fitting Sfold
+def sigma_init_fold_fun(smax,stot):
+    return np.sqrt(
+            2*stot**2/(np.pi*smax)
+            )
+
+
+
+# Function to compute the initialisation value for lambda when fitting Sfold
+def lambda_init_fun(smax,stot):
+    return -stot/(np.pi*smax)
+
+
+
+#------------------------------------
+## Functions to fit analytical forms to empirical power spectrum
+#–------------------------------------
+    
+# Fold fit
+def fit_fold(pspec,init):
+    '''
+    Input:
+        pspec: power spectrum data as a Series indexed by frequency
+        init: Initial parameter guesses [sigma_init, lambda_init]
+        
+    Output:
+        List containing fitted model and AIC score
+    '''
+    
+    
+    # Put frequency values and power values as a list to use LMFIT
+    freq_vals = pspec.index.tolist()
+    power_vals = pspec.tolist()
+    
+    sigma_init, lambda_init = init
+    # Assign model object
+    model = Model(psd_fold)
+    # Set up constraint S(wMax) < psi_fold*S(0)
+    psi_fold = 0.5
+    wMax = max(freq_vals)
+    # Parameter constraints for sigma
+    model.set_param_hint('sigma', value=sigma_init, min=0, max=10*sigma_init)
+    # Parameter constraints for lambda
+    model.set_param_hint('lam', min=-np.sqrt(psi_fold/(1-psi_fold))*wMax, max=0, value=lambda_init)
+    
+    # Assign initial parameter values and constraints
+    params = model.make_params()        
+    # Fit model to the empircal spectrum
+    result = model.fit(power_vals, params, w=freq_vals)
+    # Compute AIC score
+    aic = result.aic
+    
+    # Export AIC score and model fit
+    return [aic, result]
+
+
+
+# Function to fit Hopf model to empirical specrum with specified initial parameter guess
+def fit_hopf(pspec, init):
+    '''
+    Input:
+        pspec: power spectrum data as a Series indexed by frequency
+        init: Initial parameter guesses [sigma_init, mu_init, delta_fit]
+        
+    Output:
+        List containing fitted model and AIC score
+    '''
+    
+    # Put frequency values and power values as a list to use LMFIT
+    freq_vals = pspec.index.tolist()
+    power_vals = pspec.tolist()
+    
+    # Assign labels to initialisation values
+    sigma_init, mu_init, w0_init = init
+    
+    
+    # If any labels are nan, resort to default values 
+    if np.isnan(sigma_init) or np.isnan(mu_init) or np.isnan(w0_init):
+        sigma_init, mu_init, w0_init = [1,-0.1,1]
+    
+    # Constraint parameter
+    psi_hopf = 0.2
+    
+    # Compute initialisation value for the dummy variable delta (direct map with w0)
+    # It must be positive to adhere to constraint - thus if negative set to 0.
+    delta_init = max(
+            w0_init + (mu_init/(2*np.sqrt(psi_hopf)))*np.sqrt(4-3*psi_hopf + np.sqrt(psi_hopf**2-16*psi_hopf+16)),
+            0.0001)
+    
+
+    # Assign model object 
+    model = Model(psd_hopf)
+    
+    ## Set initialisations parameters in model attributes
+    
+    # Sigma must be positive, and set a (high) upper bound to avoid runaway computation
+    model.set_param_hint('sigma', value=sigma_init, min=0)
+    # Psi is a fixed parameter (not used in optimisation)
+    model.set_param_hint('psi', value=psi_hopf, vary=False)
+    # Mu must be negative 
+    model.set_param_hint('mu', value=mu_init, max=0, vary=True)
+    # Delta is a dummy parameter, satisfying d = w0 - wThresh (see paper for wThresh). It is allowed to vary, in place of w0.
+    model.set_param_hint('delta', value = delta_init, min=0, vary=True)
+    # w0 is a fixed parameter dependent on delta (w0 = delta + wThresh)
+    model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
+    
+    # Assign initial parameter values and constraints
+    params = model.make_params()        
+    # Fit model to the empircal spectrum
+    result = model.fit(power_vals, params, w=freq_vals)
+    # Compute AIC score
+    aic = result.aic
+    
+    # Export AIC score and model fit
+    return [aic, result]
+
+
+
+# Function to fit Null model to empirical specrum with specified initial parameter guess
+def fit_null(pspec, init):
+    '''
+    Input:
+        pspec: power spectrum data as a Series indexed by frequency
+        init: Initial parameter guesses [sigma_init]
+        
+    Output:
+        List containing fitted model and AIC score
+    '''
+    
+    # Put frequency values and power values as a list to use LMFIT
+    freq_vals = pspec.index.tolist()
+    power_vals = pspec.tolist()
+    
+    sigma_init = init[0]
+    
+    # Assign model object
+    model = Model(psd_null)
+    
+    # Initial parameter value for Null fit        
+    model.set_param_hint('sigma', value=sigma_init, vary=True, min=0, max=10*sigma_init)
+    
+    # Assign initial parameter values and constraints
+    params = model.make_params()        
+    # Fit model to the empircal spectrum
+    result = model.fit(power_vals, params, w=freq_vals)
+    # Compute AIC score
+    aic = result.aic
+    
+    # Export AIC score and model fit
+    return [aic, result]
+
+
+
+
+#-----------------------------
+## Function to compute AIC weights from AIC scores
+#–----------------------------
+
+def aic_weights(aic_scores):
+    '''
+    Input:
+        aic_scores: array of AIC scores
+    Output:
+        Array of the corresponding AIC weights
+    '''
+    
+    # Best AIC score
+    aic_best = min(aic_scores)
+    
+    # Differences in score from best model
+    aic_diff = aic_scores - aic_best
+    
+    # Likelihoods for each model
+    llhd = np.exp(-(1/2)*aic_diff)
+    
+    # Normalise to get AIC weights
+    return llhd/sum(llhd)
+    
+    
+    
+
+#--------------------------
+## pspec_metrics
+#-------------------------
+
+
+
+def pspec_metrics(pspec,
+                  ews = ['smax','cf','aic'],
+                  sweep = False):
+
+
+    '''
+    Function to compute the metrics associated with *pspec* that can be
+    used as EWS.
+    
+    Input (default)
+    pspec : power spectrum in the form of a Series indexed by frequency
+    ews ( ['smax', 'coher_factor', 'aic'] ) : array of strings corresponding 
+    to the EWS to be computed. Options include
+        'smax' : peak in the power spectrum
+        'cf' : coherence factor
+        'aic' : Hopf, Fold and Null AIC weights
+    sweep (False) : Boolean to determine whether or not to sweep over many 
+    initialisation parameters, or just use the single initialisation that 
+    is derived from measured metrics (see Methods section).
+                 
+    Output: 
+    A dictionary of spectral metrics obtained from pspec
+    
+    
+    '''
+    
+    
+    # Initialise a dictionary for EWS
+    spec_ews = {}
+    
+    # Compute Smax
+    if 'smax' in ews:
+        smax = max(pspec)
+        # add to DataFrame
+        spec_ews['Smax'] = smax
+        
+        
+        
+    ## Compute the coherence factor
+    if 'cf' in ews:
+        
+        # frequency at which peak occurs
+        w_peak = abs(pspec.idxmax())
+        # index location
+        
+        # power of peak frequency
+        power_peak = pspec.max()
+        
+        # compute the first frequency from -w_peak at which power<power_peak/2
+        w_half = next( (w for w in pspec[-w_peak:].index if pspec.loc[w] < power_peak/2 ), 'None')
+        
+        # if there was no such frequency, or if peak crosses zero frequency,
+        # set w_peak = 0 (makes CF=0) 
+        if w_half == 'None' or w_half > 0:
+            w_peak = 0
+            
+        else:
+            # double the difference between w_half and -w_peak to get the width of the peak
+            w_width = 2*(w_half - (-w_peak))
+            
+        # compute coherence factor (height/relative width)
+        coher_factor = power_peak/(w_width/w_peak) if w_peak != 0 else 0
+
+        # add to dataframe
+        spec_ews['Coherence factor'] = coher_factor
+    
+
+    ## Compute AIC weights of fitted analytical forms
+    if 'aic' in ews:
+        
+        # Compute the empirical metrics that allow us to choose sensible initialisation parameters
+        # Peak in power spectrum
+        smax = pspec.max()
+        # Area underneath power spectrum (~ variance)
+        stot = pspec.sum()*(pspec.index[1]-pspec.index[0])
+        # Dominant frequency (take positive value)
+        wdom = abs(pspec.idxmax())
+        
+        # If stot=0 then there is no variation - set aic_null=1
+        
+#        # Print metrics
+#        print('\nSpectrum metrics [smax, stot, wdom]')
+#        print([smax, stot, wdom])
+        
+        ## Create array of initialisation parmaeters        
+        
+        # Sweep values (as proportion of baseline guess) if sweep = True
+        sweep_vals = np.array([0.5,1,1.5]) if sweep else np.array([1])
+        
+        # Baseline parameter initialisations (computed using empirical spectrum)
+        # Sfold
+        sigma_init_fold = sigma_init_fold_fun(smax,stot)
+        lambda_init = lambda_init_fun(smax,stot)
+        # Shopf
+        sigma_init_hopf = sigma_init_hopf_fun(smax,stot,wdom)
+        mu_init = mu_init_fun(smax,stot,wdom)
+        w0_init = wdom
+        # Snull
+        sigma_init_null = np.sqrt(stot)
+        
+#        # Print the derived initialisation parameters
+#        print('Initial parameter guesses for the Hopf fit [sigma, mu, w0]')
+#        print([sigma_init_hopf,mu_init,w0_init])
+        
+        
+        # Arrays of initial values
+        init_fold_array = {'sigma': sweep_vals*sigma_init_fold,
+                     'lambda': sweep_vals*lambda_init}
+        
+        init_hopf_array = {'sigma': sweep_vals*sigma_init_hopf,
+                     'mu': sweep_vals*mu_init,
+                     'w0': sweep_vals*w0_init}
+
+        init_null_array = {'sigma': sweep_vals*sigma_init_null}
+
+
+        ## Compute AIC values and fits
+        
+        ## Fold
+        
+        # Initialise list to store AIC and model fits
+        fold_aic_fits = []
+
+        # Sweep over initial parameter guesses and pick best convergence
+        for i in range(len(init_fold_array['sigma'])):
+            for j in range(len(init_fold_array['lambda'])):
+                # Initial parameter guess
+                init_fold = [init_fold_array['sigma'][i],init_fold_array['lambda'][j]]
+                # Compute fold fit and AIC score
+                [aic_temp, model_temp] = fit_fold(pspec, init_fold)
+                # Store in list
+                fold_aic_fits.append([aic_temp, model_temp])
+        # Put list into array
+        array_temp = np.array(fold_aic_fits)
+        # Pick out the best model
+        [aic_fold, model_fold] = array_temp[array_temp[:,0].argmin()]    
+                   
+        
+        ## Hopf
+        
+        # Initialise list to store AIC and model fits
+        hopf_aic_fits = []
+
+        # Sweep over initial parameter guesses and pick best convergence
+        for i in range(len(init_hopf_array['sigma'])):
+            for j in range(len(init_hopf_array['mu'])):
+                for k in range(len(init_hopf_array['w0'])):
+                    # Initial parameter guess
+                    init_hopf = [init_hopf_array['sigma'][i],init_hopf_array['mu'][j],init_hopf_array['w0'][k]]
+                    # Compute fold fit and AIC score
+                    [aic_temp, model_temp] = fit_hopf(pspec, init_hopf)
+                    # Store in list
+                    hopf_aic_fits.append([aic_temp, model_temp])
+        # Put list into array
+        array_temp = np.array(hopf_aic_fits)
+        # Pick out the best model
+        [aic_hopf, model_hopf] = array_temp[array_temp[:,0].argmin()]       
+        
+        
+        
+        
+        ## Null
+                
+        # Initialise list to store AIC and model fits
+        null_aic_fits = []
+
+        # Sweep over initial parameter guesses and pick best convergence
+        for i in range(len(init_null_array['sigma'])):
+                # Initial parameter guess
+                init_null = [init_null_array['sigma'][i]]
+                # Compute fold fit and AIC score
+                [aic_temp, model_temp] = fit_null(pspec, init_null)
+                # Store in list
+                null_aic_fits.append([aic_temp, model_temp])
+        # Put list into array
+        array_temp = np.array(null_aic_fits)
+        # Pick out the best model
+        [aic_null, model_null] = array_temp[array_temp[:,0].argmin()]   
+       
+        
+        # Compute AIC weights from the AIC scores
+        aicw_fold, aicw_hopf, aicw_null = aic_weights([aic_fold, aic_hopf, aic_null])
+        
+        
+#       # Print AIC weights
+#        print([aic_fold,aic_hopf,aic_null])
+               
+        # add to dataframe
+        spec_ews['AIC fold'] = aicw_fold
+        spec_ews['AIC hopf'] = aicw_hopf
+        spec_ews['AIC null'] = aicw_null
+        
+        
+        # export fitted parameter values
+        spec_ews['Params fold'] = dict((k, model_fold.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
+        spec_ews['Params hopf'] = dict((k, model_hopf.values[k]) for k in ('sigma','mu','w0','delta','psi'))
+        spec_ews['Params null'] = model_null.values
+
+#        # Print fitted parameter values
+#        print('Fitted parameter values after optimisation [sigma, mu, w0]')
+#        print([model_hopf.values[k] for k in ['sigma','mu','w0']])
+
+    # return DataFrame of metrics
+    return spec_ews
+
+    
+   
+
+
     
     
     
