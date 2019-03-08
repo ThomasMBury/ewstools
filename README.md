@@ -5,12 +5,20 @@
 
 # ewstools
 **Python package for computing, analysing and visualising early warning signals (EWS)
-from time-series data**
-A module to compute early warning signals (EWS) from time-series data.
-Dependencies include:
-  - standard python libraries: numpy, pandas, scipy, matplotlib
-  - LMFIT: download [here](https://lmfit.github.io/lmfit-py/installation.html)
+in time-series data**
 
+Functionality of ewstools includes
+
+  - Computing the following EWS
+    - Variance metrics (variance, standard deviation, coefficient of variation)
+    - Autocorrelation (at specified lag times)
+    - Higher moments (skewness, kurtosis)
+    - Power spectrum (including maximum frequency, coherence factor and AIC weights csp. to different canonical forms)
+
+  - Block-bootstrapping time-series to obtain confidence bounds on EWS estimates
+  
+  - Visualisation of EWS with plot of time-series and power spectra in seaborn.
+  
 
 ## ews_compute.py
 File for function `ews_compute`.  
