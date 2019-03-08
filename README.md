@@ -7,7 +7,7 @@
 **Python package for computing, analysing and visualising early warning signals (EWS)
 in time-series data**
 
-Functionality of ewstools includes
+ewstools functionality includes
 
   - Computing the following EWS
     - Variance metrics (variance, standard deviation, coefficient of variation)
@@ -17,7 +17,11 @@ Functionality of ewstools includes
 
   - Block-bootstrapping time-series to obtain confidence bounds on EWS estimates
   
-  - Visualisation of EWS with plot of time-series and power spectra in seaborn.
+  - Visualisation of EWS with plots of time-series and power spectra.
+  
+ewstools dependencies include
+  - numpy, pandas, seaborn
+  - lmfit, arch  
   
 
 ## ews_compute.py
