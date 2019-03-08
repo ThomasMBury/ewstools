@@ -5,20 +5,50 @@ Tests for `ewstools` package.
 
 
 import pytest
-
-# For numeric computation and DataFrames
 import numpy as np
 import pandas as pd
 
 
-from ewstools import ewstools as ews
+from ewstools import ewstools
 
 
-def test_convert(capsys):
-    """Correct my_name argument prints"""
-    ews.convert("Jill")
-    captured = capsys.readouterr()
-    assert "Jill" in captured.out
+def test_ews_compute():
+    '''
+    Run a time-series through ews_compute and check everything is
+    functioning correctly.
+    '''
+    # Simulate a simple time-series
+    tVals = np.arange(0,10,0.1)
+    xVals = 5 + np.random.normal(0,1,len(tVals)) 
+    series = pd.Series(xVals, index=tVals)
+    
+    # Run through ews_compute with all possible EWS
+    ews = ['var','ac','sd','cv','skew','kurt','smax','cf','aic']
+    lag_times = [1,2,3,4,5]
+    dict_ews = ewstools.ews_compute(series,
+                             ews=ews,
+                             lag_times=lag_times,
+                             sweep = True
+                             )
+    
+    assert type(dict_ews) == dict
+    
+    # Obtain components of dict_ews
+    df_ews = dict_ews['EWS metrics']
+    df_pspec = dict_ews['Power spectrum']
+    df_ktau = dict_ews['Kendall tau']
+    
+    # Check types
+    assert type(df_ews) == pd.DataFrame
+    assert type(df_pspec) == pd.DataFrame
+    assert type(df_ktau) == pd.DataFrame
+    
+    # Check index
+    assert df_ews.index.name == 'Time'
+    assert df_pspec.index.names == ['Time','Frequency']    
+    
+  
+    
     
     
 def test_pspec_welch():
@@ -26,7 +56,7 @@ def test_pspec_welch():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ews.pspec_welch(yVals, dt, ham_length=ham_length)
+    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
     
     assert type(pspec) == pd.Series
     assert pspec.shape in [(n_points,),
@@ -42,9 +72,9 @@ def test_psd_forms():
     lamda = -0.1
     mu = -0.1
     w0 = 1
-    sFoldVals = ews.psd_fold(wVals, sigma, lamda)
-    sHopfVals = ews.psd_hopf(wVals, sigma, mu, w0)
-    sNullVals = ews.psd_null(wVals, sigma)
+    sFoldVals = ewstools.psd_fold(wVals, sigma, lamda)
+    sHopfVals = ewstools.psd_hopf(wVals, sigma, mu, w0)
+    sNullVals = ewstools.psd_null(wVals, sigma)
         
     assert type(sFoldVals)==np.ndarray
     assert type(sHopfVals)==np.ndarray
@@ -60,7 +90,7 @@ def test_sfold_init():
     stot = 1
     smax = 0.5
     
-    [sigma, lamda] = ews.sfold_init(smax, stot)
+    [sigma, lamda] = ewstools.sfold_init(smax, stot)
     
     # Values that smax, stot should attain (+/- 1dp)
     smax_assert = sigma**2/(2*np.pi*lamda**2)
@@ -79,7 +109,7 @@ def test_shopf_init():
     stot = 1
     wdom = 1
     
-    [sigma, mu, w0] = ews.shopf_init(smax, stot, wdom)
+    [sigma, mu, w0] = ewstools.shopf_init(smax, stot, wdom)
     
     # Values that smax, stot should attain (+/- 1dp)
     smax_assert = (sigma**2/(4*np.pi*mu**2))*(1+(mu**2/(mu**2+4*w0**2)))
@@ -99,7 +129,7 @@ def test_snull_init():
     '''
     stot = 1
     
-    [sigma] = ews.snull_init(stot)
+    [sigma] = ewstools.snull_init(stot)
     
     # Values that smax, stot should attain (+/- 1dp)
     stot_assert = sigma**2
@@ -119,13 +149,13 @@ def test_fit_fold():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ews.pspec_welch(yVals, dt, ham_length=ham_length)
+    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
     
     sigma_init = 0.05
     lambda_init = -0.1
     init = [sigma_init, lambda_init]
     # Run power spectrum in fit_fold
-    [aic, model] = ews.fit_fold(pspec, init)
+    [aic, model] = ewstools.fit_fold(pspec, init)
     
     assert type(aic) == np.float64
     assert type(model.values) == dict
@@ -142,14 +172,14 @@ def test_fit_hopf():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ews.pspec_welch(yVals, dt, ham_length=ham_length)
+    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
     
     sigma_init = 0.05
     mu_init = -0.1
     w0_init = 1
     init = [sigma_init, mu_init, w0_init]
     # Run power spectrum in fit_hopf
-    [aic, model] = ews.fit_hopf(pspec, init)
+    [aic, model] = ewstools.fit_hopf(pspec, init)
     
     assert type(aic) == np.float64
     assert type(model.values) == dict
@@ -166,16 +196,49 @@ def test_fit_null():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ews.pspec_welch(yVals, dt, ham_length=ham_length)
+    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
     
     sigma_init = 0.05
     init = [sigma_init]
     # Run power spectrum in fit_null
-    [aic, model] = ews.fit_null(pspec, init)
+    [aic, model] = ewstools.fit_null(pspec, init)
     
     assert type(aic) == np.float64
     assert type(model.values) == dict
+    
+    
+def test_aic_weights():
+    '''
+    Run AIC scores through the conversion to AIC weights
+    '''
+    aic_scores = np.array([-231,-500,-100,5])
+    
+    aic_weights = ewstools.aic_weights(aic_scores)
+    
+    assert type(aic_weights) == np.ndarray
+    
+    
+def test_pspec_metrics():
+    '''
+    Run a power spectrum through pspec_metrics, and check that the spectral
+    EWS have the intended format
+    '''
+    # Create a power spectrum
+    n_points = 100
+    dt = 1
+    ham_length = 40
+    yVals = np.random.normal(0,1,n_points)
+    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
+    
+    # Run power spectrum in pspec_metrics
+    spec_ews = ewstools.pspec_metrics(pspec,
+                      ews=['smax','cf','aic'],
+                      sweep=True)
 
+    assert type(spec_ews) == dict
+    
+
+    
 
 
 

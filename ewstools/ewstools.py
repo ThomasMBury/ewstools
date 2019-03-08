@@ -50,21 +50,9 @@ from scipy.ndimage.filters import gaussian_filter as gf
 from lmfit import Model
 
 
-# Demo function
-def convert(my_name):
-    """
-    Print a line about converting a notebook.
-    Args:
-        my_name (str): person's name
-    Returns:
-        None
-    """
-
-    print("I'll convert a notebook for you some day, %s" % (my_name))
-
 
 #------------------------------
-# Main functions
+# Main function
 #–-----------------------------
 
 def ews_compute(raw_series,
@@ -778,16 +766,21 @@ def fit_null(pspec, init):
 
 
 
-#-----------------------------
-## Function to compute AIC weights from AIC scores
-#–----------------------------
 
 def aic_weights(aic_scores):
     '''
-    Input:
-        aic_scores: array of AIC scores
-    Output:
+    Compute AIC weights from AIC scores
+    
+    Args
+    ----------------
+    aic_scores: np.array
+        An array of AIC scores
+            
+    Returns
+    -----------------
+    np.array
         Array of the corresponding AIC weights
+        
     '''
     
     # Best AIC score
@@ -805,10 +798,7 @@ def aic_weights(aic_scores):
     
     
 
-#--------------------------
-## pspec_metrics
-#-------------------------
-
+#-----------Compute spectral metrics (EWS) from power spectrum------#
 
 
 def pspec_metrics(pspec,
@@ -817,23 +807,27 @@ def pspec_metrics(pspec,
 
 
     '''
-    Function to compute the metrics associated with *pspec* that can be
+    Compute the metrics associated with pspec that can be
     used as EWS.
     
-    Input (default)
-    pspec : power spectrum in the form of a Series indexed by frequency
-    ews ( ['smax', 'coher_factor', 'aic'] ) : array of strings corresponding 
-    to the EWS to be computed. Options include
-        'smax' : peak in the power spectrum
-        'cf' : coherence factor
-        'aic' : Hopf, Fold and Null AIC weights
-    sweep (False) : Boolean to determine whether or not to sweep over many 
-    initialisation parameters, or just use the single initialisation that 
-    is derived from measured metrics (see Methods section).
-                 
-    Output: 
-    A dictionary of spectral metrics obtained from pspec
+    Args
+    -------------------
+    pspec: pd.Series
+        Power spectrum as a Series indexed by frequency
+    ews: list of str (['smax', 'cf', 'aic'])
+        EWS to be computed. Options include
+            'smax' : Peak in the power spectrum
+            'cf'   : Coherence factor
+            'aic'  : Fold, Hopf and Null AIC weights
+    sweep: bool (False)
+        Whether or not to sweep over many 
+        initialisation parameters, or just use the single initialisation that 
+        is derived from measured metrics (see Methods section).
     
+    Return
+    -------------------
+    dict:
+        A dictionary of spectral EWS obtained from pspec
     
     '''
     
@@ -841,7 +835,7 @@ def pspec_metrics(pspec,
     # Initialise a dictionary for EWS
     spec_ews = {}
     
-    # Compute Smax
+    ## Compute Smax
     if 'smax' in ews:
         smax = max(pspec)
         # add to DataFrame
@@ -854,7 +848,6 @@ def pspec_metrics(pspec,
         
         # frequency at which peak occurs
         w_peak = abs(pspec.idxmax())
-        # index location
         
         # power of peak frequency
         power_peak = pspec.max()
@@ -981,26 +974,20 @@ def pspec_metrics(pspec,
         # Compute AIC weights from the AIC scores
         aicw_fold, aicw_hopf, aicw_null = aic_weights([aic_fold, aic_hopf, aic_null])
         
-        
-#       # Print AIC weights
-#        print([aic_fold,aic_hopf,aic_null])
                
-        # add to dataframe
+        # Add to Dataframe
         spec_ews['AIC fold'] = aicw_fold
         spec_ews['AIC hopf'] = aicw_hopf
         spec_ews['AIC null'] = aicw_null
         
         
-        # export fitted parameter values
+        # Add fitted parameter values to DataFrame
         spec_ews['Params fold'] = dict((k, model_fold.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
         spec_ews['Params hopf'] = dict((k, model_hopf.values[k]) for k in ('sigma','mu','w0','delta','psi'))
         spec_ews['Params null'] = model_null.values
 
-#        # Print fitted parameter values
-#        print('Fitted parameter values after optimisation [sigma, mu, w0]')
-#        print([model_hopf.values[k] for k in ['sigma','mu','w0']])
 
-    # return DataFrame of metrics
+    # Return DataFrame of metrics
     return spec_ews
 
     
