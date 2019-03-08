@@ -7,4 +7,4 @@ def test_convert(capsys):
     """Correct my_name argument prints"""
     ewstools.convert("Jill")
     captured = capsys.readouterr()
-    assert "Jall" in captured.out
+    assert "Jill" in captured.out
