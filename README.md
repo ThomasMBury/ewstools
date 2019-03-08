@@ -35,6 +35,8 @@ Installation with conda will be available soon, for those with an Anaconda distr
 
 ## Documentation
 
+Available on [readthedocs](https://ewstools.readthedocs.io/en/latest/).
+
 
 
 
