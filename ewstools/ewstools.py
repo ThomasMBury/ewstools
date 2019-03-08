@@ -407,23 +407,29 @@ def pspec_welch(yVals,
     Compute the power spectrum of yVals using Welch's method.
     This involves computing the periodogram with overlapping Hamming windows.
     
-    Args:
-        yVals (array) : Time-series values
-        dt (float): Seperation between time-series points
-        ham_length (int) : Length of Hamming window (number of data points).
-            Defaults to 40.
-        ham_offset (float) : Hamming offest as a proportion of the Hamming
-            window size. Defaults to 0.5.
-        w_cutoff (float): Cutoff frequency used in power spectrum. Given as a 
-            proportion of the maximum permissable frequency in the empirical
-            power spectrum. Defaults to 1.
-        scaling (str): Choose between
+    Args
+    ------------------
+    yVals: array of float
+        Time-series values
+    dt: float
+        Seperation between time-series points
+    ham_length: int (40)
+        Length of Hamming window (number of data points).
+    ham_offset: float (0.5)
+        Hamming offest as a proportion of the Hamming window size.
+    w_cutoff: float (1)
+        Cutoff frequency used in power spectrum. Given as a proportion of the 
+        maximum permissable frequency in the empirical
+        power spectrum.
+    scaling: str ('spectrum')
+        Choose between
             'spectrum' : computes the power spectrum
             'density'  : computes the power spectral density, which is
-                normalised (area underneath =1).          
+            normalised (area underneath =1).          
             
-    Returns:
-        pd.Series: Power values indexed by frequency
+    Returns
+    --------------------
+    pd.Series: Power values indexed by frequency
         
     '''
 
