@@ -3,7 +3,6 @@ wheel==0.33.1
 twine==1.13.0
 pandas>=0.24
 numpy>=1.15
-black==18.9b0
 pytest==4.3.0
 arch>=4.7
 lmfit>=0.9

@@ -138,15 +138,16 @@ def ews_compute(raw_series,
     
     Returns
     ------------
-    dict: A dictionary with three components.
-        'EWS metrics': pd.DataFrame
-            A pandas DataFrame indexed by time with columns corresopnding 
+    dict: 
+        A dictionary with three components.
+            'EWS metrics': pd.DataFrame
+                A pandas DataFrame indexed by time with columns corresopnding 
             to each EWS.
-        'Power spectrum': pd.DataFrame
-            A DataFrame of the measured power spectra and the best fits used 
+            'Power spectrum': pd.DataFrame
+                A DataFrame of the measured power spectra and the best fits used 
             to give the AIC weights. Indexed by time.
-        'Kendall tau': pd.DataFrame
-            A DataFrame of the Kendall tau values for each EWS metric.
+            'Kendall tau': pd.DataFrame
+                A DataFrame of the Kendall tau values for each EWS metric.
     
     '''
     
@@ -395,6 +396,7 @@ def ews_compute(raw_series,
 # Helper functions
 #–-----------------------------
 
+
 def pspec_welch(yVals,
                 dt,
                 ham_length=40,
@@ -429,7 +431,8 @@ def pspec_welch(yVals,
             
     Returns
     --------------------
-    pd.Series: Power values indexed by frequency
+    pd.Series: 
+        Power values indexed by frequency
         
     '''
 
@@ -460,16 +463,13 @@ def pspec_welch(yVals,
     pspec_series = pd.Series(pspec_raw[1], index=2*np.pi*pspec_raw[0], name='Power spectrum')
     pspec_series.index.name = 'Frequency'
     
-    # sort into ascending frequency
+    # Sort into ascending frequency
     pspec_series.sort_index(inplace=True)
     
-    # append power spectrum with first value (by symmetry)
+    # Append power spectrum with first value (by symmetry)
     pspec_series.at[-min(pspec_series.index)] = pspec_series.iat[0]
-    
-#    # remove zero-frequency component
-#    pspec_series.drop(0, inplace=True)
-    
-    # impose cutoff frequency
+        
+    # Impose cutoff frequency
     wmax = w_cutoff*max(pspec_series.index) # cutoff frequency
     pspec_output = pspec_series[-wmax:wmax] # subset of power spectrum
     
@@ -480,11 +480,9 @@ def pspec_welch(yVals,
 
 
 
-#-----------------------------------------
-## Analytical forms for power spectra
-#-----------------------------------------
-    
 
+#------------Functional forms of power spectra to fit------------#
+    
 def psd_fold(w,sigma,lam):
     return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
 
@@ -498,14 +496,32 @@ def psd_null(w,sigma):
     
 
 
-#--------------------------------
-## Functions to find initalisation parameters for optimisation procedure
-#–--------------------------------
+
+#-------Obtain 'best guess' intitialisation parameters for optimisation------%
+
+
+def shopf_init(smax, stot, wdom):
+    '''
+    Compute the 'best guess' initialisation values for sigma, mu and w0,
+    when fitting sHopf to the empirical power spectrum.
     
-# Function to compute the initialisation value for mu when fitting Shopf
-def mu_init_fun(smax, stot, wdom):
+    Args
+    --------------
+    smax: float
+        Maximum power in the power spectrum.
+    stot: float
+        Total power in the power spectrum.
+    wdom: float
+        Frequency that has the highest power.
+        
+    Return
+    -----------------
+    list of float: 
+        List containing the initialisation parameters [sigma, mu, w0]
+        
+    '''
     
-    # define chunky term (use \ to continue eqn to new line)
+    # Define chunky term (use \ to continue eqn to new line)
     def alpha(smax, stot, wdom):
         return stot**3 \
         + 9*(np.pi**2)*(wdom**2)*(smax**2)*stot \
@@ -514,38 +530,88 @@ def mu_init_fun(smax, stot, wdom):
                 -13*(np.pi**2)*(wdom**4)*(smax**4)*(stot**2) \
                 +2*(wdom**2)*(smax**2)*(stot**4) \
                 )
-        
-    return  -(1/(3*np.pi*smax))*(stot \
+    
+    # Initialisation for mu    
+    mu = -(1/(3*np.pi*smax))*(stot \
              +alpha(smax,stot,wdom)**(1/3) \
              +(stot**2-12*(np.pi**2)*(wdom**2)*(smax**2))/(alpha(smax,stot,wdom)**(1/3)))
- 
     
-# Function to compute the initialisation value for sigma when fitting Shopf
-def sigma_init_hopf_fun(smax,stot,wdom):
-    return np.sqrt(
-            -2*mu_init_fun(smax,stot,wdom)*stot)
+    
+    # Initialisation for sigma
+    sigma = np.sqrt(
+            -2*mu*stot)
+    
+    # Initialisation for w0
+    w0 = wdom
+    
+    # Return list
+    return [sigma, mu, w0]
+
+
 
     
-# Function to compute the initialisation value for sigma when fitting Sfold
-def sigma_init_fold_fun(smax,stot):
-    return np.sqrt(
-            2*stot**2/(np.pi*smax)
-            )
+    
+def sfold_init(smax, stot):
+    '''
+    Compute the 'best guess' initialisation values for sigma and lamda
+    when fitting sfold to the empirical power spectrum.
+    
+    Args
+    --------------
+    smax: float
+        Maximum power in the power spectrum.
+    stot: float
+        Total power in the power spectrum.
+        
+    Return
+    -----------------
+    list of float: 
+        List containing the initialisation parameters [sigma, lambda]
+        
+    '''
+    
+    # Initialisation for sigma
+    sigma = np.sqrt(2*stot**2/(np.pi*smax))
+    
+    # Initialisation for lamda
+    lamda = -stot/(np.pi*smax)
+
+    # Return list
+    return [sigma, lamda]
 
 
 
-# Function to compute the initialisation value for lambda when fitting Sfold
-def lambda_init_fun(smax,stot):
-    return -stot/(np.pi*smax)
+def snull_init(stot):
+    '''
+    Compute the 'best guess' initialisation values for sigma
+    when fitting snull to the empirical power spectrum.
+    
+    Args
+    --------------
+    stot: float
+        Total power in the power spectrum.
+        
+    Return
+    -----------------
+    list of float: 
+        List containing the initialisation parameters [sigma]
+        
+    '''
+    
+    # Initialisation for sigma
+    sigma = np.sqrt(stot)
+
+    # Return list
+    return [sigma]
 
 
 
-#------------------------------------
-## Functions to fit analytical forms to empirical power spectrum
-#–------------------------------------
+
+
+#---------Run optimisation to compute best fits-----------#
     
 # Fold fit
-def fit_fold(pspec,init):
+def fit_fold(pspec, init):
     '''
     Input:
         pspec: power spectrum data as a Series indexed by frequency
@@ -791,12 +857,6 @@ def pspec_metrics(pspec,
         # Dominant frequency (take positive value)
         wdom = abs(pspec.idxmax())
         
-        # If stot=0 then there is no variation - set aic_null=1
-        
-#        # Print metrics
-#        print('\nSpectrum metrics [smax, stot, wdom]')
-#        print([smax, stot, wdom])
-        
         ## Create array of initialisation parmaeters        
         
         # Sweep values (as proportion of baseline guess) if sweep = True
@@ -804,19 +864,12 @@ def pspec_metrics(pspec,
         
         # Baseline parameter initialisations (computed using empirical spectrum)
         # Sfold
-        sigma_init_fold = sigma_init_fold_fun(smax,stot)
-        lambda_init = lambda_init_fun(smax,stot)
+        [sigma_init_fold, lambda_init] = sfold_init(smax,stot)
         # Shopf
-        sigma_init_hopf = sigma_init_hopf_fun(smax,stot,wdom)
-        mu_init = mu_init_fun(smax,stot,wdom)
-        w0_init = wdom
+        [sigma_init_hopf, mu_init, w0_init] = shopf_init(smax,stot,wdom)
         # Snull
-        sigma_init_null = np.sqrt(stot)
-        
-#        # Print the derived initialisation parameters
-#        print('Initial parameter guesses for the Hopf fit [sigma, mu, w0]')
-#        print([sigma_init_hopf,mu_init,w0_init])
-        
+        [sigma_init_null] = snull_init(stot)
+                
         
         # Arrays of initial values
         init_fold_array = {'sigma': sweep_vals*sigma_init_fold,
