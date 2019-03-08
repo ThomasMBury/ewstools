@@ -38,8 +38,9 @@ Installation with conda will be available soon, for those with an Anaconda distr
 
 
 
-## Demos/tutorial
+## Demos
 
+For help getting started, take a look at the following demos. They are scripted in iPython notebooks for interactivity.
 
 
 
