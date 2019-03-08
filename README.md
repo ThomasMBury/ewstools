@@ -22,8 +22,20 @@ Dependencies include
   - numpy, pandas, seaborn
   - lmfit, arch  
   
+  
+## Install:
 
-## ews_compute.py
+Install ewstools using pip:
+```python
+pip install ewstools
+```
+
+Installation with conda will be available soon, for those with an Anaconda distribution.
+
+
+## Documentation
+
+### ews_compute.py
 File for function `ews_compute`.  
 `ews_compute` takes in Series data and outputs user-specified EWS in a DataFrame.
 
@@ -53,17 +65,14 @@ File for function `ews_compute`.
 
 
 
-## ews_compute_run.py
-An example script that runs `ews_compute` on times-series data of a stochastic simulation of May's 
-harvesting model. It also shows how to compute kendall tau values and plot results. This
-can be used as a template for EWS of times-series data.
 
 
-## ews_compute_runMulti.py
-An example script that runs `ews_compute` on multiple time-series data and outputs
-EWS as a distribution over realisations.
+## Demos/tutorial
 
 
+
+
+## Quick walkthrough
 
 
 
