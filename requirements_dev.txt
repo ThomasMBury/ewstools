@@ -8,6 +8,7 @@ arch>=4.7
 lmfit>=0.9
 pytest-cov==2.6.1
 coveralls==1.6.0
+sphinx==1.8.4
 
 
 
