@@ -26,7 +26,7 @@ def test_pspec_welch():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ews.pspec_welch(yVals, dt)
+    pspec = ews.pspec_welch(yVals, dt, ham_length=ham_length)
     
     assert type(pspec) == pd.Series
     assert pspec.shape in [(n_points,),
@@ -108,7 +108,73 @@ def test_snull_init():
     
     
 
-  
+def test_fit_fold():
+    '''
+    Run a power spectrum through the fitting procedure of the 'fold'
+    power spectrum form.
+    '''
+    
+    # Create a power spectrum
+    n_points = 100
+    dt = 1
+    ham_length = 40
+    yVals = np.random.normal(0,1,n_points)
+    pspec = ews.pspec_welch(yVals, dt, ham_length=ham_length)
+    
+    sigma_init = 0.05
+    lambda_init = -0.1
+    init = [sigma_init, lambda_init]
+    # Run power spectrum in fit_fold
+    [aic, model] = ews.fit_fold(pspec, init)
+    
+    assert type(aic) == np.float64
+    assert type(model.values) == dict
+    
+    
+def test_fit_hopf():
+    '''
+    Run a power spectrum through the fitting procedure of the 'hopf'
+    power spectrum form.
+    '''
+    
+    # Create a power spectrum
+    n_points = 100
+    dt = 1
+    ham_length = 40
+    yVals = np.random.normal(0,1,n_points)
+    pspec = ews.pspec_welch(yVals, dt, ham_length=ham_length)
+    
+    sigma_init = 0.05
+    mu_init = -0.1
+    w0_init = 1
+    init = [sigma_init, mu_init, w0_init]
+    # Run power spectrum in fit_hopf
+    [aic, model] = ews.fit_hopf(pspec, init)
+    
+    assert type(aic) == np.float64
+    assert type(model.values) == dict
+    
+
+def test_fit_null():
+    '''
+    Run a power spectrum through the fitting procedure of the 'null'
+    power spectrum form.
+    '''
+    
+    # Create a power spectrum
+    n_points = 100
+    dt = 1
+    ham_length = 40
+    yVals = np.random.normal(0,1,n_points)
+    pspec = ews.pspec_welch(yVals, dt, ham_length=ham_length)
+    
+    sigma_init = 0.05
+    init = [sigma_init]
+    # Run power spectrum in fit_null
+    [aic, model] = ews.fit_null(pspec, init)
+    
+    assert type(aic) == np.float64
+    assert type(model.values) == dict
 
 
 

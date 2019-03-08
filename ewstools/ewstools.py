@@ -613,12 +613,22 @@ def snull_init(stot):
 # Fold fit
 def fit_fold(pspec, init):
     '''
-    Input:
-        pspec: power spectrum data as a Series indexed by frequency
-        init: Initial parameter guesses [sigma_init, lambda_init]
+    Fit the Fold power spectrum model to pspec and compute AIC score.
+    Uses LMFIT
+    
+    Args
+    --------------
+    pspec: pd.Series
+        Power spectrum data as a Series indexed by frequency
+    init: list of float
+        Initial parameter guesses of the form [sigma_init, lambda_init]
         
-    Output:
-        List containing fitted model and AIC score
+    Returns
+    ----------------
+    list:
+        Form [aic, result] where aic is the AIC score for the model fit,
+        and result is a handle that contains further information on the fit.
+
     '''
     
     
@@ -650,15 +660,27 @@ def fit_fold(pspec, init):
 
 
 # Function to fit Hopf model to empirical specrum with specified initial parameter guess
-def fit_hopf(pspec, init):
+def fit_hopf(pspec, init):    
+    
     '''
-    Input:
-        pspec: power spectrum data as a Series indexed by frequency
-        init: Initial parameter guesses [sigma_init, mu_init, delta_fit]
+    Fit the Hopf power spectrum model to pspec and compute AIC score.
+    Uses LMFIT
+    
+    Args
+    --------------
+    pspec: pd.Series
+        Power spectrum data as a Series indexed by frequency
+    init: list of float
+        Initial parameter guesses of the form [sigma_init, mu_init, w0_init]
         
-    Output:
-        List containing fitted model and AIC score
+    Returns
+    ----------------
+    list:
+        Form [aic, result] where aic is the AIC score for the model fit,
+        and result is a handle that contains further information on the fit.
+
     '''
+    
     
     # Put frequency values and power values as a list to use LMFIT
     freq_vals = pspec.index.tolist()
@@ -713,12 +735,22 @@ def fit_hopf(pspec, init):
 # Function to fit Null model to empirical specrum with specified initial parameter guess
 def fit_null(pspec, init):
     '''
-    Input:
-        pspec: power spectrum data as a Series indexed by frequency
-        init: Initial parameter guesses [sigma_init]
+    Fit the Null power spectrum model to pspec and compute AIC score.
+    Uses LMFIT
+    
+    Args
+    --------------
+    pspec: pd.Series
+        Power spectrum data as a Series indexed by frequency
+    init: list of float
+        Initial parameter guesses of the form [sigma_init]
         
-    Output:
-        List containing fitted model and AIC score
+    Returns
+    ----------------
+    list:
+        Form [aic, result] where aic is the AIC score for the model fit,
+        and result is a handle that contains further information on the fit.
+
     '''
     
     # Put frequency values and power values as a list to use LMFIT
