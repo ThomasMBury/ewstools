@@ -5,8 +5,7 @@
 
 # ewstools
 **Python package for computing, analysing and visualising early warning signals (EWS)
-in time-series data. Includes novel approaches towards characterising bifurcations and 
-assessing confidence in metrics.**
+in time-series data. Includes novel approaches to characterising bifurcations using EWS.**
 
 Functionality includes
 
@@ -24,11 +23,6 @@ Dependencies include
   - numpy, pandas, seaborn
   - lmfit, arch  
   
-
-
-
-
-
 
 ## ews_compute.py
 File for function `ews_compute`.  
