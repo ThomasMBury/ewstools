@@ -21,11 +21,10 @@ Functionality includes
   
 ## Install:
 
-ewstools requires Python version 3.7 or later to be installed on your system. You can than install ewstools by entering
+*ewstools* requires Python version 3.7 or later to be installed on your system. Then *ewstools* can be installed using pip, by entering the following into your command line.
 ```python
 pip install ewstools
 ```
-into your command line.
 
 ## Demos
 
@@ -33,17 +32,9 @@ iPython notebooks demonstrating how to use the software are available [here](exa
 
 ## Documentation
 
-Full documentation is available [here](https://ewstools.readthedocs.io/en/latest/).
+Full documentation for *ewstools* is available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
 
+## Contribution
 
-
-
-
-
-
-
-
-
-
-
+If you are interested in being a contributer to *ewstools* please post your proposal on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues)
 
