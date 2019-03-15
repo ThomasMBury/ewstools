@@ -18,44 +18,23 @@ Functionality includes
   
   - Visualisation of EWS with plots of time-series and power spectra.
   
-Dependencies include
-  - numpy, pandas, seaborn
-  - lmfit, arch  
-  
   
 ## Install:
 
-ewstools requires Python version 3.7 or later to be installed on your system. You can than install ewstools by entering
+*ewstools* requires Python version 3.7 or later to be installed on your system. Then *ewstools* can be installed using pip, by entering the following into your command line.
 ```python
 pip install ewstools
 ```
-into the command line.
-
-Installation with conda will be available soon, for those with an Anaconda distribution.
-
-
-## Documentation
-
-Full documentation is available [here](https://ewstools.readthedocs.io/en/latest/).
-
 
 ## Demos
 
 iPython notebooks demonstrating how to use the software are available [here](examples/).
 
+## Documentation
 
+Full documentation for *ewstools* is available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
 
-## Quick walkthrough
+## Contribution
 
-
-
-
-
-
-
-
-
-
-
-
+If you are interested in being a contributer to *ewstools*, or run into trouble with the package, please post on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues).
 
