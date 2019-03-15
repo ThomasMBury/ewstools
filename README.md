@@ -45,11 +45,6 @@ iPython notebooks demonstrating how to use the software are available [here](exa
 
 
 
-## Quick walkthrough
-
-
-
-
 
 
 
