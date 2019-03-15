@@ -18,10 +18,6 @@ Functionality includes
   
   - Visualisation of EWS with plots of time-series and power spectra.
   
-Dependencies include
-  - numpy, pandas, seaborn
-  - lmfit, arch  
-  
   
 ## Install:
 
