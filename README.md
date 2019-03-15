@@ -25,19 +25,16 @@ ewstools requires Python version 3.7 or later to be installed on your system. Yo
 ```python
 pip install ewstools
 ```
-into the command line.
+into your command line.
 
-Installation with conda will be available soon, for those with an Anaconda distribution.
+## Demos
 
+iPython notebooks demonstrating how to use the software are available [here](examples/).
 
 ## Documentation
 
 Full documentation is available [here](https://ewstools.readthedocs.io/en/latest/).
 
-
-## Demos
-
-iPython notebooks demonstrating how to use the software are available [here](examples/).
 
 
 
