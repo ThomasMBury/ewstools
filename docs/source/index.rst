@@ -1,6 +1,6 @@
 
 Documentation for ewstools
-============================
+==========================
 
 .. toctree::
    :maxdepth: 2
