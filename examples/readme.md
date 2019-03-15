@@ -1,23 +1,18 @@
 # Demos/Tutorials
-**A collection of iPython notebooks demonstrating various applications of ewstools.**
+**A collection of iPython notebooks demonstrating various applications of *ewstools*.**
 
-### ews_single.ipynb
-- Simulate a single stochastic trajectory of the Ricker model going through a Fold bifurcation
-- Show how to use the package *ewstools* to compute early warning signals
-- Visualise the output of *ewstools* graphically
-
-
-### ews_multi.ipynb
-
-Simulates multiple trajectories of the Ricker model undergoing a Fold and Flip bifurcation
-and computes ensemble averages of EWS.
+### ews_fold.ipynb
+- Simulates a single stochastic trajectory of the Ricker model going through a Fold bifurcation
+- Shows how to use *ewstools* to compute early warning signals
+- Visualises the output of *ewstools* graphically
 
 
 ### ews_bootstrap.ipynb
+- Simulates a trajectories of the Ricker model going through a Flip and a Fold bifurcadtion
+- Uses *ewstools* to compute bootstrapped time-series and the corresponding EWS.
+- Visualises the output, to compare the two cases.
 
-Simulates a single trajectory of the Ricker model undergoing a Fold and Flip bifurcation, 
-computes bootstrapped time-series from rolling window segments, and computes the
-evolving distribution of EWS.
+
 
 
 
