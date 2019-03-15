@@ -8,19 +8,7 @@
 
 
 ### ews_bootstrap.ipynb
-- Simulates a trajectories of the Ricker model going through a Flip and a Fold bifurcadtion
+- Simulates single stochastic trajectories of the Ricker model going through a Flip and a Fold bifurcadtion
 - Uses *ewstools* to compute bootstrapped time-series and the corresponding EWS.
 - Visualises the output, comparing the two bifurcations.
-
-
-
-
-
-
-
-
-
-
-
-
 
