@@ -28,11 +28,11 @@ pip install ewstools
 
 ## Demos
 
-iPython notebooks demonstrating how to use the software are available [here](examples/).
+For demonstrations/tutorials on using *ewstools*, please refer to these [iPython notebooks](examples/).
 
 ## Documentation
 
-Full documentation for *ewstools* is available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
+Full documentation is available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
 
 ## Contribution
 
