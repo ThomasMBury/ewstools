@@ -36,5 +36,5 @@ Full documentation is available on [ReadTheDocs](https://ewstools.readthedocs.io
 
 ## Contribution
 
-If you are interested in being a contributer to *ewstools*, or run into trouble with the package, please post on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues).
+If you are interested in being a contributer, or run into trouble with the package, please post on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues).
 
