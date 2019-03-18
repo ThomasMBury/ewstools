@@ -1,25 +1,30 @@
-ewstools Package
-=================
+ewstools package
+================
 
-A Python package for computing, analysing and visualising early warning signals (EWS) 
-in time-series data.
+Submodules
+----------
 
-User functions
---------------
+ewstools.ewstools module
+------------------------
 
 .. automodule:: ewstools.ewstools
     :members:
     :undoc-members:
     :show-inheritance:
 
-
-Helper functions
-----------------
+ewstools.helperfuns module
+--------------------------
 
 .. automodule:: ewstools.helperfuns
     :members:
     :undoc-members:
     :show-inheritance:
 
-    
-    
+
+Module contents
+---------------
+
+.. automodule:: ewstools
+    :members:
+    :undoc-members:
+    :show-inheritance:
