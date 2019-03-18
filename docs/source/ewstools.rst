@@ -5,7 +5,7 @@ Modules
 ----------
 
 
-indicators module
+User functions
 ------------------
 
 .. automodule:: ewstools.ewstools
@@ -14,7 +14,7 @@ indicators module
     :show-inheritance:
 
 
-helper_funs module
+Helper functions
 -------------------
 
 .. automodule:: ewstools.helperfuns
