@@ -1,5 +1,5 @@
 
-Documentation for ewstools
+ewstools Documentation
 ==========================
 
 .. toctree::
@@ -7,7 +7,7 @@ Documentation for ewstools
    :caption: Contents:
 
 
-ewstools is a Python package for computing, analysing and visualising early warning signals (EWS) in time-series data.
+A Python package for computing, analysing and visualising early warning signals (EWS) in time-series data.
 
 
 
