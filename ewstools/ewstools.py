@@ -50,7 +50,7 @@ from scipy.ndimage.filters import gaussian_filter as gf
 from lmfit import Model
 
 # Import helper functions
-from helperfuns import *
+from ewstools.helperfuns import *
 
 
 

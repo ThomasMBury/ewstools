@@ -10,6 +10,7 @@ import pandas as pd
 
 
 from ewstools import ewstools
+from ewstools import helperfuns
 
 
 def test_ews_compute():
@@ -55,7 +56,7 @@ def test_pspec_welch():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
+    pspec = helperfuns.pspec_welch(yVals, dt, ham_length=ham_length)
     
     assert type(pspec) == pd.Series
     assert pspec.shape in [(n_points,),
@@ -71,9 +72,9 @@ def test_psd_forms():
     lamda = -0.1
     mu = -0.1
     w0 = 1
-    sFoldVals = ewstools.psd_fold(wVals, sigma, lamda)
-    sHopfVals = ewstools.psd_hopf(wVals, sigma, mu, w0)
-    sNullVals = ewstools.psd_null(wVals, sigma)
+    sFoldVals = helperfuns.psd_fold(wVals, sigma, lamda)
+    sHopfVals = helperfuns.psd_hopf(wVals, sigma, mu, w0)
+    sNullVals = helperfuns.psd_null(wVals, sigma)
         
     assert type(sFoldVals)==np.ndarray
     assert type(sHopfVals)==np.ndarray
@@ -89,7 +90,7 @@ def test_sfold_init():
     stot = 1
     smax = 0.5
     
-    [sigma, lamda] = ewstools.sfold_init(smax, stot)
+    [sigma, lamda] = helperfuns.sfold_init(smax, stot)
     
     # Values that smax, stot should attain (+/- 1dp)
     smax_assert = sigma**2/(2*np.pi*lamda**2)
@@ -108,7 +109,7 @@ def test_shopf_init():
     stot = 1
     wdom = 1
     
-    [sigma, mu, w0] = ewstools.shopf_init(smax, stot, wdom)
+    [sigma, mu, w0] = helperfuns.shopf_init(smax, stot, wdom)
     
     # Values that smax, stot should attain (+/- 1dp)
     smax_assert = (sigma**2/(4*np.pi*mu**2))*(1+(mu**2/(mu**2+4*w0**2)))
@@ -128,7 +129,7 @@ def test_snull_init():
     '''
     stot = 1
     
-    [sigma] = ewstools.snull_init(stot)
+    [sigma] = helperfuns.snull_init(stot)
     
     # Values that smax, stot should attain (+/- 1dp)
     stot_assert = sigma**2
@@ -148,13 +149,13 @@ def test_fit_fold():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
+    pspec = helperfuns.pspec_welch(yVals, dt, ham_length=ham_length)
     
     sigma_init = 0.05
     lambda_init = -0.1
     init = [sigma_init, lambda_init]
     # Run power spectrum in fit_fold
-    [aic, model] = ewstools.fit_fold(pspec, init)
+    [aic, model] = helperfuns.fit_fold(pspec, init)
     
     assert type(aic) == np.float64
     assert type(model.values) == dict
@@ -171,14 +172,14 @@ def test_fit_hopf():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
+    pspec = helperfuns.pspec_welch(yVals, dt, ham_length=ham_length)
     
     sigma_init = 0.05
     mu_init = -0.1
     w0_init = 1
     init = [sigma_init, mu_init, w0_init]
     # Run power spectrum in fit_hopf
-    [aic, model] = ewstools.fit_hopf(pspec, init)
+    [aic, model] = helperfuns.fit_hopf(pspec, init)
     
     assert type(aic) == np.float64
     assert type(model.values) == dict
@@ -195,12 +196,12 @@ def test_fit_null():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
+    pspec = helperfuns.pspec_welch(yVals, dt, ham_length=ham_length)
     
     sigma_init = 0.05
     init = [sigma_init]
     # Run power spectrum in fit_null
-    [aic, model] = ewstools.fit_null(pspec, init)
+    [aic, model] = helperfuns.fit_null(pspec, init)
     
     assert type(aic) == np.float64
     assert type(model.values) == dict
@@ -212,7 +213,7 @@ def test_aic_weights():
     '''
     aic_scores = np.array([-231,-500,-100,5])
     
-    aic_weights = ewstools.aic_weights(aic_scores)
+    aic_weights = helperfuns.aic_weights(aic_scores)
     
     assert type(aic_weights) == np.ndarray
     
@@ -227,10 +228,10 @@ def test_pspec_metrics():
     dt = 1
     ham_length = 40
     yVals = np.random.normal(0,1,n_points)
-    pspec = ewstools.pspec_welch(yVals, dt, ham_length=ham_length)
+    pspec = helperfuns.pspec_welch(yVals, dt, ham_length=ham_length)
     
     # Run power spectrum in pspec_metrics
-    spec_ews = ewstools.pspec_metrics(pspec,
+    spec_ews = helperfuns.pspec_metrics(pspec,
                       ews=['smax','cf','aic'],
                       sweep=True)
 

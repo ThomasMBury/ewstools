@@ -145,20 +145,25 @@ def psd_fold(w,sigma,lam):
 	Analytical approximation for the power spectrum in a continuous-time system
 	with a real eigenvalue approaching 0.
 	'''
-    return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
+	return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
+    
+    
 
 def psd_hopf(w,sigma,mu,w0):
 	'''
 	Analytical approximation for the power spectrum in a continuous-time system
 	with a complex-conjugate pair of eigenvalues approaching zero real part.
 	'''
-    return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
+	return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
+     
+    
+
 
 def psd_null(w,sigma):
 	'''
 	Power spectrum of white noise (flat).
 	'''
-    return sigma**2/(2*np.pi) * w**0
+	return sigma**2/(2*np.pi) * w**0
     
     
     
