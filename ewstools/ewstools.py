@@ -70,9 +70,9 @@ def ews_compute(raw_series,
             sweep=False):
     '''
     Compute temporal and spectral EWS from time-series data.  
-    
-    Args
-    --------
+    	
+    Arguments
+    ----------
     raw_series: pd.Series
         Time-series data to analyse. Indexed by time.
     roll_window: float (0.4)
@@ -771,13 +771,13 @@ def aic_weights(aic_scores):
     '''
     Compute AIC weights from AIC scores
     
-    Args
-    ----------------
+    Arguments
+    ------------
     aic_scores: np.array
         An array of AIC scores
             
     Returns
-    -----------------
+    ----------
     np.array
         Array of the corresponding AIC weights
         
