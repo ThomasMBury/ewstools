@@ -87,7 +87,7 @@ def ews_compute(raw_series,
         Span of time-series data used for Lowess filtering. Taken as a 
         proportion of time-series length if in (0,1), otherwise taken as 
         absolute.
-    upto: int or str
+    upto: int or 'Full'
         Time up to which EWS are computed. Enter 'Full' to use
         the entire time-series. Otherwise enter a time value.
     ews: {'var','ac','sd','cv','skew','kurt','smax','cf','aic'}
@@ -114,20 +114,15 @@ def ews_compute(raw_series,
         longer computation. If 'False', intialisation parameter is taken as the
         'best guess'.
     
-    
     Returns
     --------
     dict: 
         A dictionary with the following entries.
-        	'EWS metrics': pd.DataFrame
-                A pandas DataFrame indexed by time with columns corresopnding 
-            	to each EWS.
-            'Power spectrum': pd.DataFrame
-                A DataFrame of the measured power spectra and the best fits used 
-            	to give the AIC weights. Indexed by time.
-            'Kendall tau': pd.DataFrame
-                A DataFrame of the Kendall tau values for each EWS metric.
-    
+        *'EWS metrics':* A pandas DataFrame indexed by time with columns corresopnding 
+        to each EWS.
+        *'Power spectrum':* A DataFrame of the measured power spectra and the best fits 
+        used to give the AIC weights. Indexed by time. 
+        *'Kendall tau':*  A DataFrame of the Kendall tau values for each EWS metric.
     '''
     
     # Initialise a DataFrame to store EWS data - indexed by time
