@@ -52,11 +52,6 @@ from lmfit import Model
 
       
 
-#------------------------------
-# Helper functions
-#–-----------------------------
-
-
 def pspec_welch(yVals,
                 dt,
                 ham_length=40,
