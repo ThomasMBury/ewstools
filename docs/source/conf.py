@@ -23,7 +23,7 @@ autodoc_mock_imports = [
     'numpy',
     'scipy',
     'statsmodels',
-    'lmfit'
+    'lmfit',
     'helperfuns'
 ]
 
