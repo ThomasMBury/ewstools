@@ -1,10 +1,11 @@
-ewstools package
+ewstools Package
 =================
 
-Submodules
+Modules
 ----------
 
-ewstools.ewstools module
+
+indicators module
 --------------------------
 
 .. automodule:: ewstools.ewstools
@@ -12,3 +13,14 @@ ewstools.ewstools module
     :undoc-members:
     :show-inheritance:
 
+
+helper_funs module
+--------------------------
+
+.. automodule:: ewstools.helper_funs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+    
+    
