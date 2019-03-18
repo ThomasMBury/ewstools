@@ -75,62 +75,56 @@ def ews_compute(raw_series,
     ----------
     raw_series: pd.Series
         Time-series data to analyse. Indexed by time.
-    roll_window: float (0.4)
+    roll_window: float
         Rolling window size as a proportion of the length of the time-series 
         data.
     smooth: {'Gaussian', 'Lowess', 'None'}
         Type of detrending.
-    band_width: float (0.2)
+    band_width: float
         Bandwidth of Gaussian kernel. Taken as a proportion of time-series length if in (0,1), 
         otherwise taken as absolute.
-    span: float (0.1)
+    span: float
         Span of time-series data used for Lowess filtering. Taken as a 
         proportion of time-series length if in (0,1), otherwise taken as 
         absolute.
-    upto: int or str ('Full')
+    upto: int or str
         Time up to which EWS are computed. Enter 'Full' to use
         the entire time-series. Otherwise enter a time value.
-    ews: list of str (['var', 'ac'])
-		 List of EWS to compute. Options include
-             'var'   : Variance
-             'ac'    : Autocorrelation
-             'sd'    : Standard deviation
-             'cv'    : Coefficient of variation
-             'skew'  : Skewness
-             'kurt'  : Kurtosis
-             'smax'  : Peak in the power spectrum
-             'cf'    : Coherence factor
-             'aic'   : AIC weights
-    lag_times: list of int ([1])
+    ews: {'var','ac','sd','cv','skew','kurt','smax','cf','aic'}
+		 List of EWS to compute. Options include variance ('var'),
+		 autocorrelation ('ac'), standard deviation ('sd'), coefficient
+		 of variation ('cv'), skewness ('skew'), kurtosis ('kurt'), peak in
+		 the power spectrum ('smax'), coherence factor ('cf'), AIC weights ('aic').
+    lag_times: list of int
         List of lag times at which to compute autocorrelation.
-    ham_length: int (40)
+    ham_length: int
         Length of the Hamming window used to compute the power spectrum.
-    ham_offset: float (0.5)
+    ham_offset: float
         Hamming offset as a proportion of the Hamming window size.
-    pspec_roll_offset: int (20)
+    pspec_roll_offset: int
         Rolling window offset used when computing power spectra. Power spectrum 
         computation is relatively expensive so this is rarely taken as 1 
         (as is the case for the other EWS).
-    w_cutoff: float (1)
+    w_cutoff: float
         Cutoff frequency used in power spectrum. Given as a proportion of the 
         maximum permissable frequency in the empirical power spectrum.
-    sweep: bool ('False')
-        Choose 'True' to sweep over a range of intialisation 
+    sweep: bool
+        If 'True', sweep over a range of intialisation 
         parameters when optimising to compute AIC scores, at the expense of 
-        longer computation. Otherwise intialisation parameter is taken as the
+        longer computation. If 'False', intialisation parameter is taken as the
         'best guess'.
     
     
     Returns
-    ------------
+    --------
     dict: 
-        A dictionary with three components.
-            'EWS metrics': pd.DataFrame
+        A dictionary with the following entries.
+        	'EWS metrics': pd.DataFrame
                 A pandas DataFrame indexed by time with columns corresopnding 
-            to each EWS.
+            	to each EWS.
             'Power spectrum': pd.DataFrame
                 A DataFrame of the measured power spectra and the best fits used 
-            to give the AIC weights. Indexed by time.
+            	to give the AIC weights. Indexed by time.
             'Kendall tau': pd.DataFrame
                 A DataFrame of the Kendall tau values for each EWS metric.
     
