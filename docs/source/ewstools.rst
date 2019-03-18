@@ -12,11 +12,3 @@ ewstools.ewstools module
     :undoc-members:
     :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: ewstools
-    :members:
-    :undoc-members:
-    :show-inheritance:
