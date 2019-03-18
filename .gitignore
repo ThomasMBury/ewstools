@@ -30,6 +30,7 @@ sdist/
 var/
 .installed.cfg
 *.egg
+.idea
 
 
 # Packages #
