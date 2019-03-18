@@ -59,28 +59,32 @@ def pspec_welch(yVals,
                 w_cutoff=1,
                 scaling='spectrum'):
 
-
     '''
-    Compute the power spectrum of yVals using Welch's method.
-    This involves computing the periodogram with overlapping Hamming windows.
+    Computes the power spectrum of a time-series using Welch's method.
+    
+    The time-series is assumed to be stationary and to have equally spaced
+    measurements in time. The power spectrum is computed using Welch's method,
+    which computes the power spectrum over a rolling window of subsets of the
+    time-series and then takes the average.
     
     Args
     ------------------
-    yVals: array of float
-        Time-series values
+    yVals: array of floats
+        Array of time-series values.
     dt: float
-        Seperation between time-series points
+        Seperation between data points.
     ham_length: int
         Length of Hamming window (number of data points).
     ham_offset: float
-        Hamming offest as a proportion of the Hamming window size.
+        Hamming offset as a proportion of the Hamming window size.
     w_cutoff: float
         Cutoff frequency used in power spectrum. Given as a proportion of the 
         maximum permissable frequency in the empirical
         power spectrum.
     scaling: {'spectrum', 'density'}
         Whether to compute the power spectrum ('spectrum') or
-        the power spectral density ('density'), which is normalised to have area 1.        
+        the power spectral density ('density'). The power spectral density
+        is the power spectrum normalised (such that the area underneath equals one).        
             
     Returns
     --------------------
@@ -137,12 +141,23 @@ def pspec_welch(yVals,
 #------------Functional forms of power spectra to fit------------#
     
 def psd_fold(w,sigma,lam):
+	'''
+	Analytical approximation for the power spectrum in a continuous-time system
+	with a real eigenvalue approaching 0.
+	'''
     return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
 
 def psd_hopf(w,sigma,mu,w0):
+	'''
+	Analytical approximation for the power spectrum in a continuous-time system
+	with a complex-conjugate pair of eigenvalues approaching zero real part.
+	'''
     return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
 
 def psd_null(w,sigma):
+	'''
+	Power spectrum of white noise (flat).
+	'''
     return sigma**2/(2*np.pi) * w**0
     
     
@@ -169,7 +184,7 @@ def shopf_init(smax, stot, wdom):
         
     Return
     -----------------
-    list of float: 
+    list of floats: 
         List containing the initialisation parameters [sigma, mu, w0]
         
     '''
@@ -218,7 +233,7 @@ def sfold_init(smax, stot):
         
     Return
     -----------------
-    list of float: 
+    list of floats: 
         List containing the initialisation parameters [sigma, lambda]
         
     '''
@@ -246,8 +261,8 @@ def snull_init(stot):
         
     Return
     -----------------
-    list of float: 
-        List containing the initialisation parameters [sigma]
+    list of floats: 
+        List containing the initialisation parameters [sigma].
         
     '''
     
@@ -267,14 +282,14 @@ def snull_init(stot):
 def fit_fold(pspec, init):
     '''
     Fit the Fold power spectrum model to pspec and compute AIC score.
-    Uses LMFIT
+    Uses the package LMFIT for optimisation.
     
     Args
     --------------
     pspec: pd.Series
-        Power spectrum data as a Series indexed by frequency
-    init: list of float
-        Initial parameter guesses of the form [sigma_init, lambda_init]
+        Power spectrum data as a Series indexed by frequency.
+    init: list of floats
+        Initial parameter guesses of the form [sigma_init, lambda_init].
         
     Returns
     ----------------
@@ -317,13 +332,13 @@ def fit_hopf(pspec, init):
     
     '''
     Fit the Hopf power spectrum model to pspec and compute AIC score.
-    Uses LMFIT
+    Uses the package LMFIT for optimisation.
     
     Args
     --------------
     pspec: pd.Series
         Power spectrum data as a Series indexed by frequency
-    init: list of float
+    init: list of floats
         Initial parameter guesses of the form [sigma_init, mu_init, w0_init]
         
     Returns
@@ -389,13 +404,13 @@ def fit_hopf(pspec, init):
 def fit_null(pspec, init):
     '''
     Fit the Null power spectrum model to pspec and compute AIC score.
-    Uses LMFIT
+    Uses the package LMFIT for optimisation.
     
     Args
     --------------
     pspec: pd.Series
         Power spectrum data as a Series indexed by frequency
-    init: list of float
+    init: list of floats
         Initial parameter guesses of the form [sigma_init]
         
     Returns
@@ -434,7 +449,7 @@ def fit_null(pspec, init):
 
 def aic_weights(aic_scores):
     '''
-    Compute AIC weights from AIC scores
+    Computes AIC weights, given AIC scores.
     
     Args
     ----------------
@@ -479,15 +494,14 @@ def pspec_metrics(pspec,
     -------------------
     pspec: pd.Series
         Power spectrum as a Series indexed by frequency
-    ews: list of str (['smax', 'cf', 'aic'])
-        EWS to be computed. Options include
-            'smax' : Peak in the power spectrum
-            'cf'   : Coherence factor
-            'aic'  : Fold, Hopf and Null AIC weights
-    sweep: bool (False)
-        Whether or not to sweep over many 
-        initialisation parameters, or just use the single initialisation that 
-        is derived from measured metrics (see Methods section).
+    ews: list of {'smax', 'cf', 'aic'}
+        EWS to be computed. Options include peak in the power spectrum ('smax'),
+        coherence factor ('cf'), AIC weights ('aic').
+    sweep: bool
+        If 'True', sweep over a range of intialisation 
+        parameters when optimising to compute AIC scores, at the expense of 
+        longer computation. If 'False', intialisation parameter is taken as the
+        'best guess'.
     
     Return
     -------------------
