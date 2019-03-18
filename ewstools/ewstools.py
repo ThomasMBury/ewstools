@@ -768,7 +768,7 @@ def fit_null(pspec, init):
 
 
 def aic_weights(aic_scores):
-    '''
+    """
     Compute AIC weights from AIC scores
     
     Arguments
@@ -781,7 +781,7 @@ def aic_weights(aic_scores):
     np.array
         Array of the corresponding AIC weights
         
-    '''
+    """
     
     # Best AIC score
     aic_best = min(aic_scores)
