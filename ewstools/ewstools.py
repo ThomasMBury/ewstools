@@ -49,11 +49,11 @@ from scipy.ndimage.filters import gaussian_filter as gf
 # For fitting power spectrum models and computing AIC weights
 from lmfit import Model
 
+# Import helper functions
+import os
 
 
-#------------------------------
-# Main function
-#–-----------------------------
+
 
 def ews_compute(raw_series,
             roll_window=0.4,
@@ -78,14 +78,11 @@ def ews_compute(raw_series,
     roll_window: float (0.4)
         Rolling window size as a proportion of the length of the time-series 
         data.
-    smooth: str ('Lowess')
-        Detrending options including
-            'Gaussian' : Gaussian smoothing
-            'Lowess'   : Lowess smoothing
-            'None'     : No detrending
+    smooth: {'Gaussian', 'Lowess', 'None'}
+        Type of detrending.
     band_width: float (0.2)
         Bandwidth of Gaussian kernel. Taken as a proportion of time-series length if in (0,1), 
-            otherwise taken as absolute.
+        otherwise taken as absolute.
     span: float (0.1)
         Span of time-series data used for Lowess filtering. Taken as a 
         proportion of time-series length if in (0,1), otherwise taken as 
@@ -94,7 +91,7 @@ def ews_compute(raw_series,
         Time up to which EWS are computed. Enter 'Full' to use
         the entire time-series. Otherwise enter a time value.
     ews: list of str (['var', 'ac'])
-        List of EWS to compute. Options include
+		 List of EWS to compute. Options include
              'var'   : Variance
              'ac'    : Autocorrelation
              'sd'    : Standard deviation
