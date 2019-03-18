@@ -1,9 +1,6 @@
 ewstools Package
 =================
 
-Modules
-----------
-
 
 User functions
 ------------------
@@ -15,7 +12,7 @@ User functions
 
 
 Helper functions
--------------------
+------------------
 
 .. automodule:: ewstools.helperfuns
     :members:
