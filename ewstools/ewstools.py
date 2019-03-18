@@ -91,7 +91,7 @@ def ews_compute(raw_series,
     upto: int or 'Full'
         Time up to which EWS are computed. Enter 'Full' to use
         the entire time-series. Otherwise enter a time value.
-    ews: {'var', 'ac', 'sd', 'cv', 'skew', 'kurt', 'smax', 'cf', 'aic'}
+    ews: list of {'var', 'ac', 'sd', 'cv', 'skew', 'kurt', 'smax', 'cf', 'aic'}
 		 List of EWS to compute. Options include variance ('var'),
 		 autocorrelation ('ac'), standard deviation ('sd'), coefficient
 		 of variation ('cv'), skewness ('skew'), kurtosis ('kurt'), peak in
@@ -117,7 +117,7 @@ def ews_compute(raw_series,
     
     Returns
     --------
-    dict of pd.DataFrame:
+    dict of pd.DataFrames:
         A dictionary with the following entries.
         **'EWS metrics':** A DataFrame indexed by time with columns corresopnding 
         to each EWS.
