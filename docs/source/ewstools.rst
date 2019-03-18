@@ -6,7 +6,7 @@ Modules
 
 
 indicators module
---------------------------
+------------------
 
 .. automodule:: ewstools.ewstools
     :members:
@@ -15,9 +15,9 @@ indicators module
 
 
 helper_funs module
---------------------------
+-------------------
 
-.. automodule:: ewstools.helper_funs
+.. automodule:: ewstools.helperfuns
     :members:
     :undoc-members:
     :show-inheritance:
