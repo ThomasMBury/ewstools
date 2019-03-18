@@ -71,7 +71,7 @@ def ews_compute(raw_series,
     '''
     Compute temporal and spectral EWS from time-series data.  
     	
-    Arguments
+    Args
     ----------
     raw_series: pd.Series
         Time-series data to analyse. Indexed by time.
@@ -116,13 +116,13 @@ def ews_compute(raw_series,
     
     Returns
     --------
-    dict: 
+    dict of pd.DataFrame:
         A dictionary with the following entries.
-        *'EWS metrics':* A pandas DataFrame indexed by time with columns corresopnding 
+        ***'EWS metrics':*** A DataFrame indexed by time with columns corresopnding 
         to each EWS.
-        *'Power spectrum':* A DataFrame of the measured power spectra and the best fits 
+        ***'Power spectrum':*** A DataFrame of the measured power spectra and the best fits 
         used to give the AIC weights. Indexed by time. 
-        *'Kendall tau':*  A DataFrame of the Kendall tau values for each EWS metric.
+        ***'Kendall tau':*** A DataFrame of the Kendall tau values for each EWS metric.
     '''
     
     # Initialise a DataFrame to store EWS data - indexed by time
