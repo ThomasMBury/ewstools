@@ -21,7 +21,7 @@ Functionality includes
   
 ## Install:
 
-*ewstools* requires Python version 3.7 or later to be installed on your system. Then *ewstools* can be installed using pip, by entering the following into your command line.
+The package *ewstools* requires Python version 3.7 or later to be installed on your system. It may then be installed using pip, by entering the following into your command line.
 ```python
 pip install ewstools
 ```
