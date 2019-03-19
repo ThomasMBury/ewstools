@@ -30,7 +30,7 @@ pip install ewstools
 
 ## Demos
 
-For demonstrations/tutorials on using *ewstools*, please refer to these [iPython notebooks](demos/).
+For demonstrations/tutorials on using *ewstools*, please refer to these [iPython notebooks](https://github.com/ThomasMBury/ewstools/tree/master/demos).
 
 ## Documentation
 
