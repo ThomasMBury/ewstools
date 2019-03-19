@@ -237,6 +237,19 @@ def test_pspec_metrics():
 
     assert type(spec_ews) == dict
     
+   
+    
+def test_block_bootstrap():
+	'''
+	Run a time-series through block_bootstrap and check that it produces
+	sensible output
+	'''
+	
+	
+	
+	
+	
+	
 
     
 

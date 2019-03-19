@@ -54,6 +54,9 @@ from ewstools.helperfuns import *
 
 
 
+#---------------
+# Functions
+#---------------
 
 
 def ews_compute(raw_series,
@@ -366,4 +369,6 @@ def ews_compute(raw_series,
 
 
    
+   
+
     
