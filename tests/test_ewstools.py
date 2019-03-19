@@ -300,7 +300,7 @@ def test_mean_ci():
     intervals = ewstools.mean_ci(data)
     
     assert type(intervals) == dict
-    assert type(intervals['Mean']) == float
+    assert type(intervals['Mean']) == np.float64
 
 
     
