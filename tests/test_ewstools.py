@@ -289,7 +289,18 @@ def test_roll_bootstrap():
 
 
 
-
+def test_mean_ci():
+    '''
+    Run mean_ci with a dataset, and check that it computes confidence intervlas
+    '''
+    # Generate data as a pandas Series
+    data = pd.Series(np.random.normal(loc=0,scale=1,size=100))
+    
+    # Compute confidence intevals
+    intervals = ewstools.mean_ci(data)
+    
+    assert type(intervals) == dict
+    assert type(intervals['Mean']) == float
 
 
     

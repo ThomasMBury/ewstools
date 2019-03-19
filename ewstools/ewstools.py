@@ -41,8 +41,7 @@ import pandas as pd
 
 
 # Module for block-bootstrapping time-series
-from arch.bootstrap import StationaryBootstrap, CircularBlockBootstrap
-
+from arch.bootstrap import StationaryBootstrap, CircularBlockBootstrap, IIDBootstrap
 
 # For detrending time-series
 from statsmodels.nonparametric.smoothers_lowess import lowess
@@ -51,7 +50,7 @@ from scipy.ndimage.filters import gaussian_filter as gf
 
 
 # Import helper functions
-from ewstools import helperfuns
+import helperfuns
 
 
 
@@ -590,6 +589,43 @@ def roll_bootstrap(raw_series,
     return df_samples
 
 
+
+
+
+def mean_ci(data, alpha=0.95):
+    '''
+    Compute confidence intervals (to alpha%) of the mean of data.
+    This is performed using bootstrapping.
+    
+    Args
+    ----
+    data: pd.Series
+        Data provided as a Pandas Series
+    alpha: float
+        Confidence percentage. 
+        
+    Returns
+    -------
+    dict:
+        Dicitonary of mean, lower and upper bound of data
+    '''
+        
+    
+    # Compute the mean of the Series
+    mean = data.mean()
+    # Obtain the values of the Series as an array
+    array = data.values
+    # Bootstrap the array (sample with replacement)
+    bs = IIDBootstrap(array)
+    # Compute confidence intervals of bootstrapped distribution
+    ci = bs.conf_int(np.mean, 1000, method='percentile', size=alpha)
+    # Lower and upper bounds
+    lower = ci[0,0]
+    upper = ci[1,0]
+    
+    # Output dictionary
+    dict_out = {"Mean": mean, "Lower": lower, "Upper": upper}
+    return dict_out
 
 
 
