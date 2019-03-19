@@ -27,7 +27,7 @@ Demos
 ========
 
 For demonstrations using *ewstools*, please see the GitHub repo: 
-`https://github.com/ThomasMBury/ewstools/demos`_
+`https://github.com/ThomasMBury/ewstools/tree/master/demos`_
     
 Support
 =======
@@ -49,5 +49,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. _https://github.com/ThomasMBury/ewstools: https://github.com/ThomasMBury/ewstools/demos
+.. _https://github.com/ThomasMBury/ewstools/tree/master/demos: https://github.com/ThomasMBury/ewstools/tree/master/demos
 .. _https://github.com/ThomasMBury/ewstools/issues: https://github.com/ThomasMBury/ewstools/issues
