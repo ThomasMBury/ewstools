@@ -48,7 +48,6 @@ from statsmodels.nonparametric.smoothers_lowess import lowess
 from scipy.ndimage.filters import gaussian_filter as gf
 
 
-
 # Import helper functions
 from ewstools import helperfuns
 
