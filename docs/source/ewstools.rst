@@ -2,10 +2,10 @@ ewstools package
 ================
 
 
-User functions
-------------------------
+ewstools.ewstools submodule
+--------------
 
-Here lie the functions designed for users.
+The submodule ewstools contains functions designed for the user.
 
 .. automodule:: ewstools.ewstools
     :members:
@@ -13,10 +13,11 @@ Here lie the functions designed for users.
     :show-inheritance:
 
 
-Helper functions
+ewstools.helperfuns submodule
 --------------------------
 
-Here lie the lower level functions that do the hard work.
+The submodule helperfuns contains the lower-level functions that make up the
+user-designed functions.
 
 .. automodule:: ewstools.helperfuns
     :members:
