@@ -42,9 +42,7 @@ import pandas as pd
 # To compute power spectrum using Welch's method
 from scipy import signal
 
-# For detrending time-series
-from statsmodels.nonparametric.smoothers_lowess import lowess
-from scipy.ndimage.filters import gaussian_filter as gf
+
 
 # For fitting power spectrum models and computing AIC weights
 from lmfit import Model

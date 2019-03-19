@@ -50,7 +50,7 @@ from scipy.ndimage.filters import gaussian_filter as gf
 
 
 # Import helper functions
-import helperfuns
+from ewstools import helperfuns
 
 
 
