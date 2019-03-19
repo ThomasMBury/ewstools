@@ -240,21 +240,58 @@ def test_pspec_metrics():
    
     
 def test_block_bootstrap():
-	'''
-	Run a time-series through block_bootstrap and check that it produces
+    '''
+    Run a time-series through block_bootstrap and check that it produces
 	sensible output
-	'''
-	
-	
-	
-	
-	
+    '''
+    # Simulate a simple time-series
+    tVals = np.arange(0,10,0.1)
+    xVals = 5 + np.random.normal(0,1,len(tVals))
+    series = pd.Series(xVals, index=tVals) 
+    
+    # Bootstrap params
+    n_samples = 2
+    block_size = 10
+    bs_types = ['Stationary', 'Circular']
+    # Run through block_bootstrap
+    for bs_type in bs_types:
+        samples = ewstools.block_bootstrap(series,
+                                       n_samples,
+                                       bs_type=bs_type,
+                                       block_size=block_size
+                                       )
+    assert type(samples) == pd.DataFrame
+    assert samples.shape == (n_samples*len(tVals),1) 
 	
 
     
 
+def test_roll_bootstrap():
+    '''
+    Run a non-stationary time-series through roll_bootstrap and check that it 
+    produces sensible output
+    '''
+    # Simulate a simple time-series
+    tVals = np.arange(0,10,0.1)
+    xVals = 5*tVals + np.random.normal(0,1,len(tVals))
+    series = pd.Series(xVals, index=tVals)
+
+    # Parameters
+    n_samples = 2
+    
+    # Run function
+    df_bootstrap = ewstools.roll_bootstrap(series,
+                                           n_samples=n_samples)
+
+    assert type(df_bootstrap) == pd.DataFrame
+    assert df_bootstrap.index.names==['Time','Sample','Wintime']
 
 
 
+
+
+
+
+    
     
     
