@@ -58,7 +58,7 @@ from ewstools import helperfuns
 #---------------
 
 
-def ews_compute( raw_series,
+def ews_compute(raw_series,
             roll_window=0.4,
             smooth='Lowess',
             span=0.1,
@@ -70,12 +70,12 @@ def ews_compute( raw_series,
             ham_offset=0.5,
             pspec_roll_offset=20,
             w_cutoff=1,
-            sweep=False ):
+            sweep=False):
     '''
     Compute temporal and spectral EWS from time-series data.  
     	
     Args
-    ----------
+    ----
     raw_series: pd.Series
         Time-series data to analyse. Indexed by time.
     roll_window: float
