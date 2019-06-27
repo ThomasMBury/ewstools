@@ -233,9 +233,11 @@ def ews_compute(raw_series,
     ''' In this section we compute newly proposed EWS based on the power spectrum
         of the time-series computed over a rolling window '''
     
+    # Empty DataFrame for storage of power spectra
+    df_pspec = pd.DataFrame()
    
-    # If any of the spectral metrics are listed in the ews vector:
-    if 'smax' in ews or 'cf' in ews or 'aic' in ews:
+    # If any of the spectral metrics are listed in the ews vector, compute power spectra:
+    if ('smax' or 'cf' or 'aic' or 'smax/var' or 'smax/mean') in ews:
 
         
         # Number of components in the residual time-series
@@ -265,6 +267,15 @@ def ews_compute(raw_series,
                                 w_cutoff=w_cutoff,
                                 scaling='spectrum')
             
+            ## Create DataFrame for empirical power spectrum
+            df_pspec_empirical = pspec.to_frame().reset_index()
+            # Rename column
+            df_pspec_empirical.rename(columns={'Power spectrum': 'Empirical'}, inplace=True)
+            # Include a column for the time-stamp
+            df_pspec_empirical['Time'] = t_point*np.ones(len(pspec))
+            # Use a multi-index of ['Time','Frequency']
+            df_pspec_empirical.set_index(['Time', 'Frequency'], inplace=True)
+            
             
             ## Compute the spectral EWS using pspec_metrics (dictionary)
             metrics = helperfuns.pspec_metrics(pspec, ews, sweep)
@@ -273,10 +284,8 @@ def ews_compute(raw_series,
             # Add metrics (dictionary) to the list
             list_metrics_append.append(metrics)
             
-            
+            ## If AIC weights required - store the optimised power spectrum fits
             if 'aic' in ews:
-                
-                ## Obtain power spectrum fits as an array for plotting
                 # Create fine-scale frequency values
                 wVals = np.linspace(min(pspec.index), max(pspec.index), 100)
                 # Fold fit
@@ -297,26 +306,24 @@ def ews_compute(raw_series,
                             'Fit null': pspec_null}
                 df_pspec_fits = pd.DataFrame(dic_temp)
                 # Set the multi-index
-                df_pspec_fits.set_index(['Time','Frequency'], inplace=True)
-                            
-                ## Put empirical power spectrum and fits into the same DataFrames
-                # Put empirical power spectrum into a DataFrame and remove indexes         
-                df_pspec_empirical = pspec.to_frame().reset_index()
-                # Rename column
-                df_pspec_empirical.rename(columns={'Power spectrum': 'Empirical'}, inplace=True)
-                # Include a column for the time-stamp
-                df_pspec_empirical['Time'] = t_point*np.ones(len(pspec))
-                # Use a multi-index of ['Time','Frequency']
-                df_pspec_empirical.set_index(['Time', 'Frequency'], inplace=True)
+                df_pspec_fits.set_index(['Time','Frequency'], inplace=True)        
+            
+
+            
+            
                 # Concatenate the empirical spectrum and the fits into one DataFrame
                 df_pspec_temp = pd.concat([df_pspec_empirical, df_pspec_fits], axis=1)
                 # Add spectrum DataFrame to the list  
                 list_spec_append.append(df_pspec_temp)
             
             
-                 
+            ## Create DataFrame with power spectrum information
+            
+            
+            
+               
         # Concatenate the list of power spectra DataFrames to form a single DataFrame
-        df_pspec = pd.concat(list_spec_append) if 'aic' in ews else pd.DataFrame()
+        df_pspec = pd.concat(list_spec_append) if ('smax' or 'aic' or 'cf') in ews else pd.DataFrame()
         
         # Create a DataFrame out of the multiple dictionaries consisting of the spectral metrics
         df_spec_metrics = pd.DataFrame(list_metrics_append)
@@ -358,11 +365,8 @@ def ews_compute(raw_series,
     #-------------Organise final output and return--------------#
        
     # Ouptut a dictionary containing EWS DataFrame, power spectra DataFrame, and Kendall tau values
-    output_dic = {'EWS metrics': df_ews, 'Kendall tau': df_ktau}
-    
-    # Add df_pspec to dictionary if it was computed
-    if 'smax' in ews or 'cf' in ews or 'aic' in ews:
-        output_dic['Power spectrum'] = df_pspec
+    output_dic = {'EWS metrics': df_ews, 'Power spectrum': df_pspec, 'Kendall tau': df_ktau}
+
         
     return output_dic
 
