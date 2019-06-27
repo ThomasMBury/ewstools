@@ -24,7 +24,7 @@ def test_ews_compute():
     series = pd.Series(xVals, index=tVals)
     
     # Run through ews_compute with all possible EWS
-    ews = ['var','ac','sd','cv','skew','kurt','smax','cf','aic']
+    ews = ['var','ac','sd','cv','skew','kurt','smax','smax/var','smax/mean']
     lag_times = [1,2,3,4,5]
     dict_ews = ewstools.ews_compute(series,
                              ews=ews,
@@ -48,8 +48,7 @@ def test_ews_compute():
     assert df_ews.index.name == 'Time'
     assert df_pspec.index.names == ['Time','Frequency']    
     
-  
-    
+    return dict_ews
     
 def test_pspec_welch():
     n_points = 100

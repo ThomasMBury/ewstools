@@ -284,7 +284,9 @@ def ews_compute(raw_series,
             # Add metrics (dictionary) to the list
             list_metrics_append.append(metrics)
             
-            ## If AIC weights required - store the optimised power spectrum fits
+            
+            
+            ## Store the power spectra fits (if aic computed)
             if 'aic' in ews:
                 # Create fine-scale frequency values
                 wVals = np.linspace(min(pspec.index), max(pspec.index), 100)
@@ -308,22 +310,18 @@ def ews_compute(raw_series,
                 # Set the multi-index
                 df_pspec_fits.set_index(['Time','Frequency'], inplace=True)        
             
-
+                
+            # Concatenate empirical PS with fits
+            df_pspec_temp = pd.concat([df_pspec_empirical, df_pspec_fits], axis=1) if 'aic' in ews else df_pspec_empirical
+            # Store DataFrame in list
+            list_spec_append.append(df_pspec_temp)
             
-            
-                # Concatenate the empirical spectrum and the fits into one DataFrame
-                df_pspec_temp = pd.concat([df_pspec_empirical, df_pspec_fits], axis=1)
-                # Add spectrum DataFrame to the list  
-                list_spec_append.append(df_pspec_temp)
-            
-            
-            ## Create DataFrame with power spectrum information
-            
+                        
             
             
                
         # Concatenate the list of power spectra DataFrames to form a single DataFrame
-        df_pspec = pd.concat(list_spec_append) if ('smax' or 'aic' or 'cf') in ews else pd.DataFrame()
+        df_pspec = pd.concat(list_spec_append)
         
         # Create a DataFrame out of the multiple dictionaries consisting of the spectral metrics
         df_spec_metrics = pd.DataFrame(list_metrics_append)
@@ -333,8 +331,17 @@ def ews_compute(raw_series,
         # Join the spectral EWS DataFrame to the main EWS DataFrame 
         df_ews = df_ews.join(df_spec_metrics)
         
-        # Include Smax normalised by Variance
-        df_ews['Smax/Var'] = df_ews['Smax']/df_ews['Variance']
+        
+        
+        
+        
+        # Compute smax/var and add to the DataFrame
+        if 'smax/var' in ews:
+            df_ews['Smax/Var'] = df_ews['Smax']/df_ews['Variance']
+        
+        # Compute smax normalised by mean and add to the DataFrame
+        if 'smax/mean' in ews:
+            df_ews['Smax/Mean'] = df_ews['Smax']/roll_mean
         
         
     
