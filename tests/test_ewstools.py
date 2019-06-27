@@ -24,7 +24,7 @@ def test_ews_compute():
     series = pd.Series(xVals, index=tVals)
     
     # Run through ews_compute with all possible EWS
-    ews = ['var','ac','sd','cv','skew','kurt','smax','smax/var','smax/mean']
+    ews = ['var','ac','sd','cv','skew','kurt','smax','aic','cf','smax/var','smax/mean']
     lag_times = [1,2,3,4,5]
     dict_ews = ewstools.ews_compute(series,
                              ews=ews,
