@@ -72,7 +72,7 @@ def ews_compute(raw_series,
             w_cutoff=1,
             sweep=False):
     '''
-    Compute temporal and spectral EWS from time-series data.  
+    Compute temporal and spectral EsWS from time-series data.  
     	
     Args
     ----
@@ -358,7 +358,7 @@ def ews_compute(raw_series,
     time_vals = pd.Series(df_ews.index, index=df_ews.index)
 
     # List of EWS that can be used for Kendall tau computation
-    ktau_metrics = ['Variance','Standard deviation','Skewness','Kurtosis','Coefficient of variation','Smax','Smax/Var'] + ['Lag-'+str(i)+' AC' for i in lag_times]
+    ktau_metrics = ['Variance','Standard deviation','Skewness','Kurtosis','Coefficient of variation','Smax','Smax/Var','Smax/Mean'] + ['Lag-'+str(i)+' AC' for i in lag_times]
     # Find intersection with this list and EWS computed
     ews_list = df_ews.columns.values.tolist()
     ktau_metrics = list( set(ews_list) & set(ktau_metrics) )
