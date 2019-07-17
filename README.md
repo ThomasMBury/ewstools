@@ -8,6 +8,21 @@
 **Python package for computing, analysing and visualising early warning signals (EWS)
 in time-series data. Includes a novel approach to characterise bifurcations using EWS.**
 
+## Contents
+
+- [Overview](#overview)
+- [Repo Contents](#repo-contents)
+- [System Requirements](#system-requirements)
+- [Installation Guide](#installation-guide)
+- [Demos](#demo)
+- [License](./LICENSE)
+- [Issues](https://github.com/thomasmbury/ewstools/issues)
+- [Citation](#citation)
+
+## Overview
+
+
+
 Functionality includes
 
   - Computing the following EWS
@@ -20,8 +35,13 @@ Functionality includes
   
   - Visualisation of EWS with plots of time-series and power spectra.
   
-  
-## Install:
+
+## Repo Contents
+
+
+## System Requirements
+
+## Installation Guide
 
 The package *ewstools* requires Python version 3.7 or later to be installed on your system. It may then be installed using pip, by entering the following into your command line.
 ```python
@@ -30,7 +50,7 @@ pip install ewstools
 
 ## Demos
 
-For demonstrations/tutorials on using *ewstools*, please refer to these [iPython notebooks](https://github.com/ThomasMBury/ewstools/tree/master/demos).
+For interacitve demonstrations on using *ewstools*, please refer to these [iPython notebooks](https://github.com/ThomasMBury/ewstools/tree/master/demos).
 
 ## Documentation
 
