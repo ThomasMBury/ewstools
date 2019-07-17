@@ -6,7 +6,7 @@
 
 # ewstools
 **Python package for computing, analysing and visualising early warning signals (EWS)
-in time series data. Includes a novel approach to characterise bifurcations using EWS.**
+in time series data. Includes a novel approach to characterise bifurcations using Spectral EWS.**
 
 ## Contents
 
@@ -23,7 +23,7 @@ in time series data. Includes a novel approach to characterise bifurcations usin
 
 ## Overview
 
-Many natural and artificial systems have the capacity to undergo a sudden change in their dynamics. In the mathematical realm of dynamical systems, these changes corresopond to bifurcations, and theory therein suggests that certain signals, observable in time series data, should precede these bifurcations ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and autocorrelation, though there exist many others (see e.g. [Clements & Ozgul](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). Our objective with this package is to provide a user-friendly toolbox in Python to compute early warning signals from time series data. It also contains novel tools to extract information on the bifurcation from the power spectrum - results to be published soon.
+Many natural and artificial systems have the capacity to undergo a sudden change in their dynamics. In the mathematical realm of dynamical systems, these changes corresopond to bifurcations, and theory therein suggests that certain signals, observable in time series data, should precede these bifurcations ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and autocorrelation, though there exist many others (see e.g. [Clements & Ozgul](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). Our objective with this package is to provide a user-friendly toolbox in Python to compute early warning signals from time series data. This complements another early warning signal toolbox written in R [Dakos et al.](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010), and provides novel tools to extract information on the bifurcation from the power spectrum - results to be published soon.
 
 
 Functionality of *ewstools* includes
