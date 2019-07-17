@@ -14,11 +14,11 @@ in time series data. Includes a novel approach to characterise bifurcations usin
 - [Repo Contents](#repo-contents)
 - [System Requirements](#system-requirements)
 - [Installation Guide](#installation-guide)
-- [Demos](#demo)
-- [Documentation]
+- [Demos](#demos)
+- [Documentation](#documentation)
 - [License](./LICENSE)
 - [Issues](https://github.com/thomasmbury/ewstools/issues)
-- [Contribution]
+- [Contribution](#contribution)
 
 
 ## Overview
@@ -79,10 +79,11 @@ The Python package should be compatible with Windows, Mac, and Linux operating s
 
 Friendly instructions for downloading Python 3 on Linux, Mac OS and Windows are available [here](https://realpython.com/installing-python/).
 
-Once Python 3 is installed, *ewstools* may be downloaded using pip, with the following command
+Then, the package *ewstools* may be installed using pip, by entering the following into the command line
 ```
 pip install ewstools
 ```
+which includes all package dependencies.
 
 
 ## Demos
