@@ -71,7 +71,7 @@ numpy==1.16.2
 arch==4.7
 lmfit==0.9.12
 ```
-The Python package should be compatible with Windows, Mac, and Linux operating systems.
+The Python package should be compatible with Windows, Mac, and Linux operating systems. The demonstrations require Jupyter notebook, which can be installed 
 
 
 
@@ -79,11 +79,15 @@ The Python package should be compatible with Windows, Mac, and Linux operating s
 
 Friendly instructions for downloading Python 3 on Linux, Mac OS and Windows are available [here](https://realpython.com/installing-python/).
 
-Then, the package *ewstools* may be installed using pip, by entering the following into the command line
+Then, the package *ewstools* may be installed using pip, by entering the following into Terminal (Mac/Linux) or Command Prompt (Windows)
 ```
 pip install ewstools
 ```
-which includes all package dependencies. Installation of the package should about 1 minute on a standard computer.
+which includes all package dependencies. Installation of the package should about 1 minute on a standard computer. To interact with the demos, Jupyter notebook is required, which can be installed using
+```
+pip install jupyterlab
+```
+and takes no longer than a minute to download.
 
 
 ## Demos
