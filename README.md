@@ -83,7 +83,7 @@ Then, the package *ewstools* may be installed using pip, by entering the followi
 ```
 pip install ewstools
 ```
-which includes all package dependencies.
+which includes all package dependencies. Installation of the package should about 1 minute on a standard computer.
 
 
 ## Demos
