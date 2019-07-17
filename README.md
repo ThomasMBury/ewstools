@@ -23,7 +23,7 @@ in time series data. Includes a novel approach to characterise bifurcations usin
 
 ## Overview
 
-Many natural and artificial systems have the capacity to undergo a sudden change in their dynamics. In the mathematical realm of dynamical systems, these changes corresopond to bifurcations, and theory therein suggests that certain signals, observable in time series data, should precede these bifurcations ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and autocorrelation, though there exist many others (see e.g. [Clements & Ozgul](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). Our objective with this package is to provide a user-friendly toolbox in Python to compute early warning signals from time series data. It also contains novel tools to extract information on the bifurcation from the power spectrum, results to be published soon.
+Many natural and artificial systems have the capacity to undergo a sudden change in their dynamics. In the mathematical realm of dynamical systems, these changes corresopond to bifurcations, and theory therein suggests that certain signals, observable in time series data, should precede these bifurcations ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and autocorrelation, though there exist many others (see e.g. [Clements & Ozgul](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). Our objective with this package is to provide a user-friendly toolbox in Python to compute early warning signals from time series data. It also contains novel tools to extract information on the bifurcation from the power spectrum - results to be published soon.
 
 
 Functionality of *ewstools* includes
@@ -45,15 +45,45 @@ Functionality of *ewstools* includes
 
 ## Repo Contents
 
+- [demos](./demos): interactive demos in Jupyter notebooks to illustrate use of package
+- [docs](./docs): version-controlled package documentation provided in ReadTheDocs
+- [ewstools](./ewstools): package code
+- [tests](./tests): testing of package functions using pytest
+
 
 ## System Requirements
 
+### Hardware Requirements
+
+*ewstools* can run on a standard computer with enough RAM to support the operations defined by a user. The software has been tested on a computer with the following specs
+
+RAM: 8G
+CPU: 2.7 GHz
+
+though the software should run as expected on computers with lower RAM. The runtimes outlined below were generated on the computer with these specs.
+
+### Software Requirements
+
+*ewstools* requires Python 3.7 or higher and has the following package dependencies:
+```
+pandas==0.24.2
+numpy==1.16.2
+arch==4.7
+lmfit==0.9.12
+```
+The Python package should be compatible with Windows, Mac, and Linux operating systems.
+
+
+
 ## Installation Guide
 
-The package *ewstools* requires Python version 3.7 or later to be installed on your system. It may then be installed using pip, by entering the following into your command line.
-```python
+Friendly instructions for downloading Python 3 on Linux, Mac OS and Windows are available [here](https://realpython.com/installing-python/).
+
+Once Python 3 is installed, *ewstools* may be downloaded using pip, with the following command
+```
 pip install ewstools
 ```
+
 
 ## Demos
 
