@@ -6,7 +6,7 @@
 
 # ewstools
 **Python package for computing, analysing and visualising early warning signals (EWS)
-in time-series data. Includes a novel approach to characterise bifurcations using EWS.**
+in time series data. Includes a novel approach to characterise bifurcations using EWS.**
 
 ## Contents
 
@@ -15,21 +15,28 @@ in time-series data. Includes a novel approach to characterise bifurcations usin
 - [System Requirements](#system-requirements)
 - [Installation Guide](#installation-guide)
 - [Demos](#demo)
+- [Documentation]
 - [License](./LICENSE)
 - [Issues](https://github.com/thomasmbury/ewstools/issues)
-- [Citation](#citation)
+- [Contribution]
+
 
 ## Overview
 
+Many natural and artificial systems have the capacity to undergo a sudden change in their dynamics. In the mathematical realm of dynamical systems, these changes corresopond to bifurcations, and theory therein suggests that certain signals, observable in time series data, should precede these bifurcations ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and autocorrelation, though there exist many others (see e.g. [Clements & Ozgul](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). Our objective with this package is to provide a user-friendly toolbox in Python to compute early warning signals from time series data. It also contains novel tools to extract information on the bifurcation from the power spectrum, results to be published soon.
 
 
-Functionality includes
+Functionality of *ewstools* includes
 
-  - Computing the following EWS
-    - Variance metrics (variance, standard deviation, coefficient of variation)
+  - Detrending using either
+    - Gaussian smoothing
+    - A Lowess filter
+
+  - Computation of the following statistical properties over a rolling window:
+    - Variance and its derivatives (standard deviation, coefficient of variation)
     - Autocorrelation (at specified lag times)
-    - Higher moments (skewness, kurtosis)
-    - Power spectrum (including maximum frequency, coherence factor and AIC weights csp. to different canonical forms)
+    - Higher-order moments (skewness, kurtosis)
+    - Power spectrum (including maximum frequency, coherence factor and AIC weights csp. to canonical power spectrum forms)
 
   - Block-bootstrapping time-series to obtain confidence bounds on EWS estimates
   
