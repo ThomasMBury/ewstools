@@ -48,6 +48,7 @@ Functionality of *ewstools* includes
 - [demos](./demos): interactive demos in Jupyter notebooks to illustrate use of package
 - [docs](./docs): version-controlled package documentation provided in ReadTheDocs
 - [ewstools](./ewstools): package code
+- [nat_comms](./nat_comms): supporting code for paper submission to *Nature Communications*
 - [tests](./tests): testing of package functions using pytest
 
 
