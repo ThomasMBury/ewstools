@@ -16,18 +16,10 @@ Compute bootstrapped EWS for the Ricker model going through the Fold bifurcation
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import os
 
 
 # import ewstools
 from ewstools import ewstools
-
-
-# Name of directory within data_export
-dir_name = 'fold_test'
-
-if not os.path.exists('data_export/'+dir_name):
-    os.makedirs('data_export/'+dir_name)
 
 
 # Print update
@@ -61,7 +53,7 @@ sweep = False # during optimisation, sweep through initialisation parameters
 # Bootstrapping parameters
 block_size = 20 # size of blocks used to resample time-series
 bs_type = 'Stationary' # type of bootstrapping
-n_samples = 10 # number of bootstrapping samples to take
+n_samples = 40 # number of bootstrapping samples to take
 roll_offset = 20 # rolling window offset
 
 
@@ -321,49 +313,11 @@ data = df_ews_boot.reset_index().melt(id_vars = 'Time',
                          var_name = 'EWS',
                          value_name = 'Magnitude')
 # Make plot with error bars
-ac_plot = sns.relplot(x="Time", 
+aic_plot = sns.relplot(x="Time", 
             y="Magnitude",
             hue="EWS", 
             kind="line", 
             data=data)
-
-
-
-
-##-------------------------
-## Compute quantiles
-##–------------------------
-#
-#
-## Quantiles to compute
-#quantiles = [0.05,0.25,0.5,0.75,0.95]
-#
-## DataFrame of quantiles for each EWS
-#df_quant = df_ews_boot.groupby(level=0).quantile(quantiles, axis=0)
-## Rename and reorder index of DataFrame
-#df_quant.index.rename(['Time','Quantile'], inplace=True)
-#df_quant = df_quant.reorder_levels(['Quantile','Time']).sort_index()
-#
-
-
-#-------------------------------------
-# Export data for plotting in MMA
-#–------------------------------------
-
-# Export EWS of original time-series
-df_ews.reset_index().to_csv('data_export/'+dir_name+'/ews_orig.csv')
-
-# Export power spectra of original time-series
-df_pspec[['Empirical']].dropna().to_csv('data_export/'+dir_name+'/pspec_orig.csv')
-
-# Export bootstrapped EWS (all samples)
-df_ews_boot[ews_export].to_csv('data_export/'+dir_name+'/ews_boot.csv')
-
-# Export confidence intervals and mean of bootstrapped EWS
-df_intervals.to_csv('data_export/'+dir_name+'/ews_intervals.csv')
-
-# Export bootstrapped pspec (for one sample)
-df_pspec_boot.to_csv('data_export/'+dir_name+'/pspec_boot.csv')
 
 
 

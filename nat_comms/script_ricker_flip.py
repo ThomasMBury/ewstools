@@ -16,19 +16,9 @@ Compute bootstrapped EWS for the Ricker model going through the Flip bifurcation
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import os
-
-
 
 # import ewstools
 from ewstools import ewstools
-
-
-# Name of directory within data_export
-dir_name = 'flip_test'
-
-if not os.path.exists('data_export/'+dir_name):
-    os.makedirs('data_export/'+dir_name)
 
 
 # Print update
@@ -44,7 +34,7 @@ print("Compute bootstrapped EWS for the Ricker model going through the Flip bifu
 # Simulation parameters
 dt = 1 # time-step (must be 1 since discrete-time system)
 t0 = 0
-tmax = 1000
+tmax = 500
 tburn = 100 # burn-in period
 seed = 0 # random number generation seed
 sigma = 0.02 # noise intensity
@@ -56,7 +46,7 @@ span = 0.5
 rw = 0.4
 ews = ['var','ac','smax','aic']
 lags = [1,2,3] # autocorrelation lag times
-ham_length = 80 # number of data points in Hamming window
+ham_length = 40 # number of data points in Hamming window
 ham_offset = 0.5 # proportion of Hamming window to offset by upon each iteration
 pspec_roll_offset = 20 # offset for rolling window when doing spectrum metrics
 sweep = False # whether to sweep over optimisation parameters
@@ -64,7 +54,7 @@ sweep = False # whether to sweep over optimisation parameters
 # Bootstrapping parameters
 block_size = 20 # size of blocks used to resample time-series
 bs_type = 'Stationary' # type of bootstrapping
-n_samples = 2 # number of bootstrapping samples to take
+n_samples = 40 # number of bootstrapping samples to take
 roll_offset = 20 # rolling window offset
 
 
@@ -158,10 +148,6 @@ df_pspec = ews_dic['Power spectrum']
 
 # Plot trajectory and smoothing
 df_ews[['State variable','Smoothing']].plot()
-
-# Plot variance
-df_ews[['Variance']].plot()
-
 
 
 
@@ -306,16 +292,13 @@ ac_plot = sns.relplot(x="Time",
             data=data)
 
 
-
-
-
-
 ## Plot of Smax of bootstrapped samples
 # Put DataFrame in form for Seaborn plot
 data = df_ews_boot.reset_index().melt(id_vars = 'Time',
                          value_vars = ('Smax'),
                          var_name = 'EWS',
                          value_name = 'Magnitude')
+
 # Make plot with error bars
 smax_plot = sns.relplot(x="Time", 
             y="Magnitude",
@@ -325,45 +308,18 @@ smax_plot = sns.relplot(x="Time",
 
 
 
-
-
-##----------------------------------
-## Compute quantiles of bootstrapped EWS
-##–---------------------------------------
-#
-## Quantiles to compute
-#quantiles = [0.05,0.25,0.5,0.75,0.95]
-#
-## DataFrame of quantiles for each EWS
-#df_quant = df_ews_boot.groupby(level=0).quantile(quantiles, axis=0)
-## Rename and reorder index of DataFrame
-#df_quant.index.rename(['Time','Quantile'], inplace=True)
-#df_quant = df_quant.reorder_levels(['Quantile','Time']).sort_index()
-#
-### Plot of quantiles
-##df_quant.loc[0.05:0.95]['Variance'].unstack(level=0).plot()
-#
-
-
-#-------------------------------------
-# Export data for plotting in MMA
-#–------------------------------------
-
-# Export EWS of original time-series
-df_ews.reset_index().to_csv('data_export/'+dir_name+'/ews_orig.csv')
-
-# Export power spectra of original time-series
-df_pspec[['Empirical']].dropna().to_csv('data_export/'+dir_name+'/pspec_orig.csv')
-
-# Export bootstrapped EWS (all samples)
-df_ews_boot[ews_export].to_csv('data_export/'+dir_name+'/ews_boot.csv')
-
-# Export confidence intervals and mean of bootstrapped EWS
-df_intervals.to_csv('data_export/'+dir_name+'/ews_intervals.csv')
-
-# Export bootstrapped pspec (for one sample)
-df_pspec_boot.to_csv('data_export/'+dir_name+'/pspec_boot.csv')
-
+## Plot of AIC hopf and fold of bootstrapped samples
+# Put DataFrame in form for Seaborn plot
+data = df_ews_boot.reset_index().melt(id_vars = 'Time',
+                         value_vars = ('AIC fold','AIC hopf'),
+                         var_name = 'EWS',
+                         value_name = 'Magnitude')
+# Make plot with error bars
+aic_plot = sns.relplot(x="Time", 
+            y="Magnitude",
+            hue="EWS", 
+            kind="line", 
+            data=data)
 
 
 
