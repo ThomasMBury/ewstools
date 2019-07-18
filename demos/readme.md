@@ -5,10 +5,12 @@
 - Simulates a single stochastic trajectory of the Ricker model going through a Fold bifurcation
 - Shows how to use *ewstools* to compute early warning signals
 - Visualises the output of *ewstools* graphically
+- Run time < 1 min
 
 
 ### ews_bootstrap.ipynb
-- Simulates single stochastic trajectories of the Ricker model going through a Flip and a Fold bifurcadtion
+- Simulates single stochastic trajectories of the Ricker model going through a Flip bifurcation
 - Uses *ewstools* to compute bootstrapped time-series and the corresponding EWS.
 - Visualises the output, comparing the two bifurcations.
+- Run time < 3 mins
 
