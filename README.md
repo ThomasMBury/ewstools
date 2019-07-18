@@ -57,8 +57,7 @@ Functionality of *ewstools* includes
 
 *ewstools* can run on a standard computer with enough RAM to support the operations defined by a user. The software has been tested on a computer with the following specs
 
-RAM: 8G
-CPU: 2.7 GHz
+RAM: 8G, CPU: 2.7 GHz
 
 though the software should run as expected on computers with lower RAM. The runtimes outlined below were generated on the computer with these specs.
 
