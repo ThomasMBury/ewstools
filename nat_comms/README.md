@@ -1,4 +1,4 @@
-## Submission to Nature communications : "Detecting and Distinguishing Tippoing Points using Spectral Early Warning Signals"
+## Submission to Nature communications : "Detecting and Distinguishing Tipping Points using Spectral Early Warning Signals"
 
 This repository provides instructions and code to reproduce the quantitative results in the paper submitted to the journal *Nature communications* titled "Detecting and Distinguishing Tipping Points using Spectral Early Warning Signals".
 
