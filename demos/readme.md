@@ -1,6 +1,8 @@
 # Demos/Tutorials
 **A collection of iPython notebooks demonstrating various applications of *ewstools*.**
 
+To run and interact with these demos, Jupyter notebook must be installed on your system, which can be found [here](https://jupyter.org/install).
+
 ### ews_fold.ipynb
 - Simulates a single stochastic trajectory of the Ricker model going through a Fold bifurcation
 - Shows how to use *ewstools* to compute early warning signals
