@@ -15,11 +15,8 @@ import pytest
 import numpy as np
 import pandas as pd
 
-# Import core  and helper functions
-import sys
-sys.path.append("../ewstools")
-import core
-import helpers
+# Import ewstools
+import ewstools
 
 
 # Simulate a simple multi-variate time series
@@ -39,14 +36,14 @@ n = len(df_test.columns)
 
 def test_compute_autocov():
 
-    ar_out = helpers.compute_autocov(df_test)
+    ar_out = ewstools.helpers.compute_autocov(df_test)
     assert type(ar_out) == np.ndarray
     assert ar_out.shape == (n,n)
 
 
 def test_eval_recon():
     
-    dic_out = helpers.eval_recon(df_test)
+    dic_out = ewstools.helpers.eval_recon(df_test)
     jac = dic_out['Jacobian']
     evals = dic_out['Eigenvalues']
     evecs = dic_out['Eigenvectors']
@@ -59,7 +56,7 @@ def test_eval_recon():
     
 def test_eval_recon_rolling():
     
-    df_out = core.eval_recon_rolling(df_test)
+    df_out = ewstools.core.eval_recon_rolling(df_test)
     
     assert type(df_out) == pd.DataFrame
     assert len(df_out) == len(df_test)

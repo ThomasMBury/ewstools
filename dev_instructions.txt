@@ -13,3 +13,8 @@ To upload a new version to PyPi:
 		pip install ewstools --upgrade
 		
 		
+		
+		
+Install package locally 
+	pip install -e ewstools
+to ensure that tests will pass if making changes to files
