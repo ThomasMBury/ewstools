@@ -96,7 +96,7 @@ def eval_recon_rolling(df_in,
     
     # Select portion of data where EWS are evaluated (e.g only up to bifurcation)
     if upto=='Full':
-        df_pre = df_in
+        df_pre = df_in.copy()
     else: df_pre = df_in.loc[:upto]
 
 
@@ -134,7 +134,7 @@ def eval_recon_rolling(df_in,
             
             smooth_data = lowess(df_pre[var].values, df_pre.index.values, frac=span)[:,1]
             smooth_series = pd.Series(smooth_data, index=df_pre.index)
-            residuals = df_pre.values - smooth_data
+            residuals = df_pre[var].values - smooth_data
             resid_series = pd.Series(residuals, index=df_pre.index)
             # Add smoothed data and residuals to df_pre
             df_pre[var+'_s'] = smooth_series
@@ -171,16 +171,15 @@ def eval_recon_rolling(df_in,
         list_evaldata.append(dic_eval_recon)
         
     # Create dataframe from list of dicts of eval data
-    df_evaldata = pd.DataFrame(list_evaldata, index='Time')
+    df_evaldata = pd.DataFrame(list_evaldata)
+    df_evaldata.set_index('Time',inplace=True)
         
     # Create output dataframe that merges all useful info
     df_out = pd.concat([df_in, 
                         df_pre[[var+'_r' for var in var_names]+[var+'_s' for var in var_names]], 
-                        df_evaldata])
+                        df_evaldata],axis=1)
 
     return df_out
-
-
 
 
 
