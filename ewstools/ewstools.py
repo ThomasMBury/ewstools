@@ -49,7 +49,7 @@ from scipy.ndimage.filters import gaussian_filter as gf
 
 
 # Import fucntions from other files in package
-from ewstools import helperfuns
+import helperfuns
 
 
 #---------------
@@ -529,17 +529,6 @@ def eval_recon_rolling(df_in,
                         df_evaldata],axis=1)
 
     return df_out
-
-
-
-
-
-
-
-
-
-
-
 
 
 

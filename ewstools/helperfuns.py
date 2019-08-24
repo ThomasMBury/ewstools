@@ -45,8 +45,6 @@ from scipy import signal
 
 # For fitting power spectrum models and computing AIC weights
 from lmfit import Model
-
-
       
 
 def pspec_welch(yVals,
