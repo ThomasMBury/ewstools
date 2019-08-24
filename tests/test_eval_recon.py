@@ -12,16 +12,16 @@ Test for eval_recon function
 
 
 
+
 import pytest
 import numpy as np
 import pandas as pd
 
-# Import eval_recon function
-#import sys
-#sys.path.append('../ewstools')
-#import eval_recon
-from ewstools import eval_recon
-
+# Import core  and helper functions
+import sys
+sys.path.append("../ewstools")
+import core
+import helpers
 
 
 # Simulate a simple multi-variate time series
@@ -36,21 +36,19 @@ n = len(df_test.columns)
 
 
 
-
-
 #------------------------------------
 # Write test functions
 
 def test_compute_autocov():
 
-    ar_out = eval_recon.compute_autocov(df_test)
+    ar_out = helpers.compute_autocov(df_test)
     assert type(ar_out) == np.ndarray
     assert ar_out.shape == (n,n)
 
 
 def test_eval_recon():
     
-    dic_out = eval_recon.eval_recon(df_test)
+    dic_out = helpers.eval_recon(df_test)
     jac = dic_out['Jacobian']
     evals = dic_out['Eigenvalues']
     evecs = dic_out['Eigenvectors']
@@ -63,19 +61,11 @@ def test_eval_recon():
     
 def test_eval_recon_rolling():
     
-    df_out = eval_recon.eval_recon_rolling(df_test)
+    df_out = core.eval_recon_rolling(df_test)
     
     assert type(df_out) == pd.DataFrame
     assert len(df_out) == len(df_test)
     
-
-
-
-
-
-
-
-
 
 
 

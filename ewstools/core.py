@@ -49,7 +49,7 @@ from scipy.ndimage.filters import gaussian_filter as gf
 
 
 # Import fucntions from other files in package
-import helperfuns
+import helpers
 
 
 #---------------
@@ -265,7 +265,7 @@ def ews_compute(raw_series,
             t_point = eval_series.index[k+(rw_size-1)]            
             
             ## Compute the power spectrum using function pspec_welch
-            pspec = helperfuns.pspec_welch(window_series, dt, 
+            pspec = helpers.pspec_welch(window_series, dt, 
                                 ham_length=ham_length, 
                                 ham_offset=ham_offset,
                                 w_cutoff=w_cutoff,
@@ -282,7 +282,7 @@ def ews_compute(raw_series,
             
             
             ## Compute the spectral EWS using pspec_metrics (dictionary)
-            metrics = helperfuns.pspec_metrics(pspec, ews, sweep)
+            metrics = helpers.pspec_metrics(pspec, ews, sweep)
             # Add the time-stamp
             metrics['Time'] = t_point
             # Add metrics (dictionary) to the list
@@ -295,14 +295,14 @@ def ews_compute(raw_series,
                 # Create fine-scale frequency values
                 wVals = np.linspace(min(pspec.index), max(pspec.index), 100)
                 # Fold fit
-                pspec_fold = helperfuns.psd_fold(wVals, metrics['Params fold']['sigma'],
+                pspec_fold = helpers.psd_fold(wVals, metrics['Params fold']['sigma'],
                      metrics['Params fold']['lam'])
                 # Hopf fit
-                pspec_hopf = helperfuns.psd_hopf(wVals, metrics['Params hopf']['sigma'],
+                pspec_hopf = helpers.psd_hopf(wVals, metrics['Params hopf']['sigma'],
                      metrics['Params hopf']['mu'],
                      metrics['Params hopf']['w0'])
                 # Null fit
-                pspec_null = helperfuns.psd_null(wVals, metrics['Params null']['sigma'])
+                pspec_null = helpers.psd_null(wVals, metrics['Params null']['sigma'])
                 
                 ## Put spectrum fits into a dataframe
                 dic_temp = {'Time': t_point*np.ones(len(wVals)), 
@@ -389,7 +389,7 @@ def ews_compute(raw_series,
 
 #-----------------------------
 # Eigenvalue reconstruction
-
+#------------------------------
 
 
 def eval_recon_rolling(df_in,
@@ -513,7 +513,7 @@ def eval_recon_rolling(df_in,
         t_point = df_pre.index[k+(rw_size-1)]            
         
         # Do eigenvalue reconstruction on residuals
-        dic_eval_recon = helperfuns.eval_recon(df_window)
+        dic_eval_recon = helpers.eval_recon(df_window)
         # Add time component
         dic_eval_recon['Time'] = t_point
         # Add them to list
