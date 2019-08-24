@@ -47,9 +47,8 @@ from arch.bootstrap import StationaryBootstrap, CircularBlockBootstrap, IIDBoots
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from scipy.ndimage.filters import gaussian_filter as gf
 
-
 # Import fucntions from other files in package
-import helpers
+import ewstools.helpers as helpers
 
 
 #---------------
