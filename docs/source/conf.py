@@ -24,7 +24,6 @@ autodoc_mock_imports = [
     'scipy',
     'statsmodels',
     'lmfit',
-    'helperfuns',
     'arch'
 ]
 
@@ -41,7 +40,7 @@ author = 'Thomas M Bury'
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.0.2'
+release = '0.0.8'
 
 
 # -- General configuration ---------------------------------------------------

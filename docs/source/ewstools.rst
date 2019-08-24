@@ -2,24 +2,24 @@ ewstools package
 ================
 
 
-ewstools.ewstools submodule
---------------
+ewstools.core submodule
+-----------------------
 
 The submodule ewstools contains functions designed for the user.
 
-.. automodule:: ewstools.ewstools
+.. automodule:: ewstools.core
     :members:
     :undoc-members:
     :show-inheritance:
 
 
-ewstools.helperfuns submodule
+ewstools.helpers submodule
 --------------------------
 
 The submodule helperfuns contains the lower-level functions that make up the
 user-designed functions.
 
-.. automodule:: ewstools.helperfuns
+.. automodule:: ewstools.helpers
     :members:
     :undoc-members:
     :show-inheritance:
