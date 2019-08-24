@@ -22,10 +22,6 @@ sys.path.append('../ewstools')
 import eval_recon
 
 
-
-
-
-
 # Simulate a simple multi-variate time series
 tVals = np.arange(0,10,0.1)
 xVals = 5 + np.random.normal(0,1,len(tVals))
@@ -42,14 +38,19 @@ n = len(df_test.columns)
 # Build function that computes Jac over a rolling window
 # with smoothing etc. (temporary location for function)
 
+
+# For detrending time-series
+from statsmodels.nonparametric.smoothers_lowess import lowess
+from scipy.ndimage.filters import gaussian_filter as gf
+
 def eval_recon_rolling(df_in,
                        roll_window=0.4,
+                       roll_offset=1,
                        smooth='Lowess',
                        span=0.1,
                        band_width=0.2,
                        upto='Full'):
-    
-        '''
+    '''
     Compute reconstructed eigenvalues from residuals of multi-variate
     non-stationary time series
     	
@@ -60,6 +61,9 @@ def eval_recon_rolling(df_in,
     roll_window: float
         Rolling window size as a proportion of the length of the time series 
         data.
+    roll_offset: int
+        Offset of rolling window upon each EWS computation - make larger to save
+        on computational time
     smooth: {'Gaussian', 'Lowess', 'None'}
         Type of detrending.
     band_width: float
@@ -84,75 +88,97 @@ def eval_recon_rolling(df_in,
         **'Kendall tau':** A DataFrame of the Kendall tau values for each EWS metric.
     '''
     
-    # Initialise a DataFrame to store EWS data - indexed by time
-    df_ews = pd.DataFrame(raw_series)
-    df_ews.columns = ['State variable']
-    df_ews.index.rename('Time', inplace=True)
+    
+    # Properties of df_in
+    var_names = df_in.columns
+    
+    
     
     # Select portion of data where EWS are evaluated (e.g only up to bifurcation)
-    if upto == 'Full':
-        short_series = raw_series
-    else: short_series = raw_series.loc[:upto]
+    if upto=='Full':
+        df_pre = df_in
+    else: df_pre = df_in.loc[:upto]
 
 
     #------Data detrending--------
 
     # Compute the absolute size of the bandwidth if it is given as a proportion
     if 0 < band_width <= 1:
-        bw_size = short_series.shape[0]*band_width
+        bw_size = df_pre.shape[0]*band_width
     else:
         bw_size = band_width
         
     # Compute the Lowess span as a proportion if given as absolute
     if not 0 < span <= 1:
-        span = span/short_series.shape[0]
+        span = span/df_pre.shape[0]
     else:
         span = span
     
     
     # Compute smoothed data and residuals
     if  smooth == 'Gaussian':
-        smooth_data = gf(short_series.values, sigma=bw_size, mode='reflect')
-        smooth_series = pd.Series(smooth_data, index=short_series.index)
-        residuals = short_series.values - smooth_data
-        resid_series = pd.Series(residuals,index=short_series.index)
-    
-        # Add smoothed data and residuals to the EWS DataFrame
-        df_ews['Smoothing'] = smooth_series
-        df_ews['Residuals'] = resid_series
+        # Loop through variables
+        for var in var_names:
+            
+            smooth_data = gf(df_pre[var].values, sigma=bw_size, mode='reflect')
+            smooth_series = pd.Series(smooth_data, index=df_pre.index)
+            residuals = df_pre[var].values - smooth_data
+            resid_series = pd.Series(residuals,index=df_pre.index)
+            # Add smoothed data and residuals to df_pre
+            df_pre[var+'_s'] = smooth_series
+            df_pre[var+'_r'] = resid_series
     
     if  smooth == 'Lowess':
-        smooth_data = lowess(short_series.values, short_series.index.values, frac=span)[:,1]
-        smooth_series = pd.Series(smooth_data, index=short_series.index)
-        residuals = short_series.values - smooth_data
-        resid_series = pd.Series(residuals, index=short_series.index)
-    
-        # Add smoothed data and residuals to the EWS DataFrame
-        df_ews['Smoothing'] = smooth_series
-        df_ews['Residuals'] = resid_series
-        
-    # Use the short_series EWS if smooth='None'. Otherwise use reiduals.
-    eval_series = short_series if smooth == 'None' else resid_series
+        # Loop through variables
+        for var in var_names:
+            
+            smooth_data = lowess(df_pre[var].values, df_pre.index.values, frac=span)[:,1]
+            smooth_series = pd.Series(smooth_data, index=df_pre.index)
+            residuals = df_pre.values - smooth_data
+            resid_series = pd.Series(residuals, index=df_pre.index)
+            # Add smoothed data and residuals to df_pre
+            df_pre[var+'_s'] = smooth_series
+            df_pre[var+'_r'] = resid_series
     
     # Compute the rolling window size (integer value)
-    rw_size=int(np.floor(roll_window * raw_series.shape[0]))
+    rw_size=int(np.floor(roll_window * df_in.shape[0]))
     
     
+
+    # Set up a rolling window
+
+    # Number of components in the residual time-series
+    num_comps = len(df_pre)
+    # Rolling window offset (can make larger to save on computation time)
+    roll_offset = int(roll_offset)
     
+    # Initialise a list of dictionaries containing eval data
+    list_evaldata = []
+    
+    # Loop through window locations shifted by roll_offset
+    for k in np.arange(0, num_comps-(rw_size-1), roll_offset):
+        
+        # Select subset of residuals contained in window
+        df_window = df_pre[[var+'_r' for var in var_names]].iloc[k:k+rw_size]
+        # Asisgn the time value for the metrics (right end point of window)
+        t_point = df_pre.index[k+(rw_size-1)]            
+        
+        # Do eigenvalue reconstruction on residuals
+        dic_eval_recon = eval_recon.eval_recon(df_window)
+        # Add time component
+        dic_eval_recon['Time'] = t_point
+        # Add them to list
+        list_evaldata.append(dic_eval_recon)
+        
+    # Create dataframe from list of dicts of eval data
+    df_evaldata = pd.DataFrame(list_evaldata, index='Time')
+        
+    # Create output dataframe that merges all useful info
+    df_out = pd.concat([df_in, 
+                        df_pre[[var+'_r' for var in var_names]+[var+'_s' for var in var_names]], 
+                        df_evaldata])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return df_out
 
 
 
