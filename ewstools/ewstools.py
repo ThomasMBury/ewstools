@@ -72,7 +72,7 @@ def ews_compute(raw_series,
             w_cutoff=1,
             sweep=False):
     '''
-    Compute temporal and spectral EsWS from time-series data.  
+    Compute temporal and spectral EWS from time-series data.  
     	
     Args
     ----

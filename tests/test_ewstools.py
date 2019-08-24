@@ -50,6 +50,8 @@ def test_ews_compute():
     
     return dict_ews
     
+
+    
 def test_pspec_welch():
     n_points = 100
     dt = 1

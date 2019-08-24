@@ -5,29 +5,14 @@ Created on Wed Aug  7 11:47:31 2019
 
 @author: tbury
 
-Function to reconstruct the Jacobian from time-series data.
-See Williamson (2015) for implementation details.
+Functions to reconstruct eigenvalues from a df of time series data
+See Williamson (2015) for theory and implementation details
 
 """
 
 import numpy as np
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
-
-# Imoprt trajectoreis dataframe
-df_traj = pd.read_csv('../../ews_seasonal/models_ricker/ricker_seasonal/data_export/ews_stat_evaltest/traj.csv', index_col=['rb','rnb','Time'])
-df_traj.rename(columns={'Non-breeding':'x', 'Breeding':'y'}, inplace=True)
-
-rb_vals = df_traj.index.levels[0]
-rnb_vals = df_traj.index.levels[1]
-
-# Select time series to analyse
-df_in = df_traj.loc[(2,-1)]
-
-# Visualise with plot
-df_in[['x','y']].plot()
 
 
 #------------------------
@@ -99,20 +84,21 @@ def compute_autocov(df_in):
 
 
 
-
-
 #---------------------------------------
-## Function to do Jacobian reconstruction 
+## Function to do Jacobian and eval reconstruction 
 
 
-def jac_recon(df_in):
+def eval_recon(df_in):
     '''
     Constructs estimate of Jacobian matrix from stationary time-series data
     and outputs the eigenvalues
     Input:
         df_in: DataFrame with two columns indexed by time
     Output:
-        np.array: Jacobian matrix
+    	dictionary consisting of
+    		- 'Eigenvalues': np.array of eigenvalues
+    		- 'Eigenvectors': np.array of eigenvectors
+    		- 'Jacobian': pd.DataFrame of Jacobian entries
     '''
     
     # Compute autocovaraince matrix from columns
@@ -124,6 +110,8 @@ def jac_recon(df_in):
     # Estimate of Jacobian (formula in Williamson (2015))
     # Requires computation of an inverse matrix
     jac = np.matmul(ar_autocov, np.linalg.inv(ar_cov))
+    # Write the Jacobian as a df for output (so we have col lables)
+    df_jac = pd.DataFrame(jac, columns = df_in.columns, index=df_in.columns)
       
     # Compute eigenvalues and eigenvectors
     evals, evecs = np.linalg.eig(jac)
@@ -131,8 +119,36 @@ def jac_recon(df_in):
     # Dictionary of data output
     dic_out = {'Eigenvalues':evals, 
                'Eigenvectors':evecs,
-               'Jacobian':jac}
+               'Jacobian':df_jac}
     
     return dic_out
+
+
+
+#-----------------------------
+# Function to do Jacobian reconstruction over a rolling window
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
