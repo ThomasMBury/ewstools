@@ -83,7 +83,7 @@ Then, the package *ewstools* may be installed using pip, by entering the followi
 ```
 pip install ewstools
 ```
-which includes all package dependencies. Installation of the package should about 1 minute on a standard computer. To interact with the demos, Jupyter notebook is required, which can be installed using
+which includes all package dependencies. Installation of the package should take less than one minute on a standard computer. To interact with the demos, Jupyter notebook is required, which can be installed using
 ```
 pip install jupyterlab
 ```
