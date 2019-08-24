@@ -299,7 +299,7 @@ def test_mean_ci():
     intervals = core.mean_ci(data)
     
     assert type(intervals) == dict
-    assert type(intervals['Mean']) == np.float64
+    assert type(intervals['Mean']) == np.float64 or type(intervals['Mean']) ==float
 
 
     
