@@ -15,6 +15,6 @@ To upload a new version to PyPi:
 		
 		
 		
-Install package locally 
-	pip install -e ewstools
-to ensure that tests will pass if making changes to files
+To ensure that pytest uses most up to date version of package, 
+go into package directory and install locally using
+	pip install -e .
