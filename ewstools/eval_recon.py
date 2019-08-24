@@ -24,10 +24,10 @@ rb_vals = df_traj.index.levels[0]
 rnb_vals = df_traj.index.levels[1]
 
 # Select time series to analyse
-df_temp = df_traj.loc[(2,-1)]
+df_in = df_traj.loc[(2,-1)]
 
 # Visualise with plot
-df_temp[['x','y']].plot()
+df_in[['x','y']].plot()
 
 
 #------------------------
@@ -39,7 +39,7 @@ def compute_autocov(df_in):
     time series provided in df_in.
     
     Using the definition
-        phi_ij = < X_i(t) X_j(t+1) >
+        phi_ij = < X_i(t+1) X_j(t) >
     for each element of the autocovariance matrix phi.
     
     Input:
@@ -58,17 +58,18 @@ def compute_autocov(df_in):
     def autocov_cols(a,b):
         '''
         Computes autocovariance of two columns (can be the same)
+        Note that this does not commute (a<->b) in general
         Input:
             a,b: Series indexed by time
         Output:
             float: autocovariance between the columns
         '''
         
-        # Shift the column of b by 1
-        b_shift = b.shift(1)
+        # Shift the column of a by 1
+        a_shift = a.shift(1)
         
         # Put into a dataframe
-        df_temp = pd.DataFrame([a,b_shift],axis=1)
+        df_temp = pd.concat([a_shift,b], axis=1)
         
         # Compute covariance of columns a and b_shift
         cov = df_temp.cov().iloc[0,1]
@@ -96,91 +97,42 @@ def compute_autocov(df_in):
     return ar_autocov
 
 
+
+
+
+
 #---------------------------------------
-## Function to compute Jacobian reconstruction 
-    
+## Function to do Jacobian reconstruction 
 
 
-def eval_recon(df_in):
+def jac_recon(df_in):
     '''
     Constructs estimate of Jacobian matrix from stationary time-series data
     and outputs the eigenvalues
     Input:
         df_in: DataFrame with two columns indexed by time
     Output:
-        np.array of of eigenvalues, np.array of evecs
+        np.array: Jacobian matrix
     '''
     
-    # Compute covariance matrix
-    cov = np.array(df_in.cov())
+    # Compute autocovaraince matrix from columns
+    ar_autocov = compute_autocov(df_in)
     
-    # Compute autocovariance matrix
-    acov = autocov(df_in)
+    # Compute the covariance matrix (built in function)
+    ar_cov = df_in.cov()
     
     # Estimate of Jacobian (formula in Williamson (2015))
-    jac = np.matmul( acov, np.linalg.inv(cov))
-    
-    # Eigenvalues
+    # Requires computation of an inverse matrix
+    jac = np.matmul(ar_autocov, np.linalg.inv(ar_cov))
+      
+    # Compute eigenvalues and eigenvectors
     evals, evecs = np.linalg.eig(jac)
+
+    # Dictionary of data output
+    dic_out = {'Eigenvalues':evals, 
+               'Eigenvectors':evecs,
+               'Jacobian':jac}
     
-    return evals, evecs
-
-
-
-
-
-# Initiate list for eval data
-list_evals = []
-# Compute eigenvalues for each set of r values
-for rb in rb_vals:
-    for rnb in rnb_vals:
-        df_temp = df_traj.loc[(rb,rnb)]
-        
-        # If trajecotry is zero set evals to NA
-        if df_temp.iloc[-1,0]==0:
-            evals = np.array([np.nan,np.nan])
-            vec1 = np.array([np.nan,np.nan])
-            vec2 = np.array([np.nan,np.nan])
-        else:
-        # Compute evals and evecs
-            evals, evecs = eval_recon(df_temp)
-            vec1 = evecs[:,0]
-            vec2 = evecs[:,1]
-            
-        # Choose evecs to lie in the half-plane x>0 (wlog)
-        if vec1[0]<0:
-            vec1 = -vec1
-        if vec2[0]<0:
-            vec2 = -vec2
-            
-        
-        # Add data to a dictionary    
-        dic_temp = {'rb':rb, 'rnb':rnb, 'eval1':evals[0], 'eval2':evals[1], 
-                    'evec1_x':np.real(vec1[0]), 'evec1_y':np.real(vec1[1]),
-                    'evec2_x':np.real(vec2[0]), 'evec2_y':np.real(vec2[1])}    
-        # Append to list
-        list_evals.append(dic_temp)
-
-
-# Add to dataframe
-df_evals = pd.DataFrame(list_evals).set_index(['rb','rnb'])
-
-     
-
-
-# Columns for real and imaginary parts   
-df_evals['eval1_re'] = df_evals['eval1'].apply(lambda x: np.real(x))
-df_evals['eval1_im'] = df_evals['eval1'].apply(lambda x: np.imag(x))
-df_evals['eval2_re'] = df_evals['eval2'].apply(lambda x: np.real(x))
-df_evals['eval2_im'] = df_evals['eval2'].apply(lambda x: np.imag(x))
-
-# Compute absolute values of eigenvector components
-df_evals['evec1_x_abs'] = df_evals['evec1_x'].apply(np.abs)
-df_evals['evec1_y_abs'] = df_evals['evec1_y'].apply(np.abs)
-
-
-
-
-
+    return dic_out
 
 
