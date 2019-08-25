@@ -426,8 +426,9 @@ def eval_recon_rolling(df_in,
     Returns
     --------
 	
-	pd.DataFrame: DataFrame indexed by time, with columns of the Jacobian,
-	eigenvalues and eigenvectors at each point in time.
+	pd.DataFrame:
+		DataFrame indexed by time, with columns of the Jacobian,
+		eigenvalues and eigenvectors at each point in time.
 	
     '''
     
