@@ -42,6 +42,8 @@ import pandas as pd
 # To compute power spectrum using Welch's method
 from scipy import signal
 
+import scipy.linalg
+
 # For fitting power spectrum models and computing AIC weights
 from lmfit import Model
       
@@ -777,23 +779,20 @@ def eval_recon(df_in):
     
     # Estimate of discrete Jacobian (formula in Williamson (2015))
     # Requires computation of an inverse matrix
-    jac_discrete = np.matmul(ar_autocov, np.linalg.inv(ar_cov))
-    # Convert to continuous Jacobian, via A=e^{Jdt}
-    jac = (1/dt)*np.linalg.logm(jac_discrete)
-    
+    jac = np.matmul(ar_autocov, np.linalg.inv(ar_cov))
+
     # Write the Jacobian as a df for output (so we have col lables)
     df_jac = pd.DataFrame(jac, columns = df_in.columns, index=df_in.columns)
-      
+    
     # Compute eigenvalues and eigenvectors
     evals, evecs = np.linalg.eig(jac)
-
+	
     # Dictionary of data output
     dic_out = {'Eigenvalues':evals, 
                'Eigenvectors':evecs,
                'Jacobian':df_jac}
     
     return dic_out
-
 
 
 
