@@ -756,7 +756,7 @@ def compute_autocov(df_in):
 def eval_recon(df_in):
     '''
     Constructs estimate of Jacobian matrix from stationary time-series data
-    and outputs the eigenvalues
+    and outputs the eigenvalues, eigenvectors and jacobian.
     Input:
         df_in: DataFrame with two columns indexed by time
     Output:
@@ -766,15 +766,21 @@ def eval_recon(df_in):
     		- 'Jacobian': pd.DataFrame of Jacobian entries
     '''
     
+    # Get the time-separation between data points
+    dt = df_in.index[1] -df_in.index[0]
+    
     # Compute autocovaraince matrix from columns
     ar_autocov = compute_autocov(df_in)
     
     # Compute the covariance matrix (built in function)
     ar_cov = df_in.cov()
     
-    # Estimate of Jacobian (formula in Williamson (2015))
+    # Estimate of discrete Jacobian (formula in Williamson (2015))
     # Requires computation of an inverse matrix
-    jac = np.matmul(ar_autocov, np.linalg.inv(ar_cov))
+    jac_discrete = np.matmul(ar_autocov, np.linalg.inv(ar_cov))
+    # Convert to continuous Jacobian, via A=e^{Jdt}
+    jac = (1/dt)*np.linalg.logm(jac_discrete)
+    
     # Write the Jacobian as a df for output (so we have col lables)
     df_jac = pd.DataFrame(jac, columns = df_in.columns, index=df_in.columns)
       
