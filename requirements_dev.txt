@@ -5,7 +5,7 @@ twine==1.13.0
 pandas==0.24.2
 numpy==1.16.2
 pytest==4.3.0
-arch==4.7
+arch==4.9.0
 lmfit==0.9.12
 pytest-cov==2.6.1
 coveralls==1.6.0
