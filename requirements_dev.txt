@@ -1,7 +1,7 @@
 pip==19.0.3
 setuptools==41.0.0
 wheel==0.33.1
-twine==1.13.0
+twine==1.14.0
 pandas==0.24.2
 numpy==1.16.2
 pytest==4.3.0
