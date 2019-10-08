@@ -673,7 +673,7 @@ def pspec_metrics(pspec,
                      'lambda': sweep_vals*lambda_init}
         
         init_flip_array = {'sigma': sweep_vals*sigma_init_flip,
-                     'r': sweep_vals*r_init}        
+                     'r': [0.5*r_init,r_init,0.5*r_init+0.5]}        
         
         init_hopf_array = {'sigma': sweep_vals*sigma_init_hopf,
                      'mu': sweep_vals*mu_init,

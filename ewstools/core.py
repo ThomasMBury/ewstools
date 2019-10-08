@@ -295,6 +295,9 @@ def ews_compute(raw_series,
                 # Fold fit
                 pspec_fold = helpers.psd_fold(wVals, metrics['Params fold']['sigma'],
                      metrics['Params fold']['lam'])
+                # Flip fit
+                pspec_flip = helpers.psd_flip(wVals, metrics['Params flip']['sigma'],
+                     metrics['Params flip']['r'])
                 # Hopf fit
                 pspec_hopf = helpers.psd_hopf(wVals, metrics['Params hopf']['sigma'],
                      metrics['Params hopf']['mu'],
@@ -306,6 +309,7 @@ def ews_compute(raw_series,
                 dic_temp = {'Time': t_point*np.ones(len(wVals)), 
                             'Frequency': wVals,
                             'Fit fold': pspec_fold,
+                            'Fit flip': pspec_flip,
                             'Fit hopf': pspec_hopf, 
                             'Fit null': pspec_null}
                 df_pspec_fits = pd.DataFrame(dic_temp)
