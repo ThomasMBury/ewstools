@@ -139,17 +139,25 @@ def pspec_welch(yVals,
     
 def psd_fold(w,sigma,lam):
 	'''
-	Analytical approximation for the power spectrum in a continuous-time system
-	with a real eigenvalue approaching 0.
+	Analytical approximation for the power spectrum prior to a Fold bifurcation
+
 	'''
 	return (sigma**2 / (2*np.pi))*(1/(w**2+lam**2))
     
-    
+
+
+def psd_flip(w,sigma,r):
+	'''
+	Analytical approximation for the power spectrum prior to a Flip bifurcation
+	'''
+	return (sigma**2 / (2*np.pi))*(1/(1 + r**2 - 2*r*np.cos(w)))
+
+
 
 def psd_hopf(w,sigma,mu,w0):
 	'''
-	Analytical approximation for the power spectrum in a continuous-time system
-	with a complex-conjugate pair of eigenvalues approaching zero real part.
+	Analytical approximation for the power spectrum prior to a Hopf bifurcation
+
 	'''
 	return (sigma**2/(4*np.pi))*(1/((w+w0)**2+mu**2)+1/((w-w0)**2 +mu**2))
      
@@ -251,6 +259,37 @@ def sfold_init(smax, stot):
 
 
 
+def sflip_init(smax, stot):
+    '''
+    Compute the 'best guess' initialisation values for sigma and r
+    when fitting sflip to the empirical power spectrum.
+    
+    Args
+    --------------
+    smax: float
+        Maximum power in the power spectrum.
+    stot: float
+        Total power in the power spectrum.
+        
+    Return
+    -----------------
+    list of floats: 
+        List containing the initialisation parameters [sigma, r]
+        
+    '''
+    
+    
+    # Initialisation for r
+    r =(stot - 2*np.pi*smax)/(stot + 2*np.pi*smax)
+    
+    # Initialisation for sigma
+    sigma = np.sqrt(stot*(1-r**2))
+    
+    # Return list
+    return [sigma, r]
+
+
+
 def snull_init(stot):
     '''
     Compute the 'best guess' initialisation values for sigma
@@ -326,6 +365,56 @@ def fit_fold(pspec, init):
     
     # Export AIC score and model fit
     return [aic, result]
+
+
+
+
+
+# Fold fit
+def fit_flip(pspec, init):
+    '''
+    Fit the Flip power spectrum model to pspec and compute AIC score.
+    Uses the package LMFIT for optimisation.
+    
+    Args
+    --------------
+    pspec: pd.Series
+        Power spectrum data as a Series indexed by frequency.
+    init: list of floats
+        Initial parameter guesses of the form [sigma_init, r_init].
+        
+    Returns
+    ----------------
+    list:
+        Form [aic, result] where aic is the AIC score for the model fit,
+        and result is a handle that contains further information on the fit.
+
+    '''
+    
+    
+    # Put frequency values and power values as a list to use LMFIT
+    freq_vals = pspec.index.tolist()
+    power_vals = pspec.tolist()
+    
+    sigma_init, r_init = init
+    # Assign model object
+    model = Model(psd_flip)
+    # Parameter constraints for sigma
+    model.set_param_hint('sigma', value=sigma_init, min=0, max=10*sigma_init)
+    # Parameter constraints for r
+    model.set_param_hint('r', min=-1, max=0, value=r_init)
+    
+    # Assign initial parameter values and constraints
+    params = model.make_params()        
+    # Fit model to the empircal spectrum
+    result = model.fit(power_vals, params, w=freq_vals)
+    # Compute AIC score
+    aic = result.aic
+    
+    # Export AIC score and model fit
+    return [aic, result]
+
+
 
 
 
@@ -571,6 +660,8 @@ def pspec_metrics(pspec,
         # Baseline parameter initialisations (computed using empirical spectrum)
         # Sfold
         [sigma_init_fold, lambda_init] = sfold_init(smax,stot)
+        # Sflip
+        [sigma_init_flip, r_init] = sflip_init(smax,stot)
         # Shopf
         [sigma_init_hopf, mu_init, w0_init] = shopf_init(smax,stot,wdom)
         # Snull
@@ -580,6 +671,9 @@ def pspec_metrics(pspec,
         # Arrays of initial values
         init_fold_array = {'sigma': sweep_vals*sigma_init_fold,
                      'lambda': sweep_vals*lambda_init}
+        
+        init_flip_array = {'sigma': sweep_vals*sigma_init_flip,
+                     'r': sweep_vals*r_init}        
         
         init_hopf_array = {'sigma': sweep_vals*sigma_init_hopf,
                      'mu': sweep_vals*mu_init,
@@ -609,6 +703,31 @@ def pspec_metrics(pspec,
         # Pick out the best model
         [aic_fold, model_fold] = array_temp[array_temp[:,0].argmin()]    
                    
+        
+        
+         ## Flip
+        
+        # Initialise list to store AIC and model fits
+        flip_aic_fits = []
+
+        # Sweep over initial parameter guesses and pick best convergence
+        for i in range(len(init_flip_array['sigma'])):
+            for j in range(len(init_flip_array['r'])):
+                # Initial parameter guess
+                init_flip = [init_flip_array['sigma'][i],init_flip_array['r'][j]]
+                # Compute fold fit and AIC score
+                [aic_temp, model_temp] = fit_flip(pspec, init_flip)
+                # Store in list
+                flip_aic_fits.append([aic_temp, model_temp])
+        # Put list into array
+        array_temp = np.array(flip_aic_fits)
+        # Pick out the best model
+        [aic_flip, model_flip] = array_temp[array_temp[:,0].argmin()]           
+        
+        
+        
+        
+        
         
         ## Hopf
         
@@ -653,17 +772,19 @@ def pspec_metrics(pspec,
        
         
         # Compute AIC weights from the AIC scores
-        aicw_fold, aicw_hopf, aicw_null = aic_weights([aic_fold, aic_hopf, aic_null])
+        aicw_fold, aicw_flip, aicw_hopf, aicw_null = aic_weights([aic_fold, aic_flip, aic_hopf, aic_null])
         
                
         # Add to Dataframe
         spec_ews['AIC fold'] = aicw_fold
+        spec_ews['AIC flip'] = aicw_flip
         spec_ews['AIC hopf'] = aicw_hopf
         spec_ews['AIC null'] = aicw_null
         
         
         # Add fitted parameter values to DataFrame
-        spec_ews['Params fold'] = dict((k, model_fold.values[k]) for k in ('sigma','lam'))  # don't include dummy params 
+        spec_ews['Params fold'] = dict((k, model_fold.values[k]) for k in ('sigma','lam'))  # don't include dummy params
+        spec_ews['Params flip'] = dict((k, model_flip.values[k]) for k in ('sigma','r'))
         spec_ews['Params hopf'] = dict((k, model_hopf.values[k]) for k in ('sigma','mu','w0','delta','psi'))
         spec_ews['Params null'] = model_null.values
 

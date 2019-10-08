@@ -129,6 +129,7 @@ def ews_compute(raw_series,
         
     '''
     
+
     # Initialise a DataFrame to store EWS data - indexed by time
     df_ews = pd.DataFrame(raw_series)
     df_ews.columns = ['State variable']
