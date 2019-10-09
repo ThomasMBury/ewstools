@@ -410,7 +410,8 @@ def fit_flip(pspec, init):
     result = model.fit(power_vals, params, w=freq_vals)
     # Compute AIC score
     aic = result.aic
-    
+#    print('flip aic is {}'.format(aic))
+
     # Export AIC score and model fit
     return [aic, result]
 
@@ -477,7 +478,7 @@ def fit_hopf(pspec, init):
     # Delta is a dummy parameter, satisfying d = w0 - wThresh (see paper for wThresh). It is allowed to vary, in place of w0.
     model.set_param_hint('delta', value = delta_init, min=0, vary=True)
     # w0 is a fixed parameter dependent on delta (w0 = delta + wThresh)
-    model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',vary=False)
+    model.set_param_hint('w0',expr='delta - (mu/(2*sqrt(psi)))*sqrt(4-3*psi + sqrt(psi**2-16*psi+16))',max=2.5,vary=False)
     
     # Assign initial parameter values and constraints
     params = model.make_params()        
@@ -485,7 +486,7 @@ def fit_hopf(pspec, init):
     result = model.fit(power_vals, params, w=freq_vals)
     # Compute AIC score
     aic = result.aic
-    
+#    print('hopf aic is {}'.format(aic))
     # Export AIC score and model fit
     return [aic, result]
 
@@ -554,6 +555,7 @@ def aic_weights(aic_scores):
         
     '''
     
+    
     # Best AIC score
     aic_best = min(aic_scores)
     
@@ -574,6 +576,7 @@ def aic_weights(aic_scores):
 
 def pspec_metrics(pspec,
                   ews = ['smax','cf','aic'],
+                  aic = ['Fold','Hopf','Null'],
                   sweep = False):
 
 
@@ -588,6 +591,7 @@ def pspec_metrics(pspec,
     ews: list of {'smax', 'cf', 'aic'}
         EWS to be computed. Options include peak in the power spectrum ('smax'),
         coherence factor ('cf'), AIC weights ('aic').
+    aic: AIC weights to compute
     sweep: bool
         If 'True', sweep over a range of intialisation 
         parameters when optimising to compute AIC scores, at the expense of 
@@ -656,6 +660,7 @@ def pspec_metrics(pspec,
         
         # Sweep values (as proportion of baseline guess) if sweep = True
         sweep_vals = np.array([0.5,1,1.5]) if sweep else np.array([1])
+
         
         # Baseline parameter initialisations (computed using empirical spectrum)
         # Sfold
@@ -672,8 +677,10 @@ def pspec_metrics(pspec,
         init_fold_array = {'sigma': sweep_vals*sigma_init_fold,
                      'lambda': sweep_vals*lambda_init}
         
+        # r parameter cannot go below -1
+        r_sweep_vals = [0.5*r_init,r_init,0.5*r_init+0.5] if sweep else [r_init]
         init_flip_array = {'sigma': sweep_vals*sigma_init_flip,
-                     'r': [0.5*r_init,r_init,0.5*r_init+0.5]}        
+                     'r': r_sweep_vals}        
         
         init_hopf_array = {'sigma': sweep_vals*sigma_init_hopf,
                      'mu': sweep_vals*mu_init,
@@ -771,15 +778,29 @@ def pspec_metrics(pspec,
         [aic_null, model_null] = array_temp[array_temp[:,0].argmin()]   
        
         
-        # Compute AIC weights from the AIC scores
-        aicw_fold, aicw_flip, aicw_hopf, aicw_null = aic_weights([aic_fold, aic_flip, aic_hopf, aic_null])
+        # Compute chosen AIC weights from the AIC scores
+        aic_scores = {}
+        if 'Fold' in aic:
+            aic_scores['Fold']=aic_fold
+        if 'Flip' in aic:
+            aic_scores['Flip']=aic_flip
+        if 'Hopf' in aic:
+            aic_scores['Hopf']=aic_hopf
+        if 'Null' in aic:
+            aic_scores['Null']=aic_null
         
-               
+        aicw = aic_weights(np.array([aic_scores[x] for x in aic]))
+        aic_dict = dict(zip(aic,aicw))        
+                       
         # Add to Dataframe
-        spec_ews['AIC fold'] = aicw_fold
-        spec_ews['AIC flip'] = aicw_flip
-        spec_ews['AIC hopf'] = aicw_hopf
-        spec_ews['AIC null'] = aicw_null
+        if 'Fold' in aic:
+            spec_ews['AIC fold'] = aic_dict['Fold']
+        if 'Flip' in aic:
+            spec_ews['AIC flip'] = aic_dict['Flip']
+        if 'Hopf' in aic:
+            spec_ews['AIC hopf'] = aic_dict['Hopf']
+        if 'Null' in aic:
+            spec_ews['AIC null'] = aic_dict['Null']
         
         
         # Add fitted parameter values to DataFrame

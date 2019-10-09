@@ -25,9 +25,11 @@ def test_ews_compute():
     
     # Run through ews_compute with all possible EWS
     ews = ['var','ac','sd','cv','skew','kurt','smax','aic','cf','smax/var','smax/mean']
+    aic=['Fold','Hopf','Null','Flip']
     lag_times = [1,2,3,4,5]
     dict_ews = core.ews_compute(series,
                              ews=ews,
+                             aic=aic,
                              lag_times=lag_times,
                              sweep = True
                              )

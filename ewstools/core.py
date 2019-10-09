@@ -67,6 +67,7 @@ def ews_compute(raw_series,
             ham_offset=0.5,
             pspec_roll_offset=20,
             w_cutoff=1,
+            aic=['Fold','Hopf','Null'],
             sweep=False):
     
     '''
@@ -111,6 +112,7 @@ def ews_compute(raw_series,
     w_cutoff: float
         Cutoff frequency used in power spectrum. Given as a proportion of the 
         maximum permissable frequency in the empirical power spectrum.
+    aic: AIC values to compute
     sweep: bool
         If 'True', sweep over a range of intialisation 
         parameters when optimising to compute AIC scores, at the expense of 
@@ -280,7 +282,7 @@ def ews_compute(raw_series,
             
             
             ## Compute the spectral EWS using pspec_metrics (dictionary)
-            metrics = helpers.pspec_metrics(pspec, ews, sweep)
+            metrics = helpers.pspec_metrics(pspec, ews, aic, sweep)
             # Add the time-stamp
             metrics['Time'] = t_point
             # Add metrics (dictionary) to the list
