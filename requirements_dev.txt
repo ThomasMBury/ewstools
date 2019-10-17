@@ -3,7 +3,7 @@ setuptools==41.0.0
 wheel==0.33.1
 twine==1.13.0
 pandas==0.24.2
-numpy==1.16.2
+numpy==1.17.3
 pytest==4.3.0
 arch==4.7
 lmfit==0.9.12
