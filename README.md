@@ -1,7 +1,7 @@
 [![PyPI version](https://badge.fury.io/py/ewstools.svg)](https://badge.fury.io/py/ewstools)
 [![Build Status](https://travis-ci.com/ThomasMBury/ewstools.svg?branch=master)](https://travis-ci.com/ThomasMBury/ewstools)
 [![Coverage Status](https://coveralls.io/repos/github/ThomasMBury/ewstools/badge.svg?branch=master&service=github)](https://coveralls.io/github/ThomasMBury/ewstools?branch=master&service=github)
-[![DOI](https://zenodo.org/badge/155786429.svg)](https://zenodo.org/badge/latestdoi/155786429)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3497512.svg)](https://doi.org/10.5281/zenodo.3497512)
 
 
 # ewstools
