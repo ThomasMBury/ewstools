@@ -31,7 +31,8 @@ def test_ews_compute():
                              ews=ews,
                              aic=aic,
                              lag_times=lag_times,
-                             sweep = True
+                             sweep = True,
+                             ktau_time = 5.232
                              )
     
     assert type(dict_ews) == dict

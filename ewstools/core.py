@@ -68,7 +68,8 @@ def ews_compute(raw_series,
             pspec_roll_offset=20,
             w_cutoff=1,
             aic=['Fold','Hopf','Null'],
-            sweep=False):
+            sweep=False,
+            ktau_time='Start'):
     
     '''
     Compute temporal and spectral EWS from time-series data.
@@ -118,6 +119,9 @@ def ews_compute(raw_series,
         parameters when optimising to compute AIC scores, at the expense of 
         longer computation. If 'False', intialisation parameter is taken as the
         'best guess'.
+    ktau_time: float or 'Start'
+        Time from which to compute Kendall tau values. Defaults to the start of
+        the EWS data.
 
     Returns
     --------
@@ -359,9 +363,16 @@ def ews_compute(raw_series,
         and values close to negative one indicate high negative correlation (i.e. EWS
         decreasing with time).'''
         
+    # Time at which to start computng Kendall tau values
+    if ktau_time == 'Start':
+        ktau_time = df_ews.index[0]
+        
+    else: ktau_time = df_ews.index[np.argmin(abs(df_ews.index-ktau_time))]
+            
+                                                                             
                                                                              
     # Put time values as their own series for correlation computation
-    time_vals = pd.Series(df_ews.index, index=df_ews.index)
+    time_vals = pd.Series(df_ews.loc[ktau_time:].index, index=df_ews.loc[ktau_time:].index)
 
     # List of EWS that can be used for Kendall tau computation
     ktau_metrics = ['Variance','Standard deviation','Skewness','Kurtosis','Coefficient of variation','Smax','Smax/Var','Smax/Mean'] + ['Lag-'+str(i)+' AC' for i in lag_times]
@@ -370,7 +381,7 @@ def ews_compute(raw_series,
     ktau_metrics = list( set(ews_list) & set(ktau_metrics) )
     
     # Find Kendall tau for each EWS and store in a DataFrame
-    dic_ktau = {x:df_ews[x].corr(time_vals, method='kendall') for x in ktau_metrics} # temporary dictionary
+    dic_ktau = {x:df_ews[x].loc[ktau_time:].corr(time_vals, method='kendall') for x in ktau_metrics} # temporary dictionary
     df_ktau = pd.DataFrame(dic_ktau, index=[0]) # DataFrame (easier for concatenation purposes)
                                                                              
                                                                              
