@@ -6,7 +6,7 @@ pandas==0.24.2
 numpy==1.16.2
 pytest==4.3.0
 arch==4.7
-lmfit==0.9.12
+lmfit==1.0.0
 pytest-cov==2.6.1
 coveralls==1.6.0
 sphinx==1.8.4
