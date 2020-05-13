@@ -1,5 +1,5 @@
 pip==19.0.3
-setuptools==41.0.0
+setuptools==46.3.0
 wheel==0.33.1
 twine==1.13.0
 pandas==0.24.2
