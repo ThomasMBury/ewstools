@@ -97,6 +97,6 @@ Full documentation is available on [ReadTheDocs](https://ewstools.readthedocs.io
 
 ## Contribution
 
-If you would like to be a contributor, please make a pull request!
+If you would like to be a contributor, please fork the repository and make a pull request!
 If you run into issues with the software, you can post them on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues).
 
