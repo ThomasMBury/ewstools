@@ -17,26 +17,24 @@ in time series data.**
 - [Demos](#demos)
 - [Documentation](#documentation)
 - [License](./LICENSE)
-- [Issues](https://github.com/thomasmbury/ewstools/issues)
 - [Contribution](#contribution)
 
 
 ## Overview
 
-Many natural and artificial systems have the capacity to undergo a sudden change in their dynamics. In the mathematical realm of dynamical systems, these changes corresopond to bifurcations, and theory therein suggests that certain signals, observable in time series data, should precede these bifurcations ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and autocorrelation, though there exist many others (see e.g. [Clements & Ozgul 2018](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). Our objective with this package is to provide a user-friendly toolbox in Python to compute early warning signals from time series data. This complements another early warning signal toolbox written in R ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)), and provides novel tools to extract information on the bifurcation from the power spectrum - results to be published soon.
-
+Many natural and artificial systems have the capacity to undergo a sudden change in their dynamics. From the perspective of dynamical systems, these changes often corresopond to bifurcations, and theory therein suggests that certain signals observable in time series data should precede these bifurcations ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and lag-1 autocorrelation, though there exist many others (see e.g. [Clements & Ozgul 2018](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). Our objective with this package is to provide a user-friendly toolbox in Python to compute early warning signals from time series data, and maintain the toolbox to include the latest proposed indicators for testing and application. This toolbox complements an excellent early warning signals toolbox written in R ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)). We hope that having a toolbox written in Python will allow for additional testing, and appeal to those who primarily write code in Python.
 
 Functionality of *ewstools* includes
 
-  - Detrending using either
+  - Time series detrending using either
     - Gaussian smoothing
     - A Lowess filter
 
-  - Computation of the following statistical properties over a rolling window:
-    - Variance and its derivatives (standard deviation, coefficient of variation)
+  - Computation of the following statistical metrics over a rolling window:
+    - Variance and associated metrics (standard deviation, coefficient of variation)
     - Autocorrelation (at specified lag times)
-    - Higher-order moments (skewness, kurtosis)
-    - Power spectrum (including maximum frequency, coherence factor and AIC weights csp. to canonical power spectrum forms)
+    - Higher-order statistical moments (skewness, kurtosis)
+    - Power spectrum and associated metrics (maximum frequency, coherence factor, AIC weights csp. to canonical power spectrum forms)
 
   - Block-bootstrapping time-series to obtain confidence bounds on EWS estimates
   
@@ -70,7 +68,7 @@ numpy==1.16.2
 arch==4.7
 lmfit==0.9.12
 ```
-The Python package should be compatible with Windows, Mac, and Linux operating systems. The demonstrations require Jupyter notebook, which can be installed 
+which are installed automatically with download of the package. The Python package should be compatible with Windows, Mac, and Linux operating systems. The demos require Jupyter notebook.
 
 
 
