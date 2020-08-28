@@ -6,7 +6,7 @@
 
 # ewstools
 **Python package for computing, analysing and visualising early warning signals (EWS)
-in time series data. Includes a novel approach to characterise bifurcations using Spectral EWS.**
+in time series data.**
 
 ## Contents
 
@@ -48,7 +48,6 @@ Functionality of *ewstools* includes
 - [demos](./demos): interactive demos in Jupyter notebooks to illustrate use of package
 - [docs](./docs): version-controlled package documentation provided in ReadTheDocs
 - [ewstools](./ewstools): package code
-- [nat_comms](./nat_comms): supporting code for paper submission to *Nature Communications*
 - [tests](./tests): testing of package functions using pytest
 
 
@@ -100,5 +99,6 @@ Full documentation is available on [ReadTheDocs](https://ewstools.readthedocs.io
 
 ## Contribution
 
-If you are interested in being a contributer, or run into trouble with the package, please post on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues).
+If you would like to be a contributor, please make a pull request!
+If you run into issues with the software, you can post them on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues).
 
