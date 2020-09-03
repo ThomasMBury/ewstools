@@ -61,14 +61,7 @@ though the software should run as expected on computers with lower RAM. The runt
 
 ### Software Requirements
 
-*ewstools* requires Python 3.7 or higher and has the following package dependencies:
-```
-pandas==0.24.2
-numpy==1.16.2
-arch==4.7
-lmfit==0.9.12
-```
-which are installed automatically with download of the package. The Python package should be compatible with Windows, Mac, and Linux operating systems. The demos require Jupyter notebook.
+*ewstools* requires Python 3.7 or higher and has package dependencies listed in [requiements_dev.txt](https://github.com/ThomasMBury/ewstools/requirements_dev.txt). The Python package should be compatible with Windows, Mac, and Linux operating systems. The demos require Jupyter notebook.
 
 
 
