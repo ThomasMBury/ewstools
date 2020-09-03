@@ -93,7 +93,8 @@ def ews_compute(raw_series,
     upto: int or 'Full'
         Time up to which EWS are computed. Enter 'Full' to use
         the entire time-series. Otherwise enter a time value.
-    ews: list of {'var', 'ac', 'sd', 'cv', 'skew', 'kurt', 'smax', 'cf', 'aic', 'smax/var', 'smax/mean'}
+    ews: list of {'var', 'ac', 'sd', 'cv', 'skew', 'kurt', 'smax', 'cf', 'aic', 
+    	 'smax/var', 'smax/mean'}.
 		 List of EWS to compute. Options include variance ('var'),
 		 autocorrelation ('ac'), standard deviation ('sd'), coefficient
 		 of variation ('cv'), skewness ('skew'), kurtosis ('kurt'), peak in
