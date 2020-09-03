@@ -93,14 +93,13 @@ def ews_compute(raw_series,
     upto: int or 'Full'
         Time up to which EWS are computed. Enter 'Full' to use
         the entire time-series. Otherwise enter a time value.
-    ews: list of {'var', 'ac', 'sd', 'cv', 'skew', 'kurt', 'smax', 'cf', 'aic', 
-    	 'smax/var', 'smax/mean'}.
-		 List of EWS to compute. Options include variance ('var'),
-		 autocorrelation ('ac'), standard deviation ('sd'), coefficient
-		 of variation ('cv'), skewness ('skew'), kurtosis ('kurt'), peak in
-		 the power spectrum ('smax'), coherence factor ('cf'), AIC weights ('aic'),
-         ratio of peak in power spectrum and variance ('smax/var'), ratio of
-         peak in power spectrum and mean of time series (smax/mean')
+    ews: list of {'var', 'ac', 'sd', 'cv', 'skew', 'kurt', 'smax', 'cf', 'aic','smax/var', 'smax/mean'}.
+		List of EWS to compute. Options include variance ('var'),
+		autocorrelation ('ac'), standard deviation ('sd'), coefficient
+		of variation ('cv'), skewness ('skew'), kurtosis ('kurt'), peak in
+		the power spectrum ('smax'), coherence factor ('cf'), AIC weights ('aic'),
+		ratio of peak in power spectrum and variance ('smax/var'), ratio of
+		peak in power spectrum and mean of time series (smax/mean')
     lag_times: list of int
         List of lag times at which to compute autocorrelation.
     ham_length: int
