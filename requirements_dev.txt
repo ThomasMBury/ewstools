@@ -4,7 +4,7 @@ twine==3.2.0
 wheel==0.35.1
 pandas==1.1.1
 numpy==1.16.2
-pytest==4.3.0
+pytest==6.0.2
 arch==4.7
 lmfit==1.0.1
 pytest-cov==2.6.1
