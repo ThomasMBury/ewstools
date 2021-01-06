@@ -818,7 +818,6 @@ def pspec_metrics(pspec,
 
 
 
-
 #------------------------
 ##  Function to compute lag-1 autocovariance matrix
 
@@ -826,16 +825,24 @@ def compute_autocov(df_in):
     '''
     Computes the autocovariance (lag-1) matrix of n 
     time series provided in df_in.
-    
     Using the definition
         phi_ij = < X_i(t+1) X_j(t) >
     for each element of the autocovariance matrix phi.
+        
+    Args
+    -------------------
+    df_in: DataFrame with n columns indexed by time
+
     
-    Input:
-        df_in: DataFrame with n columns indexed by time
-    Ouptut:
-        np.array of autocovariance matrix
+    Return
+    -------------------
+    np.array:
+        autocovariance matrix
+    
     '''
+
+
+
     
     # Obtain column names of df_in
     col_names = df_in.columns
@@ -888,7 +895,24 @@ def compute_autocov(df_in):
 
 
 
+    '''
+    Computes the autocovariance (lag-1) matrix of n 
+    time series provided in df_in.
+    Using the definition
+        phi_ij = < X_i(t+1) X_j(t) >
+    for each element of the autocovariance matrix phi.
+        
+    Args
+    -------------------
+    df_in: DataFrame with n columns indexed by time
 
+    
+    Return
+    -------------------
+    np.array:
+        autocovariance matrix
+    
+    '''
 
 
 
@@ -901,13 +925,20 @@ def eval_recon(df_in):
     '''
     Constructs estimate of Jacobian matrix from stationary time-series data
     and outputs the eigenvalues, eigenvectors and jacobian.
-    Input:
+    
+    Args
+    -------------------
         df_in: DataFrame with two columns indexed by time
-    Output:
-    	dictionary consisting of
-    		- 'Eigenvalues': np.array of eigenvalues
+        
+        
+    Return
+    -------------------
+    dict
+		Consists of
+			- 'Eigenvalues': np.array of eigenvalues
     		- 'Eigenvectors': np.array of eigenvectors
     		- 'Jacobian': pd.DataFrame of Jacobian entries
+    		
     '''
     
     # Get the time-separation between data points
