@@ -84,8 +84,10 @@ def ews_compute(raw_series,
     smooth: {'Gaussian', 'Lowess', 'None'}
         Type of detrending.
     band_width: float
-        Bandwidth of Gaussian kernel. Taken as a proportion of time-series length if in (0,1), 
-        otherwise taken as absolute.
+        Bandwidth of Gaussian kernel. Provide as a proportion of data length
+        or as absolute value. As in the R function ksmooth 
+        (used by the earlywarnings package in R), we define the bandwidth
+        such that the kernel has its quartiles at +/- 0.25*bandwidth.
     span: float
         Span of time-series data used for Lowess filtering. Taken as a 
         proportion of time-series length if in (0,1), otherwise taken as 
@@ -164,7 +166,11 @@ def ews_compute(raw_series,
     
     # Compute smoothed data and residuals
     if  smooth == 'Gaussian':
-        smooth_data = gf(short_series.values, sigma=bw_size, mode='reflect')
+        # Use the gaussian_filter function provided by Scipy
+        # Standard deviation of kernel given bandwidth
+        # Note that for a Gaussian, quartiles are at +/- 0.675*sigma
+        sigma = (0.25/0.675)*bw_size
+        smooth_data = gf(short_series.values, sigma=sigma, mode='reflect')
         smooth_series = pd.Series(smooth_data, index=short_series.index)
         residuals = short_series.values - smooth_data
         resid_series = pd.Series(residuals,index=short_series.index)
@@ -231,8 +237,6 @@ def ews_compute(raw_series,
     if 'kurt' in ews:
         roll_kurt = eval_series.rolling(window=rw_size).kurt()
         df_ews['Kurtosis'] = roll_kurt
-
-
 
 
     
