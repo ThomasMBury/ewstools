@@ -27,8 +27,8 @@ Many natural and artificial systems have the capacity to undergo a sudden change
 Functionality of *ewstools* includes
 
   - Time series detrending using either
-    - Gaussian smoothing
-    - A Lowess filter
+    - A Gaussian kernel
+    - LOWESS (Locally Weighted Scatterplot Smoothing)
 
   - Computation of the following statistical metrics over a rolling window:
     - Variance and associated metrics (standard deviation, coefficient of variation)
