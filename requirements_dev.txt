@@ -1,4 +1,4 @@
-pip==19.0.3
+pip==21.2.3
 setuptools==50.1.0
 twine==3.2.0
 wheel==0.35.1
