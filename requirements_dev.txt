@@ -9,7 +9,7 @@ arch==4.7
 lmfit==1.0.1
 pytest-cov==2.6.1
 coveralls==1.6.0
-sphinx==3.2.1
+sphinx==4.3.1
 sphinxcontrib-napoleon
 
 
