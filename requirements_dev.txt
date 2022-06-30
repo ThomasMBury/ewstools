@@ -10,4 +10,4 @@ lmfit==1.0.3
 pytest-cov==3.0.0
 coveralls==3.3.1
 sphinx==3.2.1
-sphinxcontrib-napoleon
+black==22.6.0

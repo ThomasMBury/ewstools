@@ -1,5 +1,4 @@
 # Miscellaneous
-nat_comms/
 dev_instructions.txt
 tasks.txt
 
@@ -110,7 +109,8 @@ target/
 # pyenv
 .python-version
 
-
+# vscode
+.vscode
 
 
 

@@ -12,8 +12,7 @@ To upload a new version to PyPi:
 5. Reinstall on computer
 		pip install ewstools --upgrade
 		
-		
-		
+
 		
 To ensure that pytest uses most up to date version of package, 
 go into package directory and install locally using
