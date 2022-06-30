@@ -36,17 +36,15 @@
 # --------------------------------
 
 # For numeric computation and DataFrames
-from lib2to3.pgen2.pgen import DFAState
 import numpy as np
 import pandas as pd
-
 
 # Module for block-bootstrapping time-series
 from arch.bootstrap import StationaryBootstrap, CircularBlockBootstrap, IIDBootstrap
 
 # For detrending time-series
 from statsmodels.nonparametric.smoothers_lowess import lowess
-from scipy.ndimage.filters import gaussian_filter as gf
+from scipy.ndimage import gaussian_filter as gf
 
 # Import fucntions from other files in package
 import ewstools.helpers as helpers
@@ -55,7 +53,6 @@ import ewstools.helpers as helpers
 # ---------------
 # Classes
 # --------------
-
 
 class TimeSeries:
     """
@@ -67,7 +64,7 @@ class TimeSeries:
         1D list of data that makes up time series. If given as a pandas.Series,
         then the index, which should represent time values, is carried over.
     transition : float
-        Time value at which transition occurs. If defined, early warning signals
+        Time value at which transition occurs, if any. If defined, early warning signals
         are only computed up to this point in the time series.
 
     """
@@ -76,12 +73,309 @@ class TimeSeries:
 
         # Put data into a pandas DataFrame
         if type(data) in [list, np.ndarray]:
-            df = pd.DataFrame({"time": np.arange(len(data)), "state": data})
+            df_state = pd.DataFrame({'time': np.arange(len(data)), 'state': data})
 
         if type(data) == pd.Series:
-            df = pd.DataFrame({"time": data.index, "state": data.values})
+            df_state = pd.DataFrame({'time': data.index, 'state': data.values})
 
-        self.df = df
+        df_state.set_index('time', inplace=True)
+
+        
+        self.state = df_state
+        self.transition = transition
+        
+        # Make empty dataframes to store EWS and DL model predictions
+        self.ews = pd.DataFrame(index=df_state.index)
+        self.dl_preds = pd.DataFrame(index=df_state.index)
+
+
+
+    def detrend(self, method='Gaussian', bandwidth=0.2, span=0.2):
+        '''
+        Detrend the time series using a chosen method.
+        Add column to the dataframe for 'smoothing' and 'residuals'
+
+        Parameters
+        ----------
+        method : str, optional
+            Method of detrending to use. 
+            Select from ['Gaussian', 'Lowess']
+            The default is 'Gaussian'.
+        bandwidth : float, optional
+            Bandwidth of Gaussian kernel. Provide as a proportion of data length
+            or as absolute value. As in the R function ksmooth
+            (used by the earlywarnings package in R), we define the bandwidth
+            such that the kernel has its quartiles at +/- 0.25*bandwidth.
+            The default is 0.2.
+        span : float, optional
+            Span of time-series data used for Lowess filtering. Taken as a
+            proportion of time-series length if in (0,1), otherwise taken as
+            absolute. The default is 0.2.
+
+        Returns
+        -------
+        None.
+
+        '''
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+
+
+        if method == "Gaussian":
+            # Get absolute size of bandwidth if given as a proportion
+            if 0 < bandwidth <= 1:
+                bw_absolute = bandwidth * len(df_pre)
+            else:
+                bw_absolute = bandwidth
+
+            # Use the gaussian_filter function provided by Scipy
+            # Standard deviation of kernel given bandwidth
+            # Note that for a Gaussian, quartiles are at +/- 0.675*sigma
+            sigma = (0.25 / 0.675) * bw_absolute
+            smooth_values = gf(df_pre["state"].values, sigma=sigma, mode="reflect")
+            smooth_series = pd.Series(smooth_values, index=df_pre.index)
+
+
+        if method == 'Lowess':
+            # Get absolute size of Lowess span if given as a proportion
+            if 0 < span <= 1:
+                span_absolute = span * len(df_pre)
+            else:
+                span_absolute = span
+
+            smooth_values = lowess(df_pre['state'].values, 
+                                   df_pre.index.values, 
+                                   frac=span_absolute)[:,1]
+            smooth_series = pd.Series(smooth_values, index=df_pre.index)
+
+    
+        # Add smoothed data and residuals to the 'state' DataFrame
+        self.state["smoothing"] = smooth_series
+        self.state["residuals"] = self.state["state"] - self.state["smoothing"]
+
+
+
+    def compute_variance(self, rolling_window=0.25):
+        '''
+        Compute variance over a rolling window.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+        
+        Put into 'ews' dataframe
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute variance. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+            
+        Returns
+        -------
+        None.
+
+        '''
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+    
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # If residuals column exists, compute over residuals.
+        if 'residuals' in df_pre.columns:
+            var_values = df_pre['residuals'].rolling(window=rw_absolute).var()
+        # Else, compute over state variable
+        else:
+            var_values = df_pre['state'].rolling(window=rw_absolute).var()
+        
+        self.ews['variance'] = var_values
+
+
+    def compute_auto(self, rolling_window=0.25, lag=1):
+        '''
+        Compute autocorrelation over a rolling window. Add to dataframe.
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute autocorrelation. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+        lag : int
+            Lag of autocorrelation
+            
+        Returns
+        -------
+        None.
+
+        '''
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+    
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # If residuals column exists, compute over residuals.
+        if 'residuals' in df_pre.columns:
+            ac_values = df_pre['residuals'].rolling(window=rw_absolute).apply(
+                func=lambda x: pd.Series(x).autocorr(lag=lag), raw=True
+            )
+        # Else, compute over state variable
+        else:
+            ac_values = df_pre['state'].rolling(window=rw_absolute).apply(
+                func=lambda x: pd.Series(x).autocorr(lag=lag), raw=True
+            )                    
+            
+        self.ews['lag{}ac'.format(lag)] = ac_values
+
+
+    def compute_skew(self, rolling_window=0.25):
+        '''
+        Compute skew over a rolling window.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+        
+        Add to dataframe.
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute variance. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+            
+        Returns
+        -------
+        None.
+
+        '''
+        
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+    
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # If residuals column exists, compute over residuals.
+        if 'residuals' in df_pre.columns:
+            skew_values = df_pre['residuals'].rolling(window=rw_absolute).skew()
+        # Else, compute over state variable
+        else:
+            skew_values = df_pre['state'].rolling(window=rw_absolute).skew()
+        
+        self.ews['skew'] = skew_values
+
+
+
+    def compute_kurtosis(self, rolling_window=0.25):
+        '''
+        Compute kurtosis over a rolling window.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+        
+        Add to dataframe.
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute variance. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+            
+        Returns
+        -------
+        None.
+
+        '''
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+    
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # If residuals column exists, compute over residuals.
+        if 'residuals' in df_pre.columns:
+            kurt_values = df_pre['residuals'].rolling(window=rw_absolute).kurt()
+        # Else, compute over state variable
+        else:
+            kurt_values = df_pre['state'].rolling(window=rw_absolute).kurt()
+        
+        self.ews['kurtosis'] = kurt_values
+
+
+
+    def compute_ktau(self, tmin='earliest', tmax='latest'):
+        '''
+        Compute kendall tau values of CSD-based EWS
+
+        Parameters
+        ----------
+        tmin : float or 'earliest'
+            Start time for kendall tau computation. If 'earliest', then
+            time is taken as earliest time point in EWS time series.
+        tmax : float or 'latest'
+            End time for kendall tau computation. If 'latest', then time is
+            taken as latest time point in EWS time series, which could be
+            the end of the state time series, or a defined transtion point.
+
+        Returns
+        -------
+        Python dictionary containing Kendall tau value for each EWS computed. 
+
+        '''
+        
+        
+        # Get tmin and tmax values if using extrema
+        if tmin == 'earliest':
+            tmin = self.ews.dropna().index[0]
+        
+        if tmax == 'latest':
+            tmax = self.ews.dropna().index[-1]
+        
+        # Get cropped data
+        df_ews = self.ews[(self.ews.index >= tmin) &\
+                          (self.ews.index <= tmax)]
+        
+        # Compute kendall tau for each column vs time
+        time_values = df_ews.reset_index()['time']
+        ktau_out = df_ews.corrwith(time_values, method="kendall", axis=0)
+        dict_ktau = dict(ktau_out)
+        
+        return dict_ktau
+
+
+
 
 
 # ---------------
