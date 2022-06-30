@@ -7,7 +7,7 @@ requirements = ["lmfit>=0.9", "arch>=4.7"]
 
 setuptools.setup(
     name="ewstools",
-    version="1.0.0",
+    version="1.0.1",
     author="Thomas M Bury",
     author_email="tombury182@gmail.com",
     description="""Python package to compute early warning signals (EWS) 
