@@ -228,7 +228,6 @@ def shopf_init(smax, stot, wdom):
 
 
     
-    
 def sfold_init(smax, stot):
     '''
     Compute the 'best guess' initialisation values for sigma and lamda

@@ -107,14 +107,14 @@ class TimeSeries:
             The default is 'Gaussian'.
         bandwidth : float, optional
             Bandwidth of Gaussian kernel. Provide as a proportion of data length
-            or as absolute value. As in the R function ksmooth
+            or as a number of data points. As in the R function ksmooth
             (used by the earlywarnings package in R), we define the bandwidth
             such that the kernel has its quartiles at +/- 0.25*bandwidth.
             The default is 0.2.
         span : float, optional
-            Span of time-series data used for Lowess filtering. Taken as a
-            proportion of time-series length if in (0,1), otherwise taken as
-            absolute. The default is 0.2.
+            Span of time-series data used for Lowess filtering. Provide as a 
+            proportion of data length or as a number of data points. 
+            The default is 0.2.
 
         Returns
         -------
@@ -129,31 +129,31 @@ class TimeSeries:
             df_pre = self.state
 
 
-        if method == "Gaussian":
-            # Get absolute size of bandwidth if given as a proportion
+        if method == 'Gaussian':
+            # Get size of bandwidth in terms of num. datapoints if given as a proportion
             if 0 < bandwidth <= 1:
-                bw_absolute = bandwidth * len(df_pre)
+                bw_num = bandwidth * len(df_pre)
             else:
-                bw_absolute = bandwidth
+                bw_num = bandwidth
 
             # Use the gaussian_filter function provided by Scipy
             # Standard deviation of kernel given bandwidth
             # Note that for a Gaussian, quartiles are at +/- 0.675*sigma
-            sigma = (0.25 / 0.675) * bw_absolute
-            smooth_values = gf(df_pre["state"].values, sigma=sigma, mode="reflect")
+            sigma = (0.25 / 0.675) * bw_num
+            smooth_values = gf(df_pre['state'].values, sigma=sigma, mode='reflect')
             smooth_series = pd.Series(smooth_values, index=df_pre.index)
 
 
         if method == 'Lowess':
-            # Get absolute size of Lowess span if given as a proportion
-            if 0 < span <= 1:
-                span_absolute = span * len(df_pre)
+            # Convert span to a proportion of the length of the data
+            if not 0 < span <= 1:
+                span_prop = span / len(df_pre)
             else:
-                span_absolute = span
+                span_prop = span
 
             smooth_values = lowess(df_pre['state'].values, 
                                    df_pre.index.values, 
-                                   frac=span_absolute)[:,1]
+                                   frac=span_prop)[:,1]
             smooth_series = pd.Series(smooth_values, index=df_pre.index)
 
     
@@ -248,7 +248,7 @@ class TimeSeries:
                 func=lambda x: pd.Series(x).autocorr(lag=lag), raw=True
             )                    
             
-        self.ews['lag{}ac'.format(lag)] = ac_values
+        self.ews['lag{}-ac'.format(lag)] = ac_values
 
 
     def compute_skew(self, rolling_window=0.25):
@@ -336,6 +336,7 @@ class TimeSeries:
             kurt_values = df_pre['state'].rolling(window=rw_absolute).kurt()
         
         self.ews['kurtosis'] = kurt_values
+
 
 
 
