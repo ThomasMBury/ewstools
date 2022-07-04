@@ -74,15 +74,19 @@ class TimeSeries:
         # Put data into a pandas DataFrame
         if type(data) in [list, np.ndarray]:
             df_state = pd.DataFrame({'time': np.arange(len(data)), 'state': data})
-
-        if type(data) == pd.Series:
-            df_state = pd.DataFrame({'time': data.index, 'state': data.values})
-
-        df_state.set_index('time', inplace=True)
-
+            df_state.set_index('time', inplace=True)
         
+        # If given as pandas series, carry index forward
+        if type(data) == pd.Series:
+            df_state = pd.DataFrame({'state': data.values})
+            df_state.index = data.index
+            # Rename index if no name given
+            if not df_state.index.name:
+                df_state.index.name = 'time'
+                
+            
         self.state = df_state
-        self.transition = transition
+        self.transition = float(transition) if transition else transition
         
         # Make empty dataframes to store EWS and DL model predictions
         self.ews = pd.DataFrame(index=df_state.index)
@@ -368,11 +372,16 @@ class TimeSeries:
                           (self.ews.index <= tmax)]
         
         # Compute kendall tau for each column vs time
-        time_values = df_ews.reset_index()['time']
+        index_name = df_ews.index.name
+        time_values = df_ews.reset_index()[index_name]
         ktau_out = df_ews.corrwith(time_values, method="kendall", axis=0)
         dict_ktau = dict(ktau_out)
         
         return dict_ktau
+
+
+
+
 
 
 

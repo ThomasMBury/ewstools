@@ -10,16 +10,58 @@ import pandas as pd
 
 
 # Import ewstools
+import ewstools
 from ewstools import core
 from ewstools import helpers
 
 
-# # Simulate a simple time-series
-# tVals = np.arange(0, 10, 0.1)
-# xVals = 5 + np.random.normal(0, 1, len(tVals))
-# data = pd.Series(xVals, index=tVals)
+# # Import ewstools locally when testing locally
+# import sys
+# sys.path.append('../')
+# import ewstools
 
-# ts = core.TimeSeries(data)
+
+
+def test_TimeSeries():
+    '''
+    Test the TimeSeries class and its associated methods
+    '''
+    
+    # Simulate time series
+    tVals = np.arange(0, 10, 0.1)
+    xVals = 5 + np.random.normal(0, 1, len(tVals))
+    
+    # Create ts object using different data types
+    # As np.ndarray
+    ts1 = ewstools.TimeSeries(xVals)
+    assert type(ts1.state) == pd.DataFrame
+    assert ts1.state.index.name == 'time'    
+    
+    
+    # As list
+    ts2 = ewstools.TimeSeries(list(xVals))
+    assert type(ts2.state) == pd.DataFrame
+    assert ts2.state.index.name == 'time'        
+    
+    # As pandas series
+    data = pd.Series(xVals, index=tVals)
+    data.index.name = 'test_index_name'
+    ts3 = ewstools.TimeSeries(data)
+    assert type(ts3.state) == pd.DataFrame
+    assert ts3.state.index.name == 'test_index_name'   
+
+    
+    # With a transition
+    data = pd.Series(xVals, index=tVals)
+    ts4 = ewstools.TimeSeries(data, transition=80)
+    assert type(ts4.state) == pd.DataFrame
+    assert ts4.state.index.name == 'time'   
+    assert type(ts4.transition) == float
+
+    return
+
+
+
 
 
 def test_ews_compute():
