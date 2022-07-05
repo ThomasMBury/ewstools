@@ -33,32 +33,74 @@ def test_TimeSeries():
     
     # Create ts object using different data types
     # As np.ndarray
-    ts1 = ewstools.TimeSeries(xVals)
-    assert type(ts1.state) == pd.DataFrame
-    assert ts1.state.index.name == 'time'    
+    ts = ewstools.TimeSeries(xVals)
+    assert type(ts.state) == pd.DataFrame
+    assert ts.state.index.name == 'time'    
     
     
     # As list
-    ts2 = ewstools.TimeSeries(list(xVals))
-    assert type(ts2.state) == pd.DataFrame
-    assert ts2.state.index.name == 'time'        
+    ts = ewstools.TimeSeries(list(xVals))
+    assert type(ts.state) == pd.DataFrame
+    assert ts.state.index.name == 'time'        
     
     # As pandas series
     data = pd.Series(xVals, index=tVals)
     data.index.name = 'test_index_name'
-    ts3 = ewstools.TimeSeries(data)
-    assert type(ts3.state) == pd.DataFrame
-    assert ts3.state.index.name == 'test_index_name'   
+    ts = ewstools.TimeSeries(data)
+    assert type(ts.state) == pd.DataFrame
+    assert ts.state.index.name == 'test_index_name'   
 
     
     # With a transition
     data = pd.Series(xVals, index=tVals)
-    ts4 = ewstools.TimeSeries(data, transition=80)
-    assert type(ts4.state) == pd.DataFrame
-    assert ts4.state.index.name == 'time'   
-    assert type(ts4.transition) == float
+    ts = ewstools.TimeSeries(data, transition=80)
+    assert type(ts.state) == pd.DataFrame
+    assert ts.state.index.name == 'time'   
+    assert type(ts.transition) == float
 
-    return
+    # Compute EWS without detrending
+    ts.compute_var()
+    ts.compute_auto(lag=1)
+    ts.compute_auto(lag=5)
+    ts.compute_skew()
+    ts.compute_kurt()
+    assert type(ts.ews) == pd.DataFrame
+    assert 'variance' in ts.ews.columns
+    assert 'lag5-ac' in ts.ews.columns
+    
+    
+    # Detrend data using Gaussian and Lowess filter
+    ts.detrend('Gaussian', bandwidth=0.2)
+    ts.detrend('Gaussian', bandwidth=30)
+    ts.detrend('Lowess', span=0.2)
+    ts.detrend('Lowess', span=30)    
+    assert type(ts.state) == pd.DataFrame
+    assert 'residuals' in ts.state.columns
+
+
+    # Compute EWS on detrended data using rolling window as fraction and absolute
+    rolling_window = 0.2
+    ts.compute_var(rolling_window=rolling_window)
+    ts.compute_auto(lag=1, rolling_window=rolling_window)
+    ts.compute_auto(lag=5, rolling_window=rolling_window)
+    ts.compute_skew(rolling_window=rolling_window)
+    ts.compute_kurt(rolling_window=rolling_window)
+
+    assert type(ts.ews) == pd.DataFrame
+    assert 'variance' in ts.ews.columns
+    assert 'lag5-ac' in ts.ews.columns
+
+
+    # Test kendall tau computation
+    ts.compute_ktau()
+    assert type(ts.ktau) == dict
+    assert 'variance' in ts.ktau.keys()
+    assert 'lag5-ac' in ts.ktau.keys()
+
+
+
+
+
 
 
 

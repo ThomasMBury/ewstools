@@ -46,7 +46,7 @@ from arch.bootstrap import StationaryBootstrap, CircularBlockBootstrap, IIDBoots
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from scipy.ndimage import gaussian_filter as gf
 
-# Import fucntions from other files in package
+# Import functions from other files in package
 import ewstools.helpers as helpers
 
 
@@ -84,13 +84,13 @@ class TimeSeries:
             if not df_state.index.name:
                 df_state.index.name = 'time'
                 
-            
+        
+        # Initialise attributes of class
         self.state = df_state
         self.transition = float(transition) if transition else transition
-        
-        # Make empty dataframes to store EWS and DL model predictions
         self.ews = pd.DataFrame(index=df_state.index)
         self.dl_preds = pd.DataFrame(index=df_state.index)
+        self.ktau = dict()
 
 
 
@@ -163,7 +163,7 @@ class TimeSeries:
 
 
 
-    def compute_variance(self, rolling_window=0.25):
+    def compute_var(self, rolling_window=0.25):
         '''
         Compute variance over a rolling window.
         If residuals have not been computed, computation will be
@@ -295,7 +295,7 @@ class TimeSeries:
 
 
 
-    def compute_kurtosis(self, rolling_window=0.25):
+    def compute_kurt(self, rolling_window=0.25):
         '''
         Compute kurtosis over a rolling window.
         If residuals have not been computed, computation will be
@@ -342,7 +342,9 @@ class TimeSeries:
 
     def compute_ktau(self, tmin='earliest', tmax='latest'):
         '''
-        Compute kendall tau values of CSD-based EWS
+        Compute kendall tau values of CSD-based EWS.
+        Output is placed in the attribute *ktau*, which is a Python 
+        dictionary contianing Kendall tau values for each CSD-based EWS.
 
         Parameters
         ----------
@@ -353,10 +355,6 @@ class TimeSeries:
             End time for kendall tau computation. If 'latest', then time is
             taken as latest time point in EWS time series, which could be
             the end of the state time series, or a defined transtion point.
-
-        Returns
-        -------
-        Python dictionary containing Kendall tau value for each EWS computed. 
 
         '''
         
@@ -370,19 +368,13 @@ class TimeSeries:
         
         # Get cropped data
         df_ews = self.ews[(self.ews.index >= tmin) &\
-                          (self.ews.index <= tmax)]
+                          (self.ews.index <= tmax)].copy()
         
-        # Compute kendall tau for each column vs time
-        index_name = df_ews.index.name
-        time_values = df_ews.reset_index()[index_name]
+        # Make a series with the time values
+        time_values = pd.Series(data=df_ews.index, index=df_ews.index)
         ktau_out = df_ews.corrwith(time_values, method="kendall", axis=0)
-        dict_ktau = dict(ktau_out)
+        self.ktau = dict(ktau_out)
         
-        return dict_ktau
-
-
-
-
 
 
 
