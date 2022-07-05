@@ -376,6 +376,24 @@ class TimeSeries:
         self.ktau = dict(ktau_out)
         
 
+    def compute_dl_preds(self, classifier, time_points):
+        '''
+        Compute predictions from a deep learning classifier.
+
+        Parameters
+        ----------
+        classifier : TYPE
+            DESCRIPTION.
+        time_points : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        '''
+
+
 
 
 
