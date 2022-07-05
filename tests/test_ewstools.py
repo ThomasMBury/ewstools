@@ -22,48 +22,64 @@ from ewstools import helpers
 
 
 
-def test_TimeSeries():
+def test_TimeSeries_init():
     '''
-    Test the TimeSeries class and its associated methods
+    Test the TimeSeries initialisation process
     '''
     
-    # Simulate time series
+    # Simulate a time series
     tVals = np.arange(0, 10, 0.1)
     xVals = 5 + np.random.normal(0, 1, len(tVals))
     
-    # Create ts object using different data types
-    # As np.ndarray
+    # Create TimeSeries object using np.ndarray
     ts = ewstools.TimeSeries(xVals)
     assert type(ts.state) == pd.DataFrame
-    assert ts.state.index.name == 'time'    
+    assert type(ts.ews) == pd.DataFrame
+    assert type(ts.ktau) == dict
+    assert type(ts.dl_preds) == pd.DataFrame
+    assert ts.state.index.name == 'time'
+    assert ts.ews.index.name == 'time'
+    assert ts.dl_preds.index.name == 'time'
     
-    
-    # As list
+    # Create TimeSeries object using list
     ts = ewstools.TimeSeries(list(xVals))
     assert type(ts.state) == pd.DataFrame
     assert ts.state.index.name == 'time'        
     
-    # As pandas series
+    # Create TimeSeries object using pd.Series
     data = pd.Series(xVals, index=tVals)
     data.index.name = 'test_index_name'
     ts = ewstools.TimeSeries(data)
     assert type(ts.state) == pd.DataFrame
     assert ts.state.index.name == 'test_index_name'   
 
-    
-    # With a transition
+    # Create TimeSeries object using pd.Series
     data = pd.Series(xVals, index=tVals)
     ts = ewstools.TimeSeries(data, transition=80)
     assert type(ts.state) == pd.DataFrame
     assert ts.state.index.name == 'time'   
     assert type(ts.transition) == float
 
+
+def test_TimeSeries_ews():
+    '''
+    Test the TimeSeries methods that involve detrending and computing EWS
+
+    '''
+    
+    # Simulate a time series
+    tVals = np.arange(0, 10, 0.1)
+    xVals = 5 + np.random.normal(0, 1, len(tVals))
+    data = pd.Series(xVals, index=tVals)
+    ts = ewstools.TimeSeries(data, transition=80)
+    
     # Compute EWS without detrending
-    ts.compute_var()
-    ts.compute_auto(lag=1)
-    ts.compute_auto(lag=5)
-    ts.compute_skew()
-    ts.compute_kurt()
+    rolling_window = 0.5
+    ts.compute_var(rolling_window=rolling_window)
+    ts.compute_auto(lag=1, rolling_window=rolling_window)
+    ts.compute_auto(lag=5, rolling_window=rolling_window)
+    ts.compute_skew(rolling_window=rolling_window)
+    ts.compute_kurt(rolling_window=rolling_window)
     assert type(ts.ews) == pd.DataFrame
     assert 'variance' in ts.ews.columns
     assert 'lag5-ac' in ts.ews.columns
@@ -77,7 +93,6 @@ def test_TimeSeries():
     assert type(ts.state) == pd.DataFrame
     assert 'residuals' in ts.state.columns
 
-
     # Compute EWS on detrended data using rolling window as fraction and absolute
     rolling_window = 0.2
     ts.compute_var(rolling_window=rolling_window)
@@ -90,13 +105,28 @@ def test_TimeSeries():
     assert 'variance' in ts.ews.columns
     assert 'lag5-ac' in ts.ews.columns
 
-
     # Test kendall tau computation
     ts.compute_ktau()
     assert type(ts.ktau) == dict
     assert 'variance' in ts.ktau.keys()
     assert 'lag5-ac' in ts.ktau.keys()
 
+
+
+
+def test_TimeSeries_dl_preds():
+    '''
+    Test the TimeSeries methods that involve computing DL predictions
+
+    '''
+
+    # Simulate a time series
+    tVals = np.arange(0, 10, 0.1)
+    xVals = 5 + np.random.normal(0, 1, len(tVals))
+    data = pd.Series(xVals, index=tVals)
+    ts = ewstools.TimeSeries(data, transition=80)
+
+    
 
 
 

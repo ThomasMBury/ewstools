@@ -89,7 +89,7 @@ class TimeSeries:
         self.state = df_state
         self.transition = float(transition) if transition else transition
         self.ews = pd.DataFrame(index=df_state.index)
-        self.dl_preds = pd.DataFrame(index=df_state.index)
+        self.dl_preds = pd.DataFrame()
         self.ktau = dict()
 
 
@@ -376,24 +376,70 @@ class TimeSeries:
         self.ktau = dict(ktau_out)
         
 
-    def compute_dl_preds(self, classifier, time_points):
+    def apply_classifier(self, classifier, tmin='earliest', tmax='latest', 
+                        name='classifier1'):
         '''
         Compute predictions from a deep learning classifier.
 
         Parameters
         ----------
-        classifier : TYPE
+        classifier : keras.engine.sequential.Sequential
             DESCRIPTION.
-        time_points : TYPE
-            DESCRIPTION.
+        tmin : float or 'earliest'
+            Start of time series segment fed into classifier. If 'earliest', then
+            time is taken as first point in TimeSeries.
+        tmax : float or 'latest'
+            End of time series segment fed into classifier. If 'latest' 
+            then time is taken as last point, or transition point (if defined)
+            in TimeSeries.         
 
         Returns
         -------
         None.
 
         '''
+        
+        # Length of time series required as input to classifier
+        input_len = classifier.layers[0].input_shape[1]
+        
+        # Get tmin and tmax values if using extrema
+        if tmin == 'earliest':
+            tmin = self.state.index[0]
+        
+        if tmax == 'latest':
+            tmax = self.transition if self.transition else self.state.index[-1]   
+        
+        # Get time series segment. Use residuals if detrending performed.
+        # Otherwise use state variable.
+        if 'residuals' in self.state.columns:
+            data = self.state[(self.state.index >= tmin) &\
+                                (self.state.index <= tmax)]['residuals'].values      
+        else:
+            data = self.state[(self.state.index >= tmin) &\
+                                (self.state.index <= tmax)]['state'].values
+        
+        # If time series segment is larger than input dimension of classifier
+        if len(data) > input_len:
+            print('ERROR: Length of time series segment is too long for the classifier. You can modify the tmin and tmax parameters to select a smaller segment.')
+            return
+        
+        # Normalise by mean of absolute value
+        data_norm = data/(abs(data).mean())
 
+        # Prepend with zeros to make appropriate length for classifier
+        num_zeros = input_len - len(data_norm)
+        input_data = np.concatenate((np.zeros(num_zeros),data_norm)).reshape(1,-1, 1)
+        
+        # Get DL prediction
+        dl_pred = classifier.predict(input_data)[0]
+        # Put info into dataframe
+        dict_dl_pred = {i:val for (i,val) in zip(np.arange(len(dl_pred)), dl_pred)}
+        dict_dl_pred['time'] = tmax
+        dict_dl_pred['classifier'] = name      
+        df_dl_pred = pd.DataFrame(dict_dl_pred, index=[len(self.dl_preds)])
 
+        # Append to dataframe contiaining DL predictions
+        self.dl_preds = pd.concat([self.dl_preds, df_dl_pred], ignore_index=True)
 
 
 
