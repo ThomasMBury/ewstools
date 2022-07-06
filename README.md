@@ -5,7 +5,7 @@
 
 
 # ewstools
-**Early warning signals (EWS) for bifurcations in time series data.**
+**Tools for obtaining early warning signals (EWS) of bifurcations in time series data.**
 
 ## Contents
 
@@ -13,7 +13,7 @@
 - [Repo Contents](#repo-contents)
 - [System Requirements](#system-requirements)
 - [Installation Guide](#installation-guide)
-- [Demos](#demos)
+- [Tutorials](#tutorials)
 - [Documentation](#documentation)
 - [License](./LICENSE)
 - [Contribution](#contribution)
@@ -21,32 +21,36 @@
 
 ## Overview
 
-Many natural and artificial systems have the capacity to undergo a sudden change in their dynamics. From the perspective of dynamical systems, these changes often corresopond to bifurcations, and theory therein suggests that certain signals observable in time series data should precede these bifurcations ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and lag-1 autocorrelation, though there exist many others (see e.g. [Clements & Ozgul 2018](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). Our objective with this package is to provide a user-friendly toolbox in Python to compute early warning signals from time series data, and maintain the toolbox to include the latest proposed indicators for testing and application. This toolbox complements an excellent early warning signals toolbox written in R ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)). We hope that having a toolbox written in Python will allow for additional testing, and appeal to those who primarily write code in Python.
+Many systems across nature and society have the capacity to undergo an abrupt and profound change in their dynamics. From a dynamical systemes perspective, these changes corresopond to bifurcations, which carry some generic features that can be picked up on in time series data ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and lag-1 autocorrelation, though there exist many others (see e.g. [Clements & Ozgul 2018](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). More recently, deep learning methods have been developed to provide early warning signals, whilst also signalling the type of bifurcation approaching [Bury et al.](https://www.pnas.org/doi/10.1073/pnas.2106140118).
 
-Functionality of *ewstools* includes
+The goal of this Python package is to provide a user-friendly toolbox for computing early warning signals in time series data. It complements an existing early warning signals package in R ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)). We hope that having an early warning signal toolbox in Python will allow for additional testing, and appeal to those who primarily work in Python. I will try to keep it updated with the latest methods.
 
-  - Time series detrending using either
+Current functionality of *ewstools* includes
+
+  - Detrending of time series using
     - A Gaussian kernel
     - LOWESS (Locally Weighted Scatterplot Smoothing)
 
-  - Computation of the following statistical metrics over a rolling window:
+  - Computation of CSD-based early warning signals including:
     - Variance and associated metrics (standard deviation, coefficient of variation)
     - Autocorrelation (at specified lag times)
     - Higher-order statistical moments (skewness, kurtosis)
     - Power spectrum and associated metrics (maximum frequency, coherence factor, AIC weights csp. to canonical power spectrum forms)
 
-  - Block-bootstrapping time-series to obtain confidence bounds on EWS estimates
+  - Application of deep learning classifiers for bifurcation prediction as in the study by [Bury et al.](https://www.pnas.org/doi/10.1073/pnas.2106140118).
+
+  - Block-bootstrapping of time-series to obtain confidence bounds on EWS estimates
   
-  - Visualisation of EWS with plots of time-series and power spectra.
+  - Visualisation tools to display EWS.
   
 
 ## Repo Contents
 
-- [demos](./demos): interactive demos in Jupyter notebooks to illustrate use of package
-- [docs](./docs): version-controlled package documentation provided in ReadTheDocs
-- [ewstools](./ewstools): package code
-- [tests](./tests): testing of package functions using pytest
-
+- [tutorials](./tutorials): Jupyter notebooks to demonstrate methods - a good place to start
+- [docs](./docs): documentation source code running with ReadTheDocs
+- [ewstools](./ewstools): source code
+- [tests](./tests): unit tests
+- [saved_classifiers](./saved_classifiers): pre-trained Tensorflow bifurcation classifiers
 
 ## System Requirements
 
@@ -60,28 +64,25 @@ though the software should run as expected on computers with lower RAM. The runt
 
 ### Software Requirements
 
-*ewstools* requires Python 3.7 or higher and has package dependencies listed in [requiements_dev.txt](https://github.com/ThomasMBury/ewstools/requirements_dev.txt). The Python package should be compatible with Windows, Mac, and Linux operating systems. The demos require Jupyter notebook.
-
+Requires Python 3.7 or higher and has package dependencies listed in [requiements_dev.txt](https://github.com/ThomasMBury/ewstools/requirements_dev.txt). The Python package should be compatible with Windows, Mac, and Linux operating systems. The demos require Jupyter notebook.
 
 
 ## Installation Guide
 
-Friendly instructions for downloading Python 3 on Linux, Mac OS and Windows are available [here](https://realpython.com/installing-python/).
+Instructions for downloading Python 3 on Linux, Mac OS and Windows are available [here](https://realpython.com/installing-python/).
 
-Then, the package *ewstools* may be installed using pip, by entering the following into Terminal (Mac/Linux) or Command Prompt (Windows)
+*ewstools* may then be installed using pip with the following command:
 ```
 pip install ewstools
 ```
-which includes all package dependencies. Installation of the package should take less than one minute on a standard computer. To interact with the demos, Jupyter notebook is required, which can be installed using
+which should install all package dependencies. To run and interact with the tutorials, Jupyter notebook is required, which can be installed using
 ```
-pip install jupyterlab
+pip install jupyter notebook
 ```
-and takes no longer than a minute to download.
 
+## Tutorials
 
-## Demos
-
-For interacitve demonstrations on using *ewstools*, please refer to these [iPython notebooks](https://github.com/ThomasMBury/ewstools/tree/master/demos).
+For demonstrations on how to use *ewstools*, please refer to these [iPython notebooks](https://github.com/ThomasMBury/ewstools/tree/master/demos).
 
 ## Documentation
 
@@ -89,6 +90,5 @@ Full documentation is available on [ReadTheDocs](https://ewstools.readthedocs.io
 
 ## Contribution
 
-If you would like to be a contributor, please fork the repository and make a pull request!
-If you run into issues with the software, you can post them on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues).
+If you run have any suggestions or spot any bugs with the package, please post on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues)! I also welcome any contributions - please get in touch if you are interested, or submit a pull request if you are familiar with that process.
 
