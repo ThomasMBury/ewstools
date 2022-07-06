@@ -8,6 +8,8 @@ import pytest
 import numpy as np
 import pandas as pd
 
+from tensorflow.keras.models import load_model
+
 
 # Import ewstools
 import ewstools
@@ -39,7 +41,6 @@ def test_TimeSeries_init():
     assert type(ts.dl_preds) == pd.DataFrame
     assert ts.state.index.name == 'time'
     assert ts.ews.index.name == 'time'
-    assert ts.dl_preds.index.name == 'time'
     
     # Create TimeSeries object using list
     ts = ewstools.TimeSeries(list(xVals))
@@ -126,10 +127,22 @@ def test_TimeSeries_dl_preds():
     data = pd.Series(xVals, index=tVals)
     ts = ewstools.TimeSeries(data, transition=80)
 
+    # Detrend time series
+    ts.detrend()
     
+    # Import a classifier
+    classifier_path = 'saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.pkl'
+    classifier = load_model(classifier_path)
+    
+    # Apply classifier without time bounds
+    ts.apply_classifier(classifier, name='c1')    
 
+    # Apply classifier with time bounds
+    ts.apply_classifier(classifier, name='c1', tmin=1, tmax=5)    
 
-
+    assert type(ts.dl_preds) == pd.DataFrame
+    assert 'time' in ts.dl_preds.columns
+    assert 'classifier' in ts.dl_preds.columns
 
 
 
