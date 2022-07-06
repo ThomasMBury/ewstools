@@ -248,7 +248,7 @@ class TimeSeries:
                 func=lambda x: pd.Series(x).autocorr(lag=lag), raw=True
             )                    
             
-        self.ews['lag{}-ac'.format(lag)] = ac_values
+        self.ews['ac{}'.format(lag)] = ac_values
 
 
     def compute_skew(self, rolling_window=0.25):
@@ -377,7 +377,7 @@ class TimeSeries:
         
 
     def apply_classifier(self, classifier, tmin='earliest', tmax='latest', 
-                        name='classifier1'):
+                        name='classifier1', verbose=1):
         '''
         Compute predictions from a deep learning classifier.
 
@@ -391,8 +391,12 @@ class TimeSeries:
         tmax : float or 'latest'
             End of time series segment fed into classifier. If 'latest' 
             then time is taken as last point, or transition point (if defined)
-            in TimeSeries.         
-
+            in TimeSeries.       
+        name : str
+            Name assigned to the classifier
+        verbose : int
+            Verbosity of update messages from TensorFlow. 0 = silent, 1 = progress bar, 2 = single line.
+        
         Returns
         -------
         None.
@@ -431,7 +435,7 @@ class TimeSeries:
         input_data = np.concatenate((np.zeros(num_zeros),data_norm)).reshape(1,-1, 1)
         
         # Get DL prediction
-        dl_pred = classifier.predict(input_data)[0]
+        dl_pred = classifier.predict(input_data, verbose=verbose)[0]
         # Put info into dataframe
         dict_dl_pred = {i:val for (i,val) in zip(np.arange(len(dl_pred)), dl_pred)}
         dict_dl_pred['time'] = tmax
@@ -440,6 +444,19 @@ class TimeSeries:
 
         # Append to dataframe contiaining DL predictions
         self.dl_preds = pd.concat([self.dl_preds, df_dl_pred], ignore_index=True)
+
+
+    def clear_dl_preds(self):
+        '''
+        Clear the attribute *dl_preds*
+
+        Returns
+        -------
+        None.
+        '''
+        
+        self.dl_preds = pd.DataFrame()
+
 
 
 

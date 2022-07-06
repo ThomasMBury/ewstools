@@ -23,7 +23,6 @@ from ewstools import helpers
 # import ewstools
 
 
-
 def test_TimeSeries_init():
     '''
     Test the TimeSeries initialisation process
@@ -83,7 +82,7 @@ def test_TimeSeries_ews():
     ts.compute_kurt(rolling_window=rolling_window)
     assert type(ts.ews) == pd.DataFrame
     assert 'variance' in ts.ews.columns
-    assert 'lag5-ac' in ts.ews.columns
+    assert 'ac5' in ts.ews.columns
     
     
     # Detrend data using Gaussian and Lowess filter
@@ -104,13 +103,13 @@ def test_TimeSeries_ews():
 
     assert type(ts.ews) == pd.DataFrame
     assert 'variance' in ts.ews.columns
-    assert 'lag5-ac' in ts.ews.columns
+    assert 'ac5' in ts.ews.columns
 
     # Test kendall tau computation
     ts.compute_ktau()
     assert type(ts.ktau) == dict
     assert 'variance' in ts.ktau.keys()
-    assert 'lag5-ac' in ts.ktau.keys()
+    assert 'ac5' in ts.ktau.keys()
 
 
 
