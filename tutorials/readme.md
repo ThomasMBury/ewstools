@@ -3,7 +3,7 @@
 
 To run and interact with these tutorials and demos, Jupyter notebook must be installed on your system, which can be found [here](https://jupyter.org/install).
 
-I recommend starting with **tutorial_intro.ipynb**. Tutorials for other features are in progress.
+I recommend starting with *tutorial_intro.ipynb*. Tutorials for other features are in progress.
 
 ### tutorial_intro.ipynb
 
