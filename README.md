@@ -5,7 +5,7 @@
 
 
 # ewstools
-**Tools for obtaining early warning signals (EWS) of bifurcations in time series data.**
+**Early warning signals (EWS) for bifurcations in time series data.**
 
 ## Contents
 
