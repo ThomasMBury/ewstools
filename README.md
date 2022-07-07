@@ -79,6 +79,11 @@ which should install all package dependencies. To run and interact with the tuto
 ```
 pip install jupyter notebook
 ```
+To install the latest developement version of *ewstools*, use the command
+```
+pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
+```
+The development version comes with the risk of not being fully tested, therefore prone to bugs.
 
 ## Tutorials
 
