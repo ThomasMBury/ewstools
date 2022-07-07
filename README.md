@@ -18,7 +18,8 @@
 - [Tutorials](#tutorials)
 - [Documentation](#documentation)
 - [License](./LICENSE)
-- [Contribution](#contribution)
+- [Issues](#issues)
+- [Acknowledgements](#acknowledgements)
 
 
 ## Overview
@@ -90,13 +91,17 @@ Note, the development version comes with the risk of undergoing continual change
 
 ## Tutorials
 
-For demonstrations on how to use *ewstools*, please refer to these [iPython notebooks](https://github.com/ThomasMBury/ewstools/tree/master/demos).
+For tutorials/demonstrations on using *ewstools*, please refer to these [iPython notebooks](./tutorials).
 
 ## Documentation
 
-Full documentation is available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
+Documentation available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
 
-## Contribution
+## Issues
 
 If you run have any suggestions or spot any bugs with the package, please post on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues)! I also welcome any contributions - please get in touch if you are interested, or submit a pull request if you are familiar with that process.
+
+## Acknowledgements
+
+This work is supported by an FRQNT (Fonds de recherche du Québec - Nature et Technologies) postdoctoral research scholarship awarded to Thomas Bury. 
 
