@@ -30,7 +30,6 @@ autodoc_mock_imports = [
 
 
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'ewstools'
@@ -40,7 +39,7 @@ author = 'Thomas M Bury'
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.0.8'
+release = '1.0.1'
 
 
 # -- General configuration ---------------------------------------------------

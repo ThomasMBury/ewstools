@@ -2,8 +2,7 @@
 ewstools
 --------
 
-A Python package for computing, analysing and visualising early warning signals (EWS) 
-in time-series data.
+Early warning signals (EWS) for bifurcations in time series data.
 
 .. toctree::
    :maxdepth: 2
@@ -26,13 +25,13 @@ Install ewstools with pip
 Demos
 ========
 
-For demonstrations using *ewstools*, please see the GitHub repo: 
-`https://github.com/ThomasMBury/ewstools/tree/master/demos`_
+For tutorials on using *ewstools*:
+`https://github.com/ThomasMBury/ewstools/tree/main/tutorials`_
     
 Support
 =======
 
-Issues may be posted on Github via the issue tracker: 
+Issues and suggestions may be posted on Github via the issue tracker:
 `https://github.com/ThomasMBury/ewstools/issues`_
 
 
@@ -49,5 +48,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. _https://github.com/ThomasMBury/ewstools/tree/master/demos: https://github.com/ThomasMBury/ewstools/tree/master/demos
+.. _https://github.com/ThomasMBury/ewstools/tree/main/tutorials: https://github.com/ThomasMBury/ewstools/tree/main/tutorials
 .. _https://github.com/ThomasMBury/ewstools/issues: https://github.com/ThomasMBury/ewstools/issues

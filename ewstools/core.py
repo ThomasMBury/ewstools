@@ -384,7 +384,7 @@ class TimeSeries:
         Parameters
         ----------
         classifier : keras.engine.sequential.Sequential
-            DESCRIPTION.
+            Tensorflow classifier
         tmin : float or 'earliest'
             Start of time series segment fed into classifier. If 'earliest', then
             time is taken as first point in TimeSeries.

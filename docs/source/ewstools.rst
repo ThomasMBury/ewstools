@@ -5,7 +5,7 @@ ewstools package
 ewstools.core submodule
 -----------------------
 
-The submodule ewstools contains functions designed for the user.
+The 'core' submodule contains high-level functions designed for the user.
 
 .. automodule:: ewstools.core
     :members:
@@ -16,8 +16,8 @@ The submodule ewstools contains functions designed for the user.
 ewstools.helpers submodule
 --------------------------
 
-The submodule helperfuns contains the lower-level functions that make up the
-user-designed functions.
+The 'helpers' submodule contains low-level functions that are useful in 
+the implementation of the high-level functions.
 
 .. automodule:: ewstools.helpers
     :members:
