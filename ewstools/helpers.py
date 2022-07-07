@@ -825,7 +825,7 @@ def compute_autocov(df_in):
     Computes the autocovariance (lag-1) matrix of n 
     time series provided in df_in.
     Using the definition
-        phi_ij = < X_i(t+1) X_j(t) >
+    phi_ij = < X_i(t+1) X_j(t) >
     for each element of the autocovariance matrix phi.
         
     Args
@@ -929,15 +929,14 @@ def eval_recon(df_in):
     -------------------
         df_in: DataFrame with two columns indexed by time
         
-        
     Return
     -------------------
     dict
-		Consists of
-			- 'Eigenvalues': np.array of eigenvalues
-    		- 'Eigenvectors': np.array of eigenvectors
-    		- 'Jacobian': pd.DataFrame of Jacobian entries
-    		
+		Consists of 'Eigenvalues': np.array of eigenvalues. 
+		'Eigenvectors': np.array of eigenvectors. 'Jacobian': pd.DataFrame of 
+		Jacobian entries.
+	
+
     '''
     
     # Get the time-separation between data points
