@@ -84,7 +84,7 @@ To install the latest development version of *ewstools*, use the command
 ```
 pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
 ```
-Note, the development version comes with the risk of undergoing continual changes, and has not undergone the level of scrutiny of official releases of *ewstools*.
+Note, the development version comes with the risk of undergoing continual changes, and has not undergone the level of scrutiny of official releases.
 
 ## Tutorials
 
