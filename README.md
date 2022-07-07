@@ -42,7 +42,7 @@ Current functionality of *ewstools* includes
   - Block-bootstrapping of time-series to obtain confidence bounds on EWS estimates
   
   - Visualisation tools to display EWS.
-  
+
 
 ## Repo Contents
 
@@ -72,6 +72,7 @@ Requires Python 3.7 or higher and has package dependencies listed in [requiement
 Instructions for downloading Python 3 on Linux, Mac OS and Windows are available [here](https://realpython.com/installing-python/).
 
 *ewstools* may then be installed using pip with the following command:
+
 ```
 pip install ewstools
 ```
@@ -79,11 +80,11 @@ which should install all package dependencies. To run and interact with the tuto
 ```
 pip install jupyter notebook
 ```
-To install the latest developement version of *ewstools*, use the command
+To install the latest development version of *ewstools*, use the command
 ```
 pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
 ```
-The development version comes with the risk of not being fully tested, therefore prone to bugs.
+Note, the development version comes with the risk of undergoing continual changes, and has not undergone the level of scrutiny of official releases of *ewstools*.
 
 ## Tutorials
 
