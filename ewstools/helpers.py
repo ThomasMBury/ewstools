@@ -114,8 +114,8 @@ def pspec_welch(yVals,
                                scaling=scaling)
     
     # Put into a pandas series and index by frequency (scaled by 2*pi)
-    pspec_series = pd.Series(pspec_raw[1], index=2*np.pi*pspec_raw[0], name='Power spectrum')
-    pspec_series.index.name = 'Frequency'
+    pspec_series = pd.Series(pspec_raw[1], index=2*np.pi*pspec_raw[0], name='power')
+    pspec_series.index.name = 'frequency'
     
     # Sort into ascending frequency
     pspec_series.sort_index(inplace=True)
@@ -571,7 +571,6 @@ def aic_weights(aic_scores):
     
 
 #-----------Compute spectral metrics (EWS) from power spectrum------#
-
 
 def pspec_metrics(pspec,
                   ews = ['smax','cf','aic'],

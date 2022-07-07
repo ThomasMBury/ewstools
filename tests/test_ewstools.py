@@ -145,6 +145,39 @@ def test_TimeSeries_dl_preds():
 
 
 
+def test_TimeSeries_spec_ews():
+    '''
+    Test the TimeSeries methods that involve computing spectral EWS
+    
+    '''
+
+    # Simulate a time series
+    tVals = np.arange(0, 10, 0.1)
+    xVals = 5 + np.random.normal(0, 1, len(tVals))
+    data = pd.Series(xVals, index=tVals)
+    ts = ewstools.TimeSeries(data, transition=80)
+
+    # Detrend time series
+    ts.detrend()
+
+    # Compute power spectrum
+    ts.compute_spectrum()
+    assert type(ts.pspec)==pd.DataFrame
+    assert 'frequency' in ts.pspec.columns
+    assert 'power' in ts.pspec.columns
+    
+    # Compute smax
+    ts.compute_smax()
+    # Compute spectrum types indicated by AIC weights
+    ts.compute_spec_type()
+    assert type(ts.ews_spec)==pd.DataFrame
+    assert 'smax' in ts.ews_spec.columns
+    assert 'fold' in ts.ews_spec.columns
+    assert 'hopf' in ts.ews_spec.columns
+    assert 'null' in ts.ews_spec.columns
+
+
+
 
 
 

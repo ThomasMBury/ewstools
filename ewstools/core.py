@@ -85,14 +85,19 @@ class TimeSeries:
                 df_state.index.name = 'time'
                 
         
-        # Initialise attributes of class
+        
+        # Set state and transition attributes
         self.state = df_state
         self.transition = float(transition) if transition else transition
+        
+        # Initialise other attributes
         self.ews = pd.DataFrame(index=df_state.index)
         self.dl_preds = pd.DataFrame()
         self.ktau = dict()
-
-
+        self.pspec = None
+        self.pspec_fits = None
+        self.ews_spec = pd.DataFrame()
+        
 
     def detrend(self, method='Gaussian', bandwidth=0.2, span=0.2):
         '''
@@ -456,6 +461,215 @@ class TimeSeries:
         '''
         
         self.dl_preds = pd.DataFrame()
+
+
+
+    def compute_spectrum(self, rolling_window=0.25, ham_length=40,
+                         ham_offset=0.5, pspec_roll_offset=20,
+                         w_cutoff=1):
+        '''
+        Compute the power spectrum over a rolling window.
+        Stores the power spectra as a DataFrame in TimeSeries.pspec
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute variance. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+        ham_length : int
+            Length of the Hamming window used to compute the power spectrum. 
+            The default is 40.
+        ham_offset : float
+            Hamming offset as a proportion of the Hamming window size. 
+            The default is 0.5.
+        pspec_roll_offset : int
+            Rolling window offset used when computing power spectra. Power spectrum
+            computation is relatively expensive so this is rarely taken as 1
+            (as is the case for the other EWS). The default is 20.
+        w_cutoff : floag
+            Cutoff frequency used in power spectrum. Given as a proportion of the
+            maximum permissable frequency in the empirical power spectrum.
+
+        Returns
+        -------
+        None.
+
+        '''
+        
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # If residuals column exists, compute over residuals.
+        if 'residuals' in df_pre.columns:
+            series = df_pre['residuals']
+        # Else, compute over state variable
+        else:
+            series = df_pre['state']
+
+        # Number of components in the residual time-series
+        num_comps = len(df_pre)
+
+        # Rolling window offset (can make larger to save on computation time)
+        roll_offset = int(pspec_roll_offset)
+        # Time separation between data points (need for frequency values of power spectrum)
+        dt = series.index[1] - series.index[0]
+
+        # Initialise a list to store the power spectra
+        list_pspec = []
+
+        # Loop through window locations shifted by roll_offset
+        for k in np.arange(0, num_comps - (rw_absolute - 1), roll_offset):
+
+            # Select subset of series contained in window
+            window_series = series.iloc[k : k + rw_absolute]
+            # Asisgn the time value for the metrics (right end point of window)
+            t_point = series.index[k + (rw_absolute - 1)]
+
+            ## Compute the power spectrum using function pspec_welch
+            pspec = helpers.pspec_welch(
+                window_series,
+                dt,
+                ham_length=ham_length,
+                ham_offset=ham_offset,
+                w_cutoff=w_cutoff,
+                scaling="spectrum",
+            )
+
+            ## Create DataFrame for empirical power spectrum
+            df_pspec_empirical = pspec.to_frame().reset_index()
+            # Rename column
+            df_pspec_empirical.rename(
+                columns={"Power spectrum": "empirical"}, inplace=True
+            )
+            # Include a column for the time-stamp
+            df_pspec_empirical['time'] = t_point * np.ones(len(pspec))
+            list_pspec.append(df_pspec_empirical)
+        
+        # Concatenate power spectra dataframes and store in attribute pspec
+        self.pspec = pd.concat(list_pspec)
+
+
+
+    def compute_smax(self):
+        '''
+        Compute Smax (the maximum power in the power spectrum).
+        This can only be applied after applying compute_spectrum().
+        Stores Smax values in TimeSeries.ews_spec
+
+        Returns
+        -------
+        None.
+
+        '''
+        
+        if self.pspec is None:
+            print('ERROR: The power spectrum must be computed before computing\
+                  spectral EWS such as Smax. The power spectrum can be\
+                  computed using compute_pspec()')
+        
+        smax_values = self.pspec[['time','power']].groupby(['time']).max()
+        self.ews_spec['smax'] = smax_values
+
+
+
+
+    def compute_spec_type(self, sweep=False):
+        '''
+        Fit the analytical forms of the Fold, Hopf and Null power spectrum
+        to the empirical power spectrum. Get Akaike Information Criterion
+        (AIC) weights to determine best fit.
+        Store AIC weights in TimeSeries.ews_spec
+        Store fitted power spectra in TimeSeries.pspec_fits
+
+        Parameters
+        ----------
+        sweep : bool
+            If 'True', sweep over a range of intialisation
+            parameters when optimising to compute AIC scores, at the expense of
+            longer computation. If 'False', intialisation parameter is taken as the
+            'best guess'. The default is False.
+
+        Returns
+        -------
+        None.
+
+        '''
+        
+        
+        if self.pspec is None:
+            print('ERROR: The power spectrum must be computed before computing\
+                  the spectrum type. The power spectrum can be\
+                  computed using compute_pspec()')    
+    
+        list_aic = []
+        list_pspec_fits = []
+        
+        # Loop through time values
+        for time in self.pspec['time'].unique():
+            pspec = self.pspec[self.pspec['time']==time]
+            pspec_series = pspec.set_index('frequency')['power']
+            
+            ## Compute the AIC values
+            metrics = helpers.pspec_metrics(pspec_series, ews=['aic'], sweep=sweep)
+            dict_aic = {}
+            dict_aic['fold'] = metrics['AIC fold']
+            dict_aic['hopf'] = metrics['AIC hopf']
+            dict_aic['null'] = metrics['AIC null']
+            dict_aic['time'] = time
+            list_aic.append(dict_aic)
+            
+            # Generate data to plot the fitted power spectra
+
+            # Create fine-scale frequency values
+            wVals = np.linspace(min(pspec.index), max(pspec.index), 100)
+            # Fold fit
+            pspec_fold = helpers.psd_fold(
+                wVals,
+                metrics["Params fold"]["sigma"],
+                metrics["Params fold"]["lam"],
+            )
+            # Hopf fit
+            pspec_hopf = helpers.psd_hopf(
+                wVals,
+                metrics["Params hopf"]["sigma"],
+                metrics["Params hopf"]["mu"],
+                metrics["Params hopf"]["w0"],
+            )
+            # Null fit
+            pspec_null = helpers.psd_null(wVals, metrics["Params null"]["sigma"])
+
+            ## Put spectrum fits into a dataframe
+            dict_fits = {
+                "time": time * np.ones(len(wVals)),
+                "frequency": wVals,
+                "fit fold": pspec_fold,
+                "fit hopf": pspec_hopf,
+                "fit null": pspec_null,
+            }
+            df_pspec_fits = pd.DataFrame(dict_fits)
+            list_pspec_fits.append(df_pspec_fits)
+
+        # Concatenate
+        df_aic = pd.DataFrame(list_aic).set_index('time')
+        df_pspec_fits = pd.concat(list_pspec_fits)
+
+        self.ews_spec = self.ews_spec.join(df_aic)
+        self.pspec_fits = df_pspec_fits
+    
+
+
+
+
 
 
 
