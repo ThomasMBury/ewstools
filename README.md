@@ -1,11 +1,13 @@
 [![PyPI version](https://badge.fury.io/py/ewstools.svg)](https://badge.fury.io/py/ewstools)
+[![Downloads](https://pepy.tech/badge/ewstools)](https://pepy.tech/project/ewstools)
 [![Build Status](https://travis-ci.com/ThomasMBury/ewstools.svg?branch=master)](https://travis-ci.com/ThomasMBury/ewstools)
+[![Documentation Status](https://readthedocs.org/projects/ewstools/badge/?version=latest)](https://ewstools.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/ThomasMBury/ewstools/badge.svg?branch=master&service=github)](https://coveralls.io/github/ThomasMBury/ewstools?branch=master&service=github)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3497512.svg)](https://doi.org/10.5281/zenodo.3497512)
 
 
 # ewstools
-**Early warning signals (EWS) for bifurcations in time series data.**
+**Early warning signals (EWS) for bifurcations / tipping points in time series data.**
 
 ## Contents
 
@@ -16,7 +18,8 @@
 - [Tutorials](#tutorials)
 - [Documentation](#documentation)
 - [License](./LICENSE)
-- [Contribution](#contribution)
+- [Issues](#issues)
+- [Acknowledgements](#acknowledgements)
 
 
 ## Overview
@@ -88,13 +91,17 @@ Note, the development version comes with the risk of undergoing continual change
 
 ## Tutorials
 
-For demonstrations on how to use *ewstools*, please refer to these [iPython notebooks](https://github.com/ThomasMBury/ewstools/tree/master/demos).
+For tutorials/demonstrations on using *ewstools*, please refer to these [iPython notebooks](./tutorials).
 
 ## Documentation
 
-Full documentation is available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
+Documentation available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
 
-## Contribution
+## Issues
 
 If you run have any suggestions or spot any bugs with the package, please post on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues)! I also welcome any contributions - please get in touch if you are interested, or submit a pull request if you are familiar with that process.
+
+## Acknowledgements
+
+This work is supported by an FRQNT (Fonds de recherche du Québec - Nature et Technologies) postdoctoral research scholarship awarded to Thomas Bury. 
 
