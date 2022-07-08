@@ -3,13 +3,13 @@
 # Description: Python package for computing, analysing and visualising
 # early warning signals (EWS) in time-series data
 # Author: Thomas M Bury
-# Web: http://www.math.uwaterloo.ca/~tbury/
+# Web: https://www.thomasbury.net/
 # Code repo: https://github.com/ThomasMBury/ewstools
 # Documentation: https://ewstools.readthedocs.io/
 #
 # The MIT License (MIT)
 #
-# Copyright (c) 2019 Thomas Bury http://www.math.uwaterloo.ca/~tbury/
+# Copyright (c) 2019 Thomas Bury
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -77,14 +77,17 @@ class TimeSeries:
             df_state.set_index('time', inplace=True)
         
         # If given as pandas series, carry index forward
-        if type(data) == pd.Series:
+        elif type(data) == pd.Series:
             df_state = pd.DataFrame({'state': data.values})
             df_state.index = data.index
             # Rename index if no name given
             if not df_state.index.name:
                 df_state.index.name = 'time'
                 
-        
+        # If data is not provided as either of these, flag error
+        else:
+            print('\nERROR: data has been provided as type {}'.format(type(data)))
+            print('Make sure to provide data as either a list, np.ndarray or pd.Series\n')
         
         # Set state and transition attributes
         self.state = df_state

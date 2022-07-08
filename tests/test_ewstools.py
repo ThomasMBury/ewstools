@@ -17,6 +17,7 @@ from ewstools import core
 from ewstools import helpers
 
 
+
 # # Import ewstools locally when testing locally
 # import sys
 # sys.path.append('../')
@@ -180,52 +181,51 @@ def test_TimeSeries_spec_ews():
 
 
 
+# def test_ews_compute():
+#     """
+#     Run a time-series through ews_compute and check everything is
+#     functioning correctly.
+#     """
+#     # Simulate a simple time-series
+#     tVals = np.arange(0, 10, 0.1)
+#     xVals = 5 + np.random.normal(0, 1, len(tVals))
+#     series = pd.Series(xVals, index=tVals)
 
-def test_ews_compute():
-    """
-    Run a time-series through ews_compute and check everything is
-    functioning correctly.
-    """
-    # Simulate a simple time-series
-    tVals = np.arange(0, 10, 0.1)
-    xVals = 5 + np.random.normal(0, 1, len(tVals))
-    series = pd.Series(xVals, index=tVals)
+#     # Run through ews_compute with all possible EWS
+#     ews = [
+#         "var",
+#         "ac",
+#         "sd",
+#         "cv",
+#         "skew",
+#         "kurt",
+#         "smax",
+#         "aic",
+#         "cf",
+#         "smax/var",
+#         "smax/mean",
+#     ]
+#     aic = ["Fold", "Hopf", "Null", "Flip"]
+#     lag_times = [1, 2, 3, 4, 5]
+#     dict_ews = core.ews_compute(
+#         series, ews=ews, aic=aic, lag_times=lag_times, sweep=True, ktau_time=5.232
+#     )
 
-    # Run through ews_compute with all possible EWS
-    ews = [
-        "var",
-        "ac",
-        "sd",
-        "cv",
-        "skew",
-        "kurt",
-        "smax",
-        "aic",
-        "cf",
-        "smax/var",
-        "smax/mean",
-    ]
-    aic = ["Fold", "Hopf", "Null", "Flip"]
-    lag_times = [1, 2, 3, 4, 5]
-    dict_ews = core.ews_compute(
-        series, ews=ews, aic=aic, lag_times=lag_times, sweep=True, ktau_time=5.232
-    )
+#     assert type(dict_ews) == dict
 
-    assert type(dict_ews) == dict
+#     # Obtain components of dict_ews
+#     df_ews = dict_ews["EWS metrics"]
+#     df_pspec = dict_ews["Power spectrum"]
+#     df_ktau = dict_ews["Kendall tau"]
 
-    # Obtain components of dict_ews
-    df_ews = dict_ews["EWS metrics"]
-    df_pspec = dict_ews["Power spectrum"]
-    df_ktau = dict_ews["Kendall tau"]
+#     # Check types
+#     assert type(df_ews) == pd.DataFrame
+#     assert type(df_pspec) == pd.DataFrame
+#     assert type(df_ktau) == pd.DataFrame
 
-    # Check types
-    assert type(df_ews) == pd.DataFrame
-    assert type(df_pspec) == pd.DataFrame
-    assert type(df_ktau) == pd.DataFrame
-
-    # Check index
-    assert df_ews.index.name == "Time"
-    assert df_pspec.index.names == ["Time", "Frequency"]
+#     # Check index
+#     assert df_ews.index.name == "Time"
+#     assert df_pspec.index.names == ["Time", "Frequency"]
 
 
 def test_pspec_welch():

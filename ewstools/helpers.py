@@ -3,13 +3,13 @@
 # Description: Python package for computing, analysing and visualising 
 # early warning signals (EWS) in time-series data
 # Author: Thomas M Bury
-# Web: http://www.math.uwaterloo.ca/~tbury/
+# Web: https://www.thomasbury.net/
 # Code repo: https://github.com/ThomasMBury/ewstools
 # Documentation: https://ewstools.readthedocs.io/
 #
 # The MIT License (MIT)
 #
-# Copyright (c) 2019 Thomas Bury http://www.math.uwaterloo.ca/~tbury/
+# Copyright (c) 2019 Thomas Bury
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
