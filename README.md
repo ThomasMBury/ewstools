@@ -7,7 +7,7 @@
 
 
 # ewstools
-**Early warning signals (EWS) for bifurcations / tipping points in time series data.**
+**A python package for early warning signals (EWS) of bifurcations in time series data.**
 
 ## Contents
 

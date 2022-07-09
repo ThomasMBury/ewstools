@@ -7,6 +7,7 @@ Tests for `ewstools` package.
 import pytest
 import numpy as np
 import pandas as pd
+import plotly
 
 from tensorflow.keras.models import load_model
 
@@ -60,6 +61,11 @@ def test_TimeSeries_init():
     assert type(ts.state) == pd.DataFrame
     assert ts.state.index.name == 'time'   
     assert type(ts.transition) == float
+    
+    # Make plotly fig
+    fig = ts.make_plotly()
+    assert type(fig)==plotly.graph_objs._figure.Figure
+
 
 
 def test_TimeSeries_ews():
@@ -111,6 +117,10 @@ def test_TimeSeries_ews():
     assert type(ts.ktau) == dict
     assert 'variance' in ts.ktau.keys()
     assert 'ac5' in ts.ktau.keys()
+    
+    # Make plotly fig
+    fig = ts.make_plotly()
+    assert type(fig)==plotly.graph_objs._figure.Figure
 
 
 
@@ -143,6 +153,10 @@ def test_TimeSeries_dl_preds():
     assert type(ts.dl_preds) == pd.DataFrame
     assert 'time' in ts.dl_preds.columns
     assert 'classifier' in ts.dl_preds.columns
+    
+    # Make plotly fig
+    fig = ts.make_plotly()
+    assert type(fig)==plotly.graph_objs._figure.Figure
 
 
 

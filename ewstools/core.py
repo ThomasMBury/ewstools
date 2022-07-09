@@ -49,6 +49,11 @@ from scipy.ndimage import gaussian_filter as gf
 # Import functions from other files in package
 import ewstools.helpers as helpers
 
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+
+
 
 # ---------------
 # Classes
@@ -672,6 +677,217 @@ class TimeSeries:
 
 
 
+    def make_plotly(self, kendall_tau=True):
+        '''
+        Make an interactive Plotly figure to view all EWS computed
+
+        Parameters
+        ----------
+
+        kendall_tau : bool, optional
+            Set as true to show Kendall tau values (if they have been computed)
+            Default is True.
+
+        Returns
+        -------
+        Plotly figure
+
+        '''
+        
+        # Count number of panels for Plotly subplots
+        row_count = 0
+        # Always a row for state varialbe
+        row_count += 1
+        # Row for autocorrelation
+        ac_labels = [s for s in self.ews.columns if s[:2]=='ac']
+        if len(ac_labels)>0:
+            row_count+=1
+        # Row for each other EWS
+        row_count += len(self.ews.columns)-len(ac_labels)
+        # Row for Smax if included
+        if 'smax' in self.ews_spec.columns:
+            row_count+=1
+        # Row for AIC weights if computed
+        if 'fold' in self.ews_spec.columns:
+            row_count+=1
+        # Row for DL predictions if computed
+        if len(self.dl_preds.columns)>0:
+            row_count+=1
+        
+        num_rows = row_count
+        row_count = 1 # reset row counter
+            
+        # Make Plotly subplots frame
+        fig = make_subplots(rows=num_rows, cols=1, 
+                            shared_xaxes=True,
+                            x_title='Time',
+                            vertical_spacing=0.02
+                            )
+        
+        # Plot state variable
+        fig.add_trace(
+            go.Scatter(x=self.state.index.values,
+                       y=self.state['state'].values,
+                       name='state',
+                       ),
+            row=row_count, col=1
+            )
+        fig.update_yaxes(title='State', row=row_count)
+
+        
+        # Plot smoothing if computed
+        if 'smoothing' in self.state.columns:
+            fig.add_trace(
+                go.Scatter(x=self.state.index.values,
+                           y=self.state['smoothing'].values,
+                           name='smoothing',
+                           ),
+                row=row_count, col=1
+                )
+        
+        # Plot variance if computed
+        if 'variance' in self.ews.columns:
+            row_count += 1
+            
+            # Add kendall tau to name
+            if kendall_tau and ('variance' in self.ktau.keys()):
+                ktau = self.ktau['variance']
+                name = 'variance (ktau={:.2f})'.format(ktau)
+            else:
+                name = 'variance'
+            
+            fig.add_trace(
+                go.Scatter(x=self.ews.index.values,
+                           y=self.ews['variance'].values,
+                           name=name,
+                           ),
+                row=row_count, col=1
+                )  
+            fig.update_yaxes(title='Variance', row=row_count)
+            
+            
+        # Plot autocorrelation metrics if computed
+        if len(ac_labels)!=0:
+            row_count+=1
+        for ac_label in ac_labels:
+            
+            # Add kendall tau to name
+            if kendall_tau and (ac_label in self.ktau.keys()):
+                ktau = self.ktau[ac_label]
+                name = '{} (ktau={:.2f})'.format(ac_label, ktau)
+            else:
+                name = ac_label            
+            
+            fig.add_trace(
+                go.Scatter(x=self.ews.index.values,
+                           y=self.ews[ac_label].values,
+                           name=name,
+                           ),
+                row=row_count, col=1
+                )  
+            fig.update_yaxes(title='Autocorrelation', row=row_count)
+            
+                     
+        # Plot skew if computed
+        if 'skew' in self.ews.columns:
+            row_count += 1
+            
+            # Add kendall tau to name
+            if kendall_tau and ('skew' in self.ktau.keys()):
+                ktau = self.ktau['skew']
+                name = 'skew (ktau={:.2f})'.format(ktau)
+            else:
+                name = 'skew'
+                
+            fig.add_trace(
+                go.Scatter(x=self.ews.index.values,
+                           y=self.ews['skew'].values,
+                           name=name,
+                           ),
+                row=row_count, col=1
+                )  
+            fig.update_yaxes(title='Skew', row=row_count)
+                        
+        # Plot kurtosis if computed
+        if 'kurtosis' in self.ews.columns:
+            row_count += 1
+            
+            # Add kendall tau to name
+            if kendall_tau and ('kurtosis' in self.ktau.keys()):
+                ktau = self.ktau['kurtosis']
+                name = 'kurtosis (ktau={:.2f})'.format(ktau)
+            else:
+                name = 'kurtosis'   
+                
+            fig.add_trace(
+                go.Scatter(x=self.ews.index.values,
+                           y=self.ews['kurtosis'].values,
+                           name=name,
+                           ),
+                row=row_count, col=1
+                )  
+            fig.update_yaxes(title='Kurtosis', row=row_count)
+               
+            
+        # Plot Smax if computd
+        if 'smax' in self.ews_spec.columns:
+            row_count += 1
+            
+            # Add kendall tau to name
+            if kendall_tau and ('smax' in self.ktau.keys()):
+                ktau = self.ktau['smax']
+                name = 'smax (ktau={:.2f})'.format(ktau)
+            else:
+                name = 'smax'   
+                            
+            fig.add_trace(
+                go.Scatter(x=self.ews_spec.index.values,
+                           y=self.ews_spec['smax'].values,
+                           name=name,
+                           ),
+                row=row_count, col=1
+                )  
+            fig.update_yaxes(title='Smax', row=row_count)
+                          
+            
+        # Plot AIC weights if computd
+        if 'fold' in self.ews_spec.columns:
+            row_count += 1
+            aic_labels = ['fold', 'hopf', 'null']
+            for aic_label in aic_labels:
+                fig.add_trace(
+                    go.Scatter(x=self.ews_spec.index.values,
+                               y=self.ews_spec[aic_label].values,
+                               name=aic_label,
+                               ),
+                    row=row_count, col=1
+                    )  
+                
+            fig.update_yaxes(title='AIC weights', row=row_count)
+                          
+                        
+        # Plot DL predictions if computed
+        class_labels = [s for s in self.dl_preds.columns if s not in ['time', 'classifier']]
+        if len(class_labels)>0:
+            row_count += 1
+            for class_label in class_labels:
+                fig.add_trace(
+                    go.Scatter(x=self.dl_preds['time'].values,
+                               y=self.dl_preds[class_label].values,
+                               name='DL pred {}'.format(class_label),
+                               ),
+                    row=row_count, col=1
+                    )
+                
+            fig.update_yaxes(title='DL predictions', row=row_count)
+                          
+
+        # Set figure dimensions 
+        fig.update_layout(height=200*num_rows,
+                          width=800)
+
+
+        return fig
 
 
 
