@@ -18,16 +18,16 @@ import sys
 sys.path.insert(0, os.path.abspath('../../ewstools/'))
 
 
-# mock import these packages because readthedocs doesn't have them installed
-autodoc_mock_imports = [
-    'pandas',
-    'numpy',
-    'scipy',
-    'statsmodels',
-    'lmfit',
-    'arch',
-    'plotly',
-]
+# # mock import these packages because readthedocs doesn't have them installed
+# autodoc_mock_imports = [
+#     'pandas',
+#     'numpy',
+#     'scipy',
+#     'statsmodels',
+#     'lmfit',
+#     'arch',
+#     'plotly',
+# ]
 
 
 
