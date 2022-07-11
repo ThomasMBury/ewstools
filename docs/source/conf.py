@@ -30,7 +30,6 @@ autodoc_mock_imports = [
 
 
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'ewstools'
