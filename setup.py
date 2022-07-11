@@ -12,6 +12,7 @@ requirements = ['pandas>=1.2.0',
                 'statsmodels>=0.12.0',
                 'scipy>=1.5.0',
                 'sphinx>=5.0.0',
+                'sphinx-rtd-theme>=1.0.0'
                 ]
 
 setuptools.setup(
