@@ -12,7 +12,6 @@ Early warning signals (EWS) for bifurcations in time series data.
    
 
 
-
 Installation
 ============
 
