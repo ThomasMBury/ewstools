@@ -6,6 +6,8 @@ build:
     python: "3.8"
     
 sphinx:
+  builder: html
+  configuration: conf.py
   fail_on_warning: true
   
 
@@ -13,15 +15,9 @@ sphinx:
 python:
    install:
    - requirements: requirements_dev.txt
-
-  
-#python:
-#  # Install our python package before building the docs
-#  install:
-#    - method: pip
-#      path: .
-#      
-#      
+   - method: pip
+     path: .
+     
 
 formats:
   - pdf
