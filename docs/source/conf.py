@@ -12,28 +12,29 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
+
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../..'))
 
 
-# mock import these packages because readthedocs doesn't have them installed
-autodoc_mock_imports = [
-    'pandas',
-    'numpy',
-    'scipy',
-    'statsmodels',
-    'lmfit',
-    'arch',
-    'plotly',
-]
+# # mock import these packages because readthedocs doesn't have them installed
+# autodoc_mock_imports = [
+#     'pandas',
+#     'numpy',
+#     'scipy',
+#     'statsmodels',
+#     'lmfit',
+#     'arch',
+#     'plotly',
+# ]
 
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'ewstools'
-copyright = '2019, Thomas M Bury'
+copyright = '2022, Thomas M Bury'
 author = 'Thomas M Bury'
 
 # The short X.Y version
@@ -63,7 +64,8 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = {'.rst': 'restructuredtext'}
+
 
 # The master toctree document.
 master_doc = 'index'
@@ -188,4 +190,3 @@ epub_title = project
 epub_exclude_files = ['search.html']
 
 
-# -- Extension configuration -------------------------------------------------
