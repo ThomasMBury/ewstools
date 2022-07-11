@@ -9,3 +9,4 @@ pytest-cov==3.0.0
 arch==5.3.1
 sphinx==5.0.2
 black==22.6.0
+sphinx-rtd-theme==1.0.0
