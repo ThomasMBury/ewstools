@@ -8,12 +8,23 @@ build:
 sphinx:
   fail_on_warning: true
   
+
+# Declare the Python requirements required to build your docs
 python:
-  # Install our python package before building the docs
-  install:
-    - method: pip
-      path: .
-      
+   install:
+   - requirements: requirements_dev.txt
+
+  
+#python:
+#  # Install our python package before building the docs
+#  install:
+#    - method: pip
+#      path: .
+#      
+#      
+
 formats:
   - pdf
   - epub
+
+
