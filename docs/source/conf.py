@@ -25,6 +25,7 @@ autodoc_mock_imports = [
     'statsmodels',
     'lmfit',
     'arch'
+    'plotly'
 ]
 
 

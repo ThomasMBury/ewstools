@@ -24,3 +24,16 @@ the implementation of the high-level functions.
     :undoc-members:
     :show-inheritance:
 
+
+ewstools.models submodule
+--------------------------
+
+The 'models' submodule contains functions to run stochastic simulations of 
+various mechanistic models. These can be used as data sources to test
+early warning signals.
+
+.. automodule:: ewstools.models
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
