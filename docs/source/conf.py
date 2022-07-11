@@ -18,21 +18,8 @@ import sys
 sys.path.insert(0, os.path.abspath('../../ewstools/'))
 
 
-# # mock import these packages because readthedocs doesn't have them installed
-# autodoc_mock_imports = [
-#     'pandas',
-#     'numpy',
-#     'scipy',
-#     'statsmodels',
-#     'lmfit',
-#     'arch',
-#     'plotly',
-# ]
-
-
 
 # -- Project information -----------------------------------------------------
-
 project = 'ewstools'
 copyright = '2022, Thomas M Bury'
 author = 'Thomas M Bury'
@@ -47,7 +34,7 @@ release = '1.0.1'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-# needs_sphinx = '1.0'
+needs_sphinx = '5.0.2'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
