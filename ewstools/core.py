@@ -217,6 +217,105 @@ class TimeSeries:
             var_values = df_pre['state'].rolling(window=rw_absolute).var()
         
         self.ews['variance'] = var_values
+        
+        
+        
+    def compute_std(self, rolling_window=0.25):
+        '''
+        Compute standard deviation over a rolling window.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+        
+        Put into 'ews' dataframe
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute variance. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+            
+        Returns
+        -------
+        None.
+
+        '''
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+    
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # If residuals column exists, compute over residuals.
+        if 'residuals' in df_pre.columns:
+            std_values = df_pre['residuals'].rolling(window=rw_absolute).std()
+        # Else, compute over state variable
+        else:
+            std_values = df_pre['state'].rolling(window=rw_absolute).std()
+        
+        self.ews['std'] = std_values        
+
+
+    def compute_cv(self, rolling_window=0.25):
+        '''
+        Compute coefficient of variation over a rolling window.
+        This is the standard deviation of the residuals divided by the
+        mean of the state variable.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+        
+        Put into 'ews' dataframe
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute variance. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+            
+        Returns
+        -------
+        None.
+
+        '''
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+    
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # Get standard deviation values
+        # If residuals column exists, compute over residuals.
+        if 'residuals' in df_pre.columns:
+            std_values = df_pre['residuals'].rolling(window=rw_absolute).std()
+        # Else, compute over state variable
+        else:
+            std_values = df_pre['state'].rolling(window=rw_absolute).std()
+        
+        # Get mean values from state variable
+        mean_values = df_pre['state'].rolling(window=rw_absolute).mean()
+        
+        cv_values = std_values/mean_values
+        
+        self.ews['cv'] = cv_values        
+
+
+
+
 
 
     def compute_auto(self, rolling_window=0.25, lag=1):
@@ -765,6 +864,47 @@ class TimeSeries:
                 )  
             fig.update_yaxes(title='Variance', row=row_count)
             
+        # Plot standard deviation if computed
+        if 'std' in self.ews.columns:
+            row_count += 1
+            
+            # Add kendall tau to name
+            if kendall_tau and ('std' in self.ktau.keys()):
+                ktau = self.ktau['std']
+                name = 'std (ktau={:.2f})'.format(ktau)
+            else:
+                name = 'std'
+            
+            fig.add_trace(
+                go.Scatter(x=self.ews.index.values,
+                           y=self.ews['std'].values,
+                           name=name,
+                           ),
+                row=row_count, col=1
+                )  
+            fig.update_yaxes(title='St. Dev.', row=row_count)
+            
+        # Plot coefficient of variation if computed
+        if 'cv' in self.ews.columns:
+            row_count += 1
+            
+            # Add kendall tau to name
+            if kendall_tau and ('cv' in self.ktau.keys()):
+                ktau = self.ktau['cv']
+                name = 'cv (ktau={:.2f})'.format(ktau)
+            else:
+                name = 'cv'
+            
+            fig.add_trace(
+                go.Scatter(x=self.ews.index.values,
+                           y=self.ews['cv'].values,
+                           name=name,
+                           ),
+                row=row_count, col=1
+                )  
+            fig.update_yaxes(title='Coeff. of Var.', row=row_count)
+            
+                                    
             
         # Plot autocorrelation metrics if computed
         if len(ac_labels)!=0:

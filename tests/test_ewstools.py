@@ -83,6 +83,8 @@ def test_TimeSeries_ews():
     # Compute EWS without detrending
     rolling_window = 0.5
     ts.compute_var(rolling_window=rolling_window)
+    ts.compute_std(rolling_window=rolling_window)
+    ts.compute_cv(rolling_window=rolling_window)
     ts.compute_auto(lag=1, rolling_window=rolling_window)
     ts.compute_auto(lag=5, rolling_window=rolling_window)
     ts.compute_skew(rolling_window=rolling_window)
@@ -90,7 +92,7 @@ def test_TimeSeries_ews():
     assert type(ts.ews) == pd.DataFrame
     assert 'variance' in ts.ews.columns
     assert 'ac5' in ts.ews.columns
-    
+    assert 'cv' in ts.ews.columns
     
     # Detrend data using Gaussian and Lowess filter
     ts.detrend('Gaussian', bandwidth=0.2)
@@ -103,6 +105,8 @@ def test_TimeSeries_ews():
     # Compute EWS on detrended data using rolling window as fraction and absolute
     rolling_window = 0.2
     ts.compute_var(rolling_window=rolling_window)
+    ts.compute_std(rolling_window=rolling_window)
+    ts.compute_cv(rolling_window=rolling_window)
     ts.compute_auto(lag=1, rolling_window=rolling_window)
     ts.compute_auto(lag=5, rolling_window=rolling_window)
     ts.compute_skew(rolling_window=rolling_window)
