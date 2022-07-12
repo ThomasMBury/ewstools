@@ -10,6 +10,7 @@ requirements = ['pandas>=1.2.0',
                 'arch>=4.7',
                 'statsmodels>=0.12.0',
                 'scipy>=1.5.0',
+                'deprecation>=2.0',
                 ]
 
 setuptools.setup(
