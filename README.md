@@ -55,7 +55,7 @@ Package dependencies of *ewstools* are
 'statsmodels>=0.12.0',
 'scipy>=1.5.0',
 ```
-and are should be installed automaticaly with the above commands. To use any of the deep learning functionality, you will also need to install [TensorFlow](https://www.tensorflow.org/install) v2.0.0 or later.
+and should be installed automatically. To use any of the deep learning functionality, you will need to install [TensorFlow](https://www.tensorflow.org/install) v2.0.0 or later.
 
 To install the latest *development* version of *ewstools*, use the command
 ```
