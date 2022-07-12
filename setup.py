@@ -11,13 +11,11 @@ requirements = ['pandas>=1.2.0',
                 'arch>=4.7',
                 'statsmodels>=0.12.0',
                 'scipy>=1.5.0',
-                'sphinx>=5.0.0',
-                'sphinx-rtd-theme>=1.0.0'
                 ]
 
 setuptools.setup(
     name="ewstools",
-    version="1.0.1",
+    version="2.0.0",
     author="Thomas M Bury",
     author_email="tombury182@gmail.com",
     description="""Python package to compute early warning signals (EWS) 
