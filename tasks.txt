@@ -1,6 +1,0 @@
-
-->  Write a TypeError for ews_compute to make sure that it receives a pandas Series.
-
--> Create a demo notebook for using bootstrapping functionality
-
-
