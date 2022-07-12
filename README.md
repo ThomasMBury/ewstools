@@ -13,8 +13,7 @@
 
 - [Overview](#overview)
 - [Repo Contents](#repo-contents)
-- [System Requirements](#system-requirements)
-- [Installation Guide](#installation-guide)
+- [Installation Guide](#install)
 - [Tutorials](#tutorials)
 - [Documentation](#documentation)
 - [License](./LICENSE)
@@ -55,35 +54,21 @@ Current functionality of *ewstools* includes
 - [tests](./tests): unit tests
 - [saved_classifiers](./saved_classifiers): pre-trained Tensorflow bifurcation classifiers
 
-## System Requirements
+## Install
 
-### Hardware Requirements
-
-*ewstools* can run on a standard computer with enough RAM to support the operations defined by a user. The software has been tested on a computer with the following specs
-
-RAM: 8G, CPU: 2.7 GHz
-
-though the software should run as expected on computers with lower RAM. The runtimes outlined below were generated on the computer with these specs.
-
-### Software Requirements
-
-Requires Python 3.7 or higher and has package dependencies listed in [requiements_dev.txt](https://github.com/ThomasMBury/ewstools/requirements_dev.txt). The Python package should be compatible with Windows, Mac, and Linux operating systems. The demos require Jupyter notebook.
-
-
-## Installation Guide
-
-Instructions for downloading Python 3 on Linux, Mac OS and Windows are available [here](https://realpython.com/installing-python/).
-
-*ewstools* may then be installed using pip with the following command:
+You can install *ewstools* with pip using the commands
 
 ```
+pip install --upgrade pip
 pip install ewstools
 ```
-which should install all package dependencies. To run and interact with the tutorials, Jupyter notebook is required, which can be installed using
+
+[Jupyter notebook](https://jupyter.org/install) is required for the tutorials, and can be installed with the command
 ```
 pip install jupyter notebook
 ```
-To install the latest development version of *ewstools*, use the command
+
+To install the latest *development* version, use the command
 ```
 pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
 ```
@@ -91,7 +76,7 @@ Note, the development version comes with the risk of undergoing continual change
 
 ## Tutorials
 
-For tutorials/demonstrations on using *ewstools*, please refer to these [iPython notebooks](./tutorials).
+A good place to start is with the [tutorials](./tutorials), written as iPython notebooks.
 
 ## Documentation
 
