@@ -5,19 +5,7 @@
 [![codecov](https://codecov.io/gh/ThomasMBury/ewstools/branch/main/graph/badge.svg?token=Q5LGRV6TLF)](https://codecov.io/gh/ThomasMBury/ewstools)
 
 # ewstools
-**A python package for early warning signals (EWS) of bifurcations in time series data.**
-
-## Contents
-
-- [Overview](#overview)
-- [Repo Contents](#repo-contents)
-- [Installation Guide](#install)
-- [Tutorials](#tutorials)
-- [Documentation](#documentation)
-- [License](./LICENSE)
-- [Issues](#issues)
-- [Acknowledgements](#acknowledgements)
-
+**A Python package for early warning signals (EWS) of bifurcations in time series data.**
 
 ## Overview
 
@@ -44,14 +32,6 @@ Current functionality of *ewstools* includes
   - Visualisation tools to display EWS.
 
 
-## Repo Contents
-
-- [tutorials](./tutorials): Jupyter notebooks to demonstrate methods - a good place to start
-- [docs](./docs): documentation source code running with ReadTheDocs
-- [ewstools](./ewstools): source code
-- [tests](./tests): unit tests
-- [saved_classifiers](./saved_classifiers): pre-trained Tensorflow bifurcation classifiers
-
 ## Install
 
 You can install *ewstools* with pip using the commands
@@ -65,16 +45,31 @@ pip install ewstools
 ```
 pip install jupyter notebook
 ```
+Package dependencies of *ewstools* are
+```
+'pandas>=1.2.0',
+'numpy>=1.20.0',
+'plotly>=5.3.0',
+'lmfit>=0.9', 
+'arch>=4.7',
+'statsmodels>=0.12.0',
+'scipy>=1.5.0',
+```
+and are should be installed automaticaly with the above commands. To use any of the deep learning functionality, you will also need to install [TensorFlow](https://www.tensorflow.org/install) v2.0.0 or later.
 
-To install the latest *development* version, use the command
+To install the latest *development* version of *ewstools*, use the command
 ```
 pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
 ```
-Note, the development version comes with the risk of undergoing continual changes, and has not undergone the level of scrutiny of official releases.
+NB: the development version comes with the risk of undergoing continual changes, and has not undergone the level of scrutiny of official releases.
 
-## Tutorials
 
-A good place to start is with the [tutorials](./tutorials), written as iPython notebooks.
+## Tutorials/Demonstrations
+
+1. [ewstools: An Introduction](./tutorials/tutorial_intro.ipynb)
+2. [ewstools: Computing Spectral EWS](./tutorials/tutorial_spectral.ipynb)
+3. [ewstools: Deep Learning Classifiers](./tutorials/tutorial_deep_learning.ipynb)
+
 
 ## Documentation
 
