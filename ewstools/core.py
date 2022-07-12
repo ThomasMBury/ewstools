@@ -53,6 +53,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
+# For deprecating old functions
+import deprecation
 
 
 # ---------------
@@ -757,8 +759,8 @@ class TimeSeries:
 
             ## Put spectrum fits into a dataframe
             dict_fits = {
-                "time": time * np.ones(len(wVals)),
-                "frequency": wVals,
+                'time': time * np.ones(len(wVals)),
+                'frequency': wVals,
                 "fit fold": pspec_fold,
                 "fit hopf": pspec_hopf,
                 "fit null": pspec_null,
@@ -819,7 +821,7 @@ class TimeSeries:
         # Make Plotly subplots frame
         fig = make_subplots(rows=num_rows, cols=1, 
                             shared_xaxes=True,
-                            x_title='Time',
+                            x_title='time',
                             vertical_spacing=0.02
                             )
         
@@ -1034,11 +1036,15 @@ class TimeSeries:
 
 
 
-
 # ---------------
 # Functions
 # ---------------
 
+
+@deprecation.deprecated(deprecated_in="2.0", removed_in="2.1",
+                        current_version="2.0",
+                        details="Please use the ewstools.TimeSeries object and its associated methods to compute EWS instead. A tutorial on how to do so is provided in the tutorial_info ipython notebook at https://github.com/ThomasMBury/ewstools/tree/main/tutorials."
+                        )
 
 def ews_compute(
     raw_series,
@@ -1127,7 +1133,7 @@ def ews_compute(
     # Initialise a DataFrame to store EWS data - indexed by time
     df_ews = pd.DataFrame(raw_series)
     df_ews.columns = ["State variable"]
-    df_ews.index.rename("Time", inplace=True)
+    df_ews.index.rename('time', inplace=True)
 
     # Select portion of data where EWS are evaluated (e.g only up to bifurcation)
     if upto == "Full":
@@ -1270,14 +1276,14 @@ def ews_compute(
                 columns={"Power spectrum": "Empirical"}, inplace=True
             )
             # Include a column for the time-stamp
-            df_pspec_empirical["Time"] = t_point * np.ones(len(pspec))
-            # Use a multi-index of ['Time','Frequency']
-            df_pspec_empirical.set_index(["Time", "Frequency"], inplace=True)
+            df_pspec_empirical['time'] = t_point * np.ones(len(pspec))
+            # Use a multi-index of ['time','Frequency']
+            df_pspec_empirical.set_index(['time', 'frequency'], inplace=True)
 
             ## Compute the spectral EWS using pspec_metrics (dictionary)
             metrics = helpers.pspec_metrics(pspec, ews, aic, sweep)
             # Add the time-stamp
-            metrics["Time"] = t_point
+            metrics['time'] = t_point
             # Add metrics (dictionary) to the list
             list_metrics_append.append(metrics)
 
@@ -1307,8 +1313,8 @@ def ews_compute(
 
                 ## Put spectrum fits into a dataframe
                 dic_temp = {
-                    "Time": t_point * np.ones(len(wVals)),
-                    "Frequency": wVals,
+                    'time': t_point * np.ones(len(wVals)),
+                    'frequency': wVals,
                     "Fit fold": pspec_fold,
                     "Fit flip": pspec_flip,
                     "Fit hopf": pspec_hopf,
@@ -1316,7 +1322,7 @@ def ews_compute(
                 }
                 df_pspec_fits = pd.DataFrame(dic_temp)
                 # Set the multi-index
-                df_pspec_fits.set_index(["Time", "Frequency"], inplace=True)
+                df_pspec_fits.set_index(['time', 'frequency'], inplace=True)
 
             # Concatenate empirical PS with fits
             df_pspec_temp = (
@@ -1332,7 +1338,7 @@ def ews_compute(
 
         # Create a DataFrame out of the multiple dictionaries consisting of the spectral metrics
         df_spec_metrics = pd.DataFrame(list_metrics_append)
-        df_spec_metrics.set_index("Time", inplace=True)
+        df_spec_metrics.set_index('time', inplace=True)
 
         # Join the spectral EWS DataFrame to the main EWS DataFrame
         df_ews = df_ews.join(df_spec_metrics)
@@ -1404,7 +1410,6 @@ def ews_compute(
 # -----------------------------
 # Eigenvalue reconstruction
 # ------------------------------
-
 
 def eval_recon_rolling(
     df_in,
@@ -1525,13 +1530,13 @@ def eval_recon_rolling(
         # Do eigenvalue reconstruction on residuals
         dic_eval_recon = helpers.eval_recon(df_window)
         # Add time component
-        dic_eval_recon["Time"] = t_point
+        dic_eval_recon['time'] = t_point
         # Add them to list
         list_evaldata.append(dic_eval_recon)
 
     # Create dataframe from list of dicts of eval data
     df_evaldata = pd.DataFrame(list_evaldata)
-    df_evaldata.set_index("Time", inplace=True)
+    df_evaldata.set_index('time', inplace=True)
 
     # Create output dataframe that merges all useful info
     df_out = pd.concat(
@@ -1590,7 +1595,7 @@ def block_bootstrap(series, n_samples, bs_type="Stationary", block_size=10):
         for data in bs.bootstrap(n_samples):
 
             df_temp = pd.DataFrame(
-                {"sample": count, "time": series.index.values, "x": data[0][0]}
+                {"sample": count, 'time': series.index.values, "x": data[0][0]}
             )
             list_samples.append(df_temp)
             count += 1
@@ -1603,14 +1608,14 @@ def block_bootstrap(series, n_samples, bs_type="Stationary", block_size=10):
         for data in bs.bootstrap(n_samples):
 
             df_temp = pd.DataFrame(
-                {"sample": count, "time": series.index.values, "x": data[0][0]}
+                {"sample": count, 'time': series.index.values, "x": data[0][0]}
             )
             list_samples.append(df_temp)
             count += 1
 
     # Concatenate list of samples
     df_samples = pd.concat(list_samples)
-    df_samples.set_index(["sample", "time"], inplace=True)
+    df_samples.set_index(["sample", 'time'], inplace=True)
 
     # Output DataFrame of samples
     return df_samples
@@ -1711,14 +1716,16 @@ def roll_bootstrap(
 
         # Compute bootstrap samples of residauls within rolling window
         df_samples_temp = block_bootstrap(window_series, n_samples, bs_type, block_size)
-
+        df_samples_temp.reset_index(inplace=True)
+        df_samples_temp['wintime'] = df_samples_temp['time']
+        
         # Add column with real time (end of window)
-        df_samples_temp["Time"] = t_point
+        df_samples_temp['time'] = t_point
 
         # Reorganise index
+        
         df_samples_temp.reset_index(inplace=True)
-        df_samples_temp.set_index(["Time", "sample", "time"], inplace=True)
-        df_samples_temp.index.rename(["Time", "Sample", "Wintime"], inplace=True)
+        df_samples_temp.set_index(['time', "sample", 'wintime'], inplace=True)
 
         # Append the list of samples
         list_samples.append(df_samples_temp)
