@@ -198,7 +198,6 @@ def test_TimeSeries_spec_ews():
 
 
 
-
 # def test_ews_compute():
 #     """
 #     Run a time-series through ews_compute and check everything is
