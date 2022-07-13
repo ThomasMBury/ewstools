@@ -36,17 +36,17 @@ Current functionality of *ewstools* includes
 
 You can install *ewstools* with pip using the commands
 
-```
+```bash
 pip install --upgrade pip
 pip install ewstools
 ```
 
 [Jupyter notebook](https://jupyter.org/install) is required for the tutorials, and can be installed with the command
-```
+```bash
 pip install jupyter notebook
 ```
 Package dependencies of *ewstools* are
-```
+```bash
 'pandas>=1.2.0',
 'numpy>=1.20.0',
 'plotly>=5.3.0',
@@ -58,10 +58,12 @@ Package dependencies of *ewstools* are
 and are should be installed automaticaly with the above commands. To use any of the deep learning functionality, you will also need to install [TensorFlow](https://www.tensorflow.org/install) v2.0.0 or later.
 
 To install the latest *development* version of *ewstools*, use the command
-```
+```bash
 pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
 ```
 NB: the development version comes with the risk of undergoing continual changes, and has not undergone the level of scrutiny of official releases.
+
+
 
 
 ## Tutorials/Demonstrations
@@ -71,15 +73,52 @@ NB: the development version comes with the risk of undergoing continual changes,
 3. [ewstools: Deep Learning Classifiers](./tutorials/tutorial_deep_learning.ipynb)
 
 
+
+## Quick demo
+
+First we need to import *ewstools* and collect the data we wish to analyse. Here we will run a simulation of the Ricker model, one of the model functions stored in [`ewstools.models`](https://ewstools.readthedocs.io/en/latest/ewstools.html#ewstools-models-submodule).
+```python
+import ewstools
+from ewstools.models import simulate_ricker
+series = simulate_ricker(tmax=500, F=[0,2.7])
+series.plot();
+```
+![](tutorials/readme/series.png)
+
+We then make a [`TimeSeries`](https://ewstools.readthedocs.io/en/latest/ewstools.html#ewstools.core.TimeSeries) object, which takes in our data and a transition time (if desired). EWS are not computed beyond the transition time.
+
+```python
+ts = ewstools.TimeSeries(data=series, transition=440)
+```
+
+We can then detrend, compute EWS and calculate Kendall tau statistics by applying methods to the [`TimeSeries`](https://ewstools.readthedocs.io/en/latest/ewstools.html#ewstools.core.TimeSeries) object:
+
+```python
+ts.detrend(method='Lowess', span=0.2)
+ts.compute_var(rolling_window=0.5)
+ts.compute_auto(lag=1, rolling_window=0.5)
+ts.compute_auto(lag=2, rolling_window=0.5)
+ts.compute_ktau()
+```
+
+Finally, we can view output as an interactive Plotly figure (when run in a Jupyter notebook) using
+
+```python
+ts.make_plotly()
+```
+
+![](tutorials/readme/ews.png)
+
+More detailed demonstrations can be found in the tutorials, and all methods are listed in the documentation.
+
 ## Documentation
 
-Documentation available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
+Available on [ReadTheDocs](https://ewstools.readthedocs.io/en/latest/).
 
 ## Issues
 
-If you run have any suggestions or spot any bugs with the package, please post on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues)! I also welcome any contributions - please get in touch if you are interested, or submit a pull request if you are familiar with that process.
+If you have any suggestions or find any bugs, please post them on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues). I also welcome any contributions - please get in touch if you are interested, or submit a pull request if you are familiar with that process.
 
 ## Acknowledgements
 
-This work is supported by an FRQNT (Fonds de recherche du Québec - Nature et Technologies) postdoctoral research scholarship awarded to Thomas Bury. 
-
+This work is currently supported by an FRQNT (Fonds de recherche du Québec - Nature et Technologies) postdoctoral research scholarship awarded to Dr. Thomas Bury. In the past, it was supported by NSERC (Natural Sciences and Engineering Research Council) Discovery Grants awarded to Dr. Chris Bauch and Dr. Madhur Anand.

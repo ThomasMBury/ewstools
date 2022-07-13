@@ -822,7 +822,7 @@ class TimeSeries:
         # Make Plotly subplots frame
         fig = make_subplots(rows=num_rows, cols=1, 
                             shared_xaxes=True,
-                            x_title='time',
+                            x_title='Time',
                             vertical_spacing=0.02
                             )
         
