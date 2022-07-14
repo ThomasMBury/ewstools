@@ -240,7 +240,7 @@ def test_ews_compute():
         "smax/var",
         "smax/mean",
     ]
-    aic = ["Fold", "Hopf", "Null", "Flip"]
+    aic = ["Fold", "Hopf", "Null"]
     lag_times = [1, 2, 3, 4, 5]
     dict_ews = core.ews_compute(
         series, ews=ews, aic=aic, lag_times=lag_times, sweep=True, ktau_time=5.232
