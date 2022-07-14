@@ -15,7 +15,7 @@ The goal of this Python package is to provide a user-friendly toolbox for comput
 
 Current functionality of *ewstools* includes
 
-  - Detrending of time series using
+  - Time series detrending methods using
     - A Gaussian kernel
     - LOWESS (Locally Weighted Scatterplot Smoothing)
 
@@ -23,13 +23,15 @@ Current functionality of *ewstools* includes
     - Variance and associated metrics (standard deviation, coefficient of variation)
     - Autocorrelation (at specified lag times)
     - Higher-order statistical moments (skewness, kurtosis)
-    - Power spectrum and associated metrics (maximum frequency, coherence factor, AIC weights csp. to canonical power spectrum forms)
+    - Power spectrum and associated metrics
 
-  - Application of deep learning classifiers for bifurcation prediction as in the study by [Bury et al.](https://www.pnas.org/doi/10.1073/pnas.2106140118).
-
-  - Block-bootstrapping of time-series to obtain confidence bounds on EWS estimates
+  - Computation of Kendall tau values to quantify trends
   
-  - Visualisation tools to display EWS.
+  - Application of deep learning classifiers for bifurcation prediction as in [Bury et al. (2022) PNAS](https://www.pnas.org/doi/10.1073/pnas.2106140118).
+
+  - Block-bootstrapping of time-series to obtain confidence intervals on EWS estimates
+  
+  - Visualisation tools to display output
 
 
 ## Install
