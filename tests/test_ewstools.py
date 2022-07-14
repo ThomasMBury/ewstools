@@ -46,7 +46,6 @@ def test_TimeSeries_init():
     # Create TimeSeries object using list
     ts = ewstools.TimeSeries(list(xVals))
     assert type(ts.state) == pd.DataFrame
-    assert ts.state.index.name == 'time'        
     
     # Create TimeSeries object using pd.Series
     data = pd.Series(xVals, index=tVals)
@@ -79,6 +78,8 @@ def test_TimeSeries_ews():
     xVals = 5 + np.random.normal(0, 1, len(tVals))
     data = pd.Series(xVals, index=tVals)
     ts = ewstools.TimeSeries(data, transition=80)
+    ts2 =  ewstools.TimeSeries(data) # time series without a transition
+    
     
     # Compute EWS without detrending
     rolling_window = 0.5
@@ -93,6 +94,22 @@ def test_TimeSeries_ews():
     assert 'variance' in ts.ews.columns
     assert 'ac5' in ts.ews.columns
     assert 'cv' in ts.ews.columns
+    
+    
+    # Compute EWS on time series without transition
+    rolling_window = 0.5
+    ts2.compute_var(rolling_window=rolling_window)
+    ts2.compute_std(rolling_window=rolling_window)
+    ts2.compute_cv(rolling_window=rolling_window)
+    ts2.compute_auto(lag=1, rolling_window=rolling_window)
+    ts2.compute_auto(lag=5, rolling_window=rolling_window)
+    ts2.compute_skew(rolling_window=rolling_window)
+    ts2.compute_kurt(rolling_window=rolling_window)
+    assert type(ts2.ews) == pd.DataFrame
+    assert 'variance' in ts2.ews.columns
+    assert 'ac5' in ts2.ews.columns
+    assert 'cv' in ts2.ews.columns    
+    
     
     # Detrend data using Gaussian and Lowess filter
     ts.detrend('Gaussian', bandwidth=0.2)
@@ -125,7 +142,6 @@ def test_TimeSeries_ews():
     # Make plotly fig
     fig = ts.make_plotly()
     assert type(fig)==plotly.graph_objs._figure.Figure
-
 
 
 
