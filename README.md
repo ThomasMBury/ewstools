@@ -103,7 +103,7 @@ ts.compute_auto(lag=2, rolling_window=0.5)
 ts.compute_ktau()
 ```
 
-Finally, we can view output as an interactive Plotly figure (when run in a Jupyter notebook) using
+Finally, we can view output as an interactive [Plotly](https://plotly.com/python/) figure (when run in a Jupyter notebook) using
 
 ```python
 ts.make_plotly()
