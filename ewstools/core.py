@@ -485,6 +485,10 @@ class TimeSeries:
         df_ews = self.ews[(self.ews.index >= tmin) &\
                           (self.ews.index <= tmax)].copy()
         
+        # Include smax in Kendall tau computation if it exists
+        if 'smax' in self.ews_spec.columns:
+            df_ews = df_ews.join(self.ews_spec['smax'])
+            
         # Make a series with the time values
         time_values = pd.Series(data=df_ews.index, index=df_ews.index)
         ktau_out = df_ews.corrwith(time_values, method="kendall", axis=0)
