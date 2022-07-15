@@ -49,6 +49,8 @@ from scipy.ndimage import gaussian_filter as gf
 # Import functions from other files in package
 import ewstools.helpers as helpers
 
+# Plotly modules for visualisation
+import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -818,7 +820,7 @@ class TimeSeries:
 
 
 
-    def make_plotly(self, kendall_tau=True):
+    def make_plotly(self, kendall_tau=True, ens_avg=False):
         '''
         Make an interactive Plotly figure to view all EWS computed
 
@@ -828,6 +830,9 @@ class TimeSeries:
         kendall_tau : bool, optional
             Set as true to show Kendall tau values (if they have been computed)
             Default is True.
+        ens_avg : bool, optional
+            Plot the ensenble average of DL predictions. 
+            Default is False.
 
         Returns
         -------
@@ -835,6 +840,8 @@ class TimeSeries:
 
         '''
         
+        # Trace colours
+        colours = px.colors.qualitative.Plotly
         # Count number of panels for Plotly subplots
         row_count = 0
         # Always a row for state varialbe
@@ -1046,28 +1053,57 @@ class TimeSeries:
                     )  
                 
             fig.update_yaxes(title='AIC weights', row=row_count)
-                          
+                       
+            
                         
         # Plot DL predictions if computed
-        class_labels = [s for s in self.dl_preds.columns if s not in ['time', 'classifier']]
-        if len(class_labels)>0:
+        if len(self.dl_preds)>0:
             row_count += 1
-            for class_label in class_labels:
-                fig.add_trace(
-                    go.Scatter(x=self.dl_preds['time'].values,
-                               y=self.dl_preds[class_label].values,
-                               name='DL pred {}'.format(class_label),
-                               ),
-                    row=row_count, col=1
-                    )
-                
+            class_labels = [s for s in self.dl_preds.columns if s not in ['time', 'classifier']]
+            classifiers = self.dl_preds['classifier'].unique()
+            
+            # If plotting predictions from every classifier
+            if not ens_avg:
+                # Loop through class labels and classifier names
+                for idx, class_label in enumerate(class_labels):
+                    for idx2, classifier in enumerate(classifiers):
+                        df_plot = self.dl_preds[self.dl_preds['classifier']==classifier]
+                        fig.add_trace(
+                            go.Scatter(x=df_plot['time'].values,
+                                       y=df_plot[class_label].values,
+                                       name='DL class {}'.format(class_label),
+                                       legendgroup='DL class {}'.format(class_label),
+                                       showlegend=True if idx2==0 else False,
+                                       line=dict(color=colours[idx])
+                                       ),
+                            row=row_count, col=1
+                            )
+                        
+            # If plotting ensemble average over classifiers
+            else:
+                df_plot = self.dl_preds.groupby(['time']).mean().reset_index()
+                # Loop through class labels
+                for idx, class_label in enumerate(class_labels):
+                    fig.add_trace(
+                        go.Scatter(x=df_plot['time'].values,
+                                   y=df_plot[class_label].values,
+                                   name='DL class {}'.format(class_label),
+                                   line=dict(color=colours[idx])
+                                   ),
+                        row=row_count, col=1
+                        )    
+                    
             fig.update_yaxes(title='DL predictions', row=row_count)
-                          
+                              
+
+
 
         # Set figure dimensions 
         fig.update_layout(height=200*num_rows,
                           width=800)
-
+        
+        # Separation between legend entries
+        fig.layout.legend.tracegroupgap = 0
 
         return fig
 
