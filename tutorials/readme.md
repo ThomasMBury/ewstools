@@ -1,17 +1,31 @@
 # Tutorials
 **A collection of iPython notebooks to demonstrate various applications of *ewstools*.**
 
-To run and interact with these tutorials and demos, Jupyter notebook must be installed on your system, which can be found [here](https://jupyter.org/install).
+To run these tutorials, [Jupyter notebook](https://jupyter.org/install) must be installed. Tutorial 1 is a prerequisite to all later tutorials.
 
-I recommend starting with *tutorial_intro.ipynb*. Tutorials for other features are in progress.
+### 1. Introduction to *ewstools* (tutorial_intro.ipynb)
 
-### tutorial_intro.ipynb
+- Initialise a TimeSeries object with your data
+- Detrend your data using a specific filter and bandwidth
+- Compute CSD-based early warning signals (EWS) over a rolling window
+- Measure the trend of the EWS with Kendall tau values
+- Visualise output
 
-- Introduction to the object-oriented version of *ewstools* and the TimeSeries class.
-- Detrending using Gaussian and Lowess filters
-- Computing CSD-based early warning signals
-- Applying deep learning classifiers to predict a bifurcation and its type
-- Visualsing output from *ewstools*.
+### 2. Spectral EWS (tutorial_spectral.ipynb)
+
+- Compute and visualise changes in the power spectrum over a rolling window
+- Compute spectral early warning signals as in [Bury et al. (2020) Royal Soc. Interface](https://royalsocietypublishing.org/doi/full/10.1098/rsif.2020.0482)
+
+### 3. Deep learning classifiers for bifurcation prediction (tutorial_deep_learning.ipynb)
+
+- Import a TensorFlow classifier and obtain its predictions on a section of time series data
+- Compute predictions made from an ensemble of classifiers
+
+
+
+## Old tutorials
+
+These old tutorials use deprecated functions that will be removed in future versions of *ewstools*.
 
 ### ews_fold.ipynb - Deprecated (uses deprecated functions in ewstools)
 - Simulates a single stochastic trajectory of the Ricker model going through a Fold bifurcation

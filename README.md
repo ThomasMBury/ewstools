@@ -70,9 +70,9 @@ NB: the development version comes with the risk of undergoing continual changes,
 
 ## Tutorials/Demonstrations
 
-1. [ewstools: An Introduction](./tutorials/tutorial_intro.ipynb)
-2. [ewstools: Computing Spectral EWS](./tutorials/tutorial_spectral.ipynb)
-3. [ewstools: Deep Learning Classifiers](./tutorials/tutorial_deep_learning.ipynb)
+1. [Introduction to *ewstools*](./tutorials/tutorial_intro.ipynb)
+2. [Spectral EWS](./tutorials/tutorial_spectral.ipynb)
+3. [Deep learning classifiers for bifurcation prediction](./tutorials/tutorial_deep_learning.ipynb)
 
 
 

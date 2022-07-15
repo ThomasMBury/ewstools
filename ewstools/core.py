@@ -495,26 +495,27 @@ class TimeSeries:
         self.ktau = dict(ktau_out)
         
 
-    def apply_classifier(self, classifier, tmin='earliest', tmax='latest', 
-                        name='classifier1', verbose=1):
+    def apply_classifier(self, classifier, tmin, tmax, 
+                        name='c1', verbose=1):
         '''
-        Compute predictions from a deep learning classifier.
+        Apply a deep learning classifier to the residual time series from
+        tmin to tmax. 
+        If time series has not been detrended, apply to the raw data.
+        Predictions from the classifier are saved into the attribute dl_preds.
 
         Parameters
         ----------
         classifier : keras.engine.sequential.Sequential
             Tensorflow classifier
-        tmin : float or 'earliest'
-            Start of time series segment fed into classifier. If 'earliest', then
-            time is taken as first point in TimeSeries.
-        tmax : float or 'latest'
-            End of time series segment fed into classifier. If 'latest' 
-            then time is taken as last point, or transition point (if defined)
-            in TimeSeries.       
-        name : str
-            Name assigned to the classifier
-        verbose : int
+        tmin : float
+            Earliest time in time series segment
+        tmax : float
+            Latest time in time series segment    
+        name : str, optional
+            Name assigned to the classifier. The default is 'c1'.
+        verbose : int, optional
             Verbosity of update messages from TensorFlow. 0 = silent, 1 = progress bar, 2 = single line.
+            The default is 1.
         
         Returns
         -------
@@ -524,13 +525,6 @@ class TimeSeries:
         
         # Length of time series required as input to classifier
         input_len = classifier.layers[0].input_shape[1]
-        
-        # Get tmin and tmax values if using extrema
-        if tmin == 'earliest':
-            tmin = self.state.index[0]
-        
-        if tmax == 'latest':
-            tmax = self.transition if self.transition else self.state.index[-1]   
         
         # Get time series segment. Use residuals if detrending performed.
         # Otherwise use state variable.
@@ -563,6 +557,47 @@ class TimeSeries:
 
         # Append to dataframe contiaining DL predictions
         self.dl_preds = pd.concat([self.dl_preds, df_dl_pred], ignore_index=True)
+
+
+
+    def apply_classifier_inc(self, classifier, inc=10, name='c1', verbose=1):
+        '''
+        Apply a deep learning classifier to incrementally increasing time
+        series lengths. First prediction is made on time series segment from
+        data point at index 0 to data point at index inc. Second prediction
+        is made on time series segment from 0 to 2*inc. Third prediction is
+        made on time series segment from 0 to 3*inc. Etc.
+
+        Parameters
+        ----------
+        classifier : keras.engine.sequential.Sequential
+            TensorFlow classifier.
+        inc : int, optional
+            Incrment to length of time series upon each DL prediction.
+            The default is 10.
+        name : str, optional
+            Name assigned to the classifier. The default is 'c1'.
+        verbose : int, optional
+            Verbosity of update messages from TensorFlow. 
+            0 = silent, 1 = progress bar, 2 = single line.
+            The default is 1.
+
+        Returns
+        -------
+        None.
+
+        '''
+        
+        tmin = self.state.index[0]
+        tend = self.state.index[-1] if not self.transition else self.transition
+        
+        # Tmax values for each time series segment
+        tmax_vals = np.arange(tmin, tend, inc)
+        for tmax in tmax_vals:
+            self.apply_classifier(classifier, name=name, tmin=tmin, tmax=tmax, 
+                                verbose=verbose)
+    
+    
 
 
     def clear_dl_preds(self):
