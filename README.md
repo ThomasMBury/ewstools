@@ -33,6 +33,8 @@ Current functionality of *ewstools* includes
   
   - Visualisation tools to display output
 
+*ewstools* makes use of [pandas](https://pandas.pydata.org/) for dataframe handling, [numpy](https://numpy.org/) for fast numerical computing, [plotly](https://plotly.com/graphing-libraries/) for visuliastion, [lmfit](https://lmfit.github.io/lmfit-py/) for least-squares minimisation, [arch](https://github.com/bashtage/arch) for bootstrapping methods, [statsmodels](https://www.statsmodels.org/stable/index.html) and [scipy](https://scipy.org/) for detrending methods, and [TensorFlow](https://www.tensorflow.org/install) for deep learning.
+
 
 ## Install
 
@@ -124,3 +126,13 @@ If you have any suggestions or find any bugs, please post them on the [issue tra
 ## Acknowledgements
 
 This work is currently supported by an FRQNT (Fonds de recherche du Québec - Nature et Technologies) postdoctoral research scholarship awarded to Dr. Thomas Bury. In the past, it was supported by NSERC (Natural Sciences and Engineering Research Council) Discovery Grants awarded to Dr. Chris Bauch and Dr. Madhur Anand.
+
+## Citation info
+
+If your research uses the deep learning functionality of *ewstools*, please cite
+
+Bury, Thomas M., et al. "[Deep learning for early warning signals of tipping points.](https://www.pnas.org/doi/abs/10.1073/pnas.2106140118)" *Proceedings of the National Academy of Sciences* 118.39 (2021): e2106140118.
+
+If your research computes spectral EWS using *ewstools*, please cite
+
+Bury, Thomas M., Chris T. Bauch, and Madhur Anand. "[Detecting and distinguishing tipping points using spectral early warning signals.](https://royalsocietypublishing.org/doi/full/10.1098/rsif.2020.0482)" *Journal of the Royal Society Interface* 17.170 (2020): 20200482.
