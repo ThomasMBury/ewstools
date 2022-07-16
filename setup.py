@@ -3,13 +3,13 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-requirements = ['pandas>=1.2.0',
-                'numpy>=1.20.0',
-                'plotly>=5.3.0',
-                'lmfit>=0.9', 
-                'arch>=4.7',
-                'statsmodels>=0.12.0',
-                'scipy>=1.5.0',
+requirements = ['pandas>=0.23.0',
+                'numpy>=1.14.0',
+                'plotly>=2.3.0',
+                'lmfit>=0.9.0', 
+                'arch>=4.4',
+                'statsmodels>=0.9.0',
+                'scipy>=1.0.1',
                 'deprecation>=2.0',
                 ]
 
