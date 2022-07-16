@@ -163,22 +163,31 @@ def test_TimeSeries_dl_preds():
     # Import a classifier
     classifier_path = 'saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.pkl'
     classifier = load_model(classifier_path)
-    
-    # Apply classifier without time bounds
-    ts.apply_classifier(classifier, name='c1')    
 
     # Apply classifier with time bounds
     ts.apply_classifier(classifier, name='c1', tmin=1, tmax=5)    
-
     assert type(ts.dl_preds) == pd.DataFrame
     assert 'time' in ts.dl_preds.columns
     assert 'classifier' in ts.dl_preds.columns
+    
+    # Apply classifier many times on incrementally longer segments of time series
+    ts.clear_dl_preds()
+    ts.apply_classifier_inc(classifier, inc=40, name='c1', verbose=1)
     
     # Make plotly fig
     fig = ts.make_plotly()
     assert type(fig)==plotly.graph_objs._figure.Figure
 
+    # Import and apply a second classifier
+    classifier_path = 'saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.pkl'
+    classifier2 = load_model(classifier_path)
+    ts.apply_classifier_inc(classifier2, inc=40, name='c2', verbose=1)
 
+    # Make plotly fig using ensemble average
+    fig = ts.make_plotly(ens_avg=True)
+    assert type(fig)==plotly.graph_objs._figure.Figure
+    
+    
 
 def test_TimeSeries_spec_ews():
     '''

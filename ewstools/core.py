@@ -575,7 +575,7 @@ class TimeSeries:
         classifier : keras.engine.sequential.Sequential
             TensorFlow classifier.
         inc : int, optional
-            Incrment to length of time series upon each DL prediction.
+            Increment to tmax (the end time of each time series segment) after each classification.
             The default is 10.
         name : str, optional
             Name assigned to the classifier. The default is 'c1'.
