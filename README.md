@@ -51,13 +51,13 @@ pip install jupyter notebook
 ```
 Package dependencies of *ewstools* are
 ```bash
-'pandas>=1.2.0',
-'numpy>=1.20.0',
-'plotly>=5.3.0',
-'lmfit>=0.9', 
-'arch>=4.7',
-'statsmodels>=0.12.0',
-'scipy>=1.5.0',
+'pandas>=0.23.0',
+'numpy>=1.14.0',
+'plotly>=2.3.0',
+'lmfit>=0.9.0', 
+'arch>=4.4',
+'statsmodels>=0.9.0',
+'scipy>=1.0.1',
 ```
 and should be installed automatically. To use any of the deep learning functionality, you will need to install [TensorFlow](https://www.tensorflow.org/install) v2.0.0 or later.
 
