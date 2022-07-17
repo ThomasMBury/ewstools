@@ -70,7 +70,7 @@ NB: the development version comes with the risk of undergoing continual changes,
 
 
 
-## Tutorials/Demonstrations
+## Tutorials
 
 1. [Introduction to *ewstools*](./tutorials/tutorial_intro.ipynb)
 2. [Spectral EWS](./tutorials/tutorial_spectral.ipynb)
