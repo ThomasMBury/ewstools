@@ -129,6 +129,8 @@ This work is currently supported by an FRQNT (Fonds de recherche du Québec - Na
 
 ## Citation info
 
+If you like the respoitory, please give it a star :D
+
 If your research uses the deep learning functionality of *ewstools*, please cite
 
 Bury, Thomas M., et al. "[Deep learning for early warning signals of tipping points.](https://www.pnas.org/doi/abs/10.1073/pnas.2106140118)" *Proceedings of the National Academy of Sciences* 118.39 (2021): e2106140118.
