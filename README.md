@@ -9,9 +9,9 @@
 
 ## Overview
 
-Many systems across nature and society have the capacity to undergo an abrupt and profound change in their dynamics. From a dynamical systemes perspective, these changes corresopond to bifurcations, which carry some generic features that can be picked up on in time series data ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). Two commonly used metrics include variance and lag-1 autocorrelation, though there exist many others (see e.g. [Clements & Ozgul 2018](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). More recently, deep learning methods have been developed to provide early warning signals, whilst also signalling the type of bifurcation approaching [(Bury et al. 2021)](https://www.pnas.org/doi/10.1073/pnas.2106140118).
+Many systems across nature and society have the capacity to undergo an abrupt and profound change in their dynamics. From a dynamical systemes perspective, these events are often associated with the crossing of a bifurcation. Early warning signals (EWS) for bifurcations are therefore in high demand. Two commonly used EWS for bifurcations are variance and lag-1 autocorrelation, that are expected to increase prior to many bifurcations due to critical slowing down ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). There now exist a wealth of other EWS based on changes in time series dynamics that are expected to occur prior to bifurcations (see e.g. [Clements & Ozgul 2018](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). More recently, deep learning classifiers have trained and applied to detect bifurcations, with promising results ([Bury et al. 2021](https://www.pnas.org/doi/10.1073/pnas.2106140118)).
 
-The goal of this Python package is to provide a user-friendly toolbox for computing early warning signals in time series data. It complements an existing early warning signals package in R ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)). We hope that having an early warning signal toolbox in Python will allow for additional testing, and appeal to those who primarily work in Python. I will try to keep it updated with the latest methods.
+The goal of this Python package is to provide a an accessible toolbox for computing, analysing and visulaising EWS in time series data. It complements an existing EWS package in R ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)). We hope that having an EWS toolbox in Python will allow for additional testing, and appeal to those who primarily work in Python.
 
 Current functionality of *ewstools* includes
 
@@ -125,9 +125,11 @@ If you have any suggestions or find any bugs, please post them on the [issue tra
 
 ## Acknowledgements
 
-This work is currently supported by an FRQNT (Fonds de recherche du Québec - Nature et Technologies) postdoctoral research scholarship awarded to Dr. Thomas Bury. In the past, it was supported by NSERC (Natural Sciences and Engineering Research Council) Discovery Grants awarded to Dr. Chris Bauch and Dr. Madhur Anand.
+This work is currently supported by an FRQNT (Fonds de recherche du Québec - Nature et Technologies) postdoctoral research scholarship awarded to Dr. Thomas Bury. In the past, it has also been supported by NSERC (Natural Sciences and Engineering Research Council) Discovery Grants awarded to Dr. Chris Bauch and Dr. Madhur Anand.
 
 ## Citation info
+
+If you like the respoitory, please give it a star :D
 
 If your research uses the deep learning functionality of *ewstools*, please cite
 
