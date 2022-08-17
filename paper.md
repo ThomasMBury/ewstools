@@ -7,9 +7,9 @@ tags:
   - tipping point
   - dynamical system
   - bifurcation
-  
 authors:
   - name: Thomas M. Bury
+    equal-contrib: false
     orcid: 0000-0003-1595-9444
     affiliation: "1, 2" # (Multiple affiliations must be quoted)
 affiliations:
@@ -19,7 +19,7 @@ affiliations:
    index: 2
 date: 17 August 2022
 bibliography: paper.bib
-
+---
 
 # Summary
 
