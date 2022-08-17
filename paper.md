@@ -1,5 +1,5 @@
 ---
-title: 'ewstools: A Python package for early warning signals of bifurcations in time series data.'
+title: 'EWStools: A Python package for early warning signals of bifurcations in time series data.'
 tags:
   - Python
   - time series
@@ -35,19 +35,16 @@ classifiers have been trained and applied to detect bifurcations, with promising
 results [@bury2021deep]
 
 
-
-# Statement of need
-
-`ewstools` is a Python package for computing, analysing, and visualising
+``EWStools`` is a Python package for computing, analysing, and visualising
 early warning signals in time series data.
 
 
 
 # Acknowledgements
 
-TB acknowledge contributions from Chris Bauch on code for training deep learning 
-classifiers. This project is currently supported by the
-Fonds de recherche du Québec (FRQ), 
+TMB acknowledges contributions from Chris T. Bauch (University of Waterloo) 
+on code for training deep learning classifiers. This project is currently supported by the
+Fonds de recherche du Québec (FRQ) 
 and has received funding in the past from the
 Natural Sciences and Engineering Research Council of Canada (NSERC).
 
