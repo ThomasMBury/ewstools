@@ -28,11 +28,11 @@ profound change in their dynamics. From a dynamical systemes perspective, these 
 are often associated with the crossing of a bifurcation. Early warning signals (EWS) 
 for bifurcations are therefore in high demand. Two commonly used EWS for bifurcations 
 are variance and lag-1 autocorrelation, that are expected to increase prior to many 
-bifurcations due to critical slowing down [@scheffer2009early]. There now exist a 
+bifurcations due to critical slowing down [scheffer2009early]. There now exist a 
 wealth of other EWS based on changes in time series dynamics that are expected to occur 
-prior to bifurcations [@clements2018indicators]. More recently, deep learning 
+prior to bifurcations [clements2018indicators]. More recently, deep learning 
 classifiers have been trained and applied to detect bifurcations, with promising 
-results [@bury2021deep]
+results [bury2021deep]
 
 
 
