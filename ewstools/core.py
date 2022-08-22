@@ -594,7 +594,7 @@ class TimeSeries:
         tend = self.state.index[-1] if not self.transition else self.transition
         
         # Tmax values for each time series segment
-        tmax_vals = np.arange(tmin, tend, inc)
+        tmax_vals = np.arange(tmin+inc, tend+inc, inc)
         for tmax in tmax_vals:
             self.apply_classifier(classifier, name=name, tmin=tmin, tmax=tmax, 
                                 verbose=verbose)
