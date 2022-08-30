@@ -72,9 +72,9 @@ NB: the development version comes with the risk of undergoing continual changes,
 
 ## Tutorials
 
-1. [Introduction to *ewstools*](./tutorials/tutorial_intro.ipynb)
-2. [Spectral EWS](./tutorials/tutorial_spectral.ipynb)
-3. [Deep learning classifiers for bifurcation prediction](./tutorials/tutorial_deep_learning.ipynb)
+1. [Introduction to *ewstools*](https://github.com/ThomasMBury/ewstools/tree/main/tutorials/tutorial_intro.ipynb)
+2. [Spectral EWS](https://github.com/ThomasMBury/ewstools/tree/main/tutorials/tutorial_spectral.ipynb)
+3. [Deep learning classifiers for bifurcation prediction](https://github.com/ThomasMBury/ewstools/tree/main/tutorials/tutorial_deep_learning.ipynb)
 
 
 
@@ -87,7 +87,7 @@ from ewstools.models import simulate_ricker
 series = simulate_ricker(tmax=500, F=[0,2.7])
 series.plot();
 ```
-![](tutorials/images/series.png)
+![](https://github.com/ThomasMBury/ewstools/blob/main/tutorials/images/series.png)
 
 We then make a [`TimeSeries`](https://ewstools.readthedocs.io/en/latest/ewstools.html#ewstools.core.TimeSeries) object, which takes in our data and a transition time (if desired). EWS are not computed beyond the transition time.
 
@@ -111,7 +111,7 @@ Finally, we can view output as an interactive [Plotly](https://plotly.com/python
 ts.make_plotly()
 ```
 
-![](tutorials/images/ews.png)
+![](https://github.com/ThomasMBury/ewstools/blob/main/tutorials/images/ews.png)
 
 More detailed demonstrations can be found in the tutorials, and all methods are listed in the documentation.
 
