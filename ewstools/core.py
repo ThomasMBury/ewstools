@@ -510,9 +510,9 @@ class TimeSeries:
         classifier : keras.engine.sequential.Sequential
             Tensorflow classifier
         tmin : float
-            Earliest time in time series segment
+            Earliest time in time series segment (inclusive)
         tmax : float
-            Latest time in time series segment    
+            Latest time in time series segment (not inclusive)
         name : str, optional
             Name assigned to the classifier. The default is 'c1'.
         verbose : int, optional
@@ -531,11 +531,14 @@ class TimeSeries:
         # Get time series segment. Use residuals if detrending performed.
         # Otherwise use state variable.
         if 'residuals' in self.state.columns:
-            data = self.state[(self.state.index >= tmin) &\
-                                (self.state.index <= tmax)]['residuals'].values      
+            series = self.state[(self.state.index >= tmin) &\
+                                (self.state.index < tmax)]['residuals']      
         else:
-            data = self.state[(self.state.index >= tmin) &\
-                                (self.state.index <= tmax)]['state'].values
+            series = self.state[(self.state.index >= tmin) &\
+                                (self.state.index < tmax)]['state']
+        
+        # Get values in series
+        data = series.values
         
         # If time series segment is larger than input dimension of classifier
         if len(data) > input_len:
@@ -553,7 +556,7 @@ class TimeSeries:
         dl_pred = classifier.predict(input_data, verbose=verbose)[0]
         # Put info into dataframe
         dict_dl_pred = {i:val for (i,val) in zip(np.arange(len(dl_pred)), dl_pred)}
-        dict_dl_pred['time'] = tmax
+        dict_dl_pred['time'] = series.index[-1]
         dict_dl_pred['classifier'] = name      
         df_dl_pred = pd.DataFrame(dict_dl_pred, index=[len(self.dl_preds)])
 
@@ -590,11 +593,13 @@ class TimeSeries:
 
         '''
         
+        dt = self.state.index[1]-self.state.index[0]
         tmin = self.state.index[0]
         tend = self.state.index[-1] if not self.transition else self.transition
+        tend += dt # Make transition point inclusive
         
         # Tmax values for each time series segment
-        tmax_vals = np.arange(tmin+inc, tend+inc, inc)
+        tmax_vals = np.arange(tmin+inc, tend+dt, inc)
         for tmax in tmax_vals:
             self.apply_classifier(classifier, name=name, tmin=tmin, tmax=tmax, 
                                 verbose=verbose)

@@ -1,5 +1,5 @@
 ---
-title: 'EWStools: A Python package for early warning signals of bifurcations in time series data.'
+title: 'ewstools: A Python package for early warning signals of bifurcations in time series data.'
 tags:
   - Python
   - time series
@@ -37,7 +37,6 @@ results [@bury2021deep]
 
 ``EWStools`` is a Python package for computing, analysing, and visualising
 early warning signals in time series data.
-
 
 
 # Acknowledgements
