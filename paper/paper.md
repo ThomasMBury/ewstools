@@ -61,9 +61,6 @@ Earlier versions of `ewstools` were used in the following publications:
 
 
 
-
-
-
 It complements a popular EWS package written in R [@dakos2012methods]. 
 My hope that having an EWS toolbox in Python will allow for additional testing, 
 and appeal to those who primarily work in Python. 
@@ -82,6 +79,7 @@ results [@bury2021deep]
 
 
 # Statement of need
+
 
 
 
