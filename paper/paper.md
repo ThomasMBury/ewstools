@@ -36,39 +36,28 @@ This created massive interest in the subject of EWS from a wide range scientific
 Now, there exist a multitude of different EWS and associated methods for
 anticipating bifurcations [@clements2018indicators].
 
+More recently, deep learning 
+classifiers have been trained and applied to detect bifurcations, with promising 
+results [@bury2021deep]
+
+
 
 `ewstools` provides an accessible toolbox for computing, analysing and 
 visualising EWS in time seires data. The package provides:
 
-- Time series detrending methods
-- A suite of standard statistical metrics that can provide an EWS (e.g. variance, autocorrelation, skew)
-- A suite of spectral EWS, which are based on the power spectrum [@bury2020detecting]
-- Methods to apply deep learning classifiers for EWS [@bury2021deep]
-- Integrated plotting and evaluation functions to quickly check the performance of EWS
-- Comprehensive and interactive tutorials
+- An intuitive, object-oriented framework to compute EWS in a given dataset
+- Methods to detrend time series
+- A suite of standard temporal EWS such as variance, autocorrelation, skew
+- A suite of spectral EWS [@bury2020detecting]
+- Methods to apply deep learning classifiers to detect and classify bifurcations [@bury2021deep]
+- Integrated plotting and evaluation functions to quickly check performance of EWS
+- Interactive tutorials in the form of Jupyter notebooks
 
 
 Earlier versions of `ewstools` were used in the following publications:
+
 - @bury2020detecting
 - @bury2021deep
-
-
-
-
-It complements a popular EWS package written in R [@dakos2012methods]. 
-My hope that having an EWS toolbox in Python will allow for additional testing, 
-and appeal to those who primarily work in Python. 
-
-
-
-
-To date, it includes methods to detrend time series
-
-
-
-More recently, deep learning 
-classifiers have been trained and applied to detect bifurcations, with promising 
-results [@bury2021deep]
 
 
 
@@ -86,6 +75,11 @@ and TensorFlow [@abadi2016tensorflow] for deep learning.
 
 
 # Statement of need
+
+It complements a popular EWS package written in R [@dakos2012methods]. 
+My hope that having an EWS toolbox in Python will allow for additional testing, 
+and appeal to those who primarily work in Python. 
+
 
 
 
