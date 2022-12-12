@@ -37,20 +37,15 @@ Now, there exist a multitude of different EWS and associated methods for
 anticipating bifurcations [@clements2018indicators].
 
 
-The goal of `ewstools` is to provide an accessible toolbox for computing, analysing and 
-visualising EWS in Python. 
+`ewstools` provides an accessible toolbox for computing, analysing and 
+visualising EWS in time seires data. The package provides:
 
-
-`ewstools` is a Python package to compute, analyse and visualise early warning signals in time series data. 
-The package provides:
-
-- Python API and a command-line interface for wide accessibility
-- Automatic dataset splitting and cross-validation
-- Five models from various back-ends in a unified interface that cover a broad range of common use cases
-- Solutions for very large datasets and heteroskedastic data
-- Integrated plotting and evaluation functions to quickly check the validity of the model fit and results
+- Time series detrending methods
+- A suite of standard statistical metrics that can provide an EWS (e.g. variance, autocorrelation, skew)
+- A suite of spectral EWS, which are based on the power spectrum [@bury2020detecting]
+- Methods to apply deep learning classifiers for EWS [@bury2021deep]
+- Integrated plotting and evaluation functions to quickly check the performance of EWS
 - Comprehensive and interactive tutorials
-
 
 
 Earlier versions of `ewstools` were used in the following publications:
@@ -77,11 +72,6 @@ results [@bury2021deep]
 
 
 
-# Statement of need
-
-
-
-
 `ewstools` makes use of several open-source Python packages, including
 pandas [@mckinney2010data] for dataframe handling, 
 numpy [@harris2020array] for fast numerical computing, 
@@ -90,6 +80,12 @@ lmfit [@newville2016lmfit] for least-squares minimisation,
 arch [@sheppard_2015_15681] for bootstrapping methods, 
 statsmodels [@seabold2010statsmodels] and scipy [@virtanen2020scipy] for detrending methods, 
 and TensorFlow [@abadi2016tensorflow] for deep learning.
+
+
+
+
+
+# Statement of need
 
 
 
@@ -120,7 +116,7 @@ ts.compute_ktau()
 fig = ts.make_plotly()
 ```
 
-![Output of code in usage example.\label{fig:Figure 1}](figure1.png)
+![Output of plotting function in usage example.\label{fig:Figure 1}](figure1.png)
 
 
 # Documentation
