@@ -30,19 +30,19 @@ Examples include the outbreak of disease, the collapse of an ecosystem, or the o
 of a cardiac arrhythmia.
 From a mathematical perspective, these transitions may be understood as the 
 crossing of a bifurcation (tipping point) in an appropriate dynamical system model.
-In 2009, Scheffer and colleagues proposed using statistical metrics to signal the
-approach of a bifurcation in time series data [@scheffer2009early].
-This spurred massive interest in the subject of EWS from a wide range scientific disciplines.
-Now, there exist a multitude of different EWS and associated methods for
-anticipating bifurcations [@clements2018indicators].
+In 2009, Scheffer and colleagues proposed early warning signals (EWS) for bifurcations
+based on statistics of noisy fluctuations in time series data.
+This spurred massive interest in the subject, resulting in a multitude of different
+EWS for anticipating bifurcations [@clements2018indicators]. More recently, EWS 
+from deep learning classifiers have outperformed conventional EWS
+on several model and empirical datasets [@bury2021deep], whilst also providing
+information on the type of bifurcation.
+Software packages for EWS can facilitate the development and testing of EWS,
+whilst also providing the scientific community with a way to rapidly apply 
+EWS to their own data.
 
-More recently, deep learning 
-classifiers have been trained and applied to detect bifurcations, with promising 
-results [@bury2021deep]
 
-
-
-`ewstools` provides an accessible toolbox for computing, analysing and 
+`ewstools` is an accessible Python package for computing, analysing and 
 visualising EWS in time seires data. The package provides:
 
 - An intuitive, object-oriented framework to compute EWS in a given dataset
@@ -54,7 +54,6 @@ visualising EWS in time seires data. The package provides:
 - Interactive tutorials in the form of Jupyter notebooks
 
 
-
 `ewstools` makes use of several open-source Python packages, including
 pandas [@mckinney2010data] for dataframe handling, 
 NumPy [@harris2020array] for fast numerical computing, 
@@ -63,8 +62,6 @@ lmfit [@newville2016lmfit] for least-squares minimisation,
 arch [@sheppard_2015_15681] for bootstrapping methods, 
 statsmodels [@seabold2010statsmodels] and SciPy [@virtanen2020scipy] for detrending methods, 
 and TensorFlow [@abadi2016tensorflow] for deep learning.
-
-
 
 
 # Statement of need
