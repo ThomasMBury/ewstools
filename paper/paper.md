@@ -26,13 +26,12 @@ bibliography: paper.bib
 
 Many systems in nature and society have the capacity to undergo critical transitions--
 sudden and profound changes in their dynamics that are hard to reverse.
-Consider for example the outbreak of disease, the collapse of an ecosystem, or the onset 
+Examples include the outbreak of disease, the collapse of an ecosystem, or the onset 
 of a cardiac arrhythmia.
-From a mathematical perspective, these transitions are often understood as the 
+From a mathematical perspective, these transitions may be understood as the 
 crossing of a bifurcation (tipping point) in an appropriate dynamical system model.
-In 2009, Scheffer and colleagues proposed that features of bifurcations that are manifested
-in time series data could provide an early warning signal (EWS) for their
-arrival [@scheffer2009early].
+In 2009, Scheffer and colleagues proposed using statistical metrics to signal the
+approach of a bifurcation in time series data [@scheffer2009early].
 This created massive interest in the subject of EWS from a wide range scientific disciplines.
 Now, there exist a multitude of different EWS and associated methods for
 anticipating bifurcations [@clements2018indicators].
@@ -83,8 +82,7 @@ results [@bury2021deep]
 
 
 
-
-`ewstools` makes use of several other Python packages, including
+`ewstools` makes use of several open-source Python packages, including
 pandas [@mckinney2010data] for dataframe handling, 
 numpy [@harris2020array] for fast numerical computing, 
 plotly [@plotly] for visuliastion, 
@@ -96,7 +94,8 @@ and TensorFlow [@abadi2016tensorflow] for deep learning.
 
 
 # Usage Example
-```
+
+```python
 import ewstools
 
 # Load data and get time series as a pandas Series object
@@ -119,10 +118,9 @@ ts.compute_ktau()
 
 # Plot results - can be saved as an interactive html file or as a static image
 fig = ts.make_plotly()
-
 ```
 
-![Output of built-in plotting function (static image version).\label{fig:Figure 1}](figure1.png)
+![Output of code in usage example.\label{fig:Figure 1}](figure1.png)
 
 
 # Documentation
@@ -133,20 +131,18 @@ Tutorials in the form of Jupyter notebooks are available at
 [https://github.com/ThomasMBury/ewstools/tree/main/tutorials](https://github.com/ThomasMBury/ewstools/tree/main/tutorials).
 
 
-
 # Similar tools
 
+The R package 
 [earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) [@dakos2012methods]
-is an R package that computes EWS from time series data.
+computes EWS from time series data, and the R package
 [spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) [@genin2018monitoring]
-is an R package that computes EWS from spatial data.
-
-
+computes EWS from spatial data.
 
 
 # Acknowledgements
 
-This work is currently supported by the 
+This work is supported by the 
 Fonds de Recherche du Québec Nature et technologies (FRQNT)
 and Compute Canada. Earlier versions were supported by the 
 Natural Sciences and Engineering Research Council of Canada (NSERC).
