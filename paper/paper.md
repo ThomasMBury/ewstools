@@ -31,7 +31,7 @@ of a cardiac arrhythmia.
 From a mathematical perspective, these transitions may be understood as the 
 crossing of a bifurcation (tipping point) in an appropriate dynamical system model.
 In 2009, Scheffer and colleagues proposed early warning signals (EWS) for bifurcations
-based on statistics of noisy fluctuations in time series data.
+based on statistics of noisy fluctuations in time series data [@scheffer2009early].
 This spurred massive interest in the subject, resulting in a multitude of different
 EWS for anticipating bifurcations [@clements2018indicators]. More recently, EWS 
 from deep learning classifiers have outperformed conventional EWS
@@ -45,7 +45,7 @@ EWS to their own data.
 `ewstools` is an accessible Python package for computing, analysing and 
 visualising EWS in time seires data. The package provides:
 
-- An intuitive, object-oriented framework to compute EWS in a given dataset
+- An intuitive, object-oriented framework to compute EWS for a given time series
 - Methods to detrend time series
 - A suite of standard temporal EWS such as variance, autocorrelation, skew
 - A suite of spectral EWS [@bury2020detecting]
@@ -61,7 +61,7 @@ Plotly [@plotly] for visuliastion,
 lmfit [@newville2016lmfit] for least-squares minimisation, 
 arch [@sheppard_2015_15681] for bootstrapping methods, 
 statsmodels [@seabold2010statsmodels] and SciPy [@virtanen2020scipy] for detrending methods, 
-and TensorFlow [@abadi2016tensorflow] for deep learning.
+and Keras [@chollet2015keras] and TensorFlow [@abadi2016tensorflow] for deep learning.
 
 
 # Statement of need
@@ -70,15 +70,16 @@ Critical transitions are relevant to many disciplines, including ecology, medici
 finance, and epidemiology, to name a few. As such, it is important that EWS are made 
 widely accessible. 
 To my knowledge, there are two other software packages developed for
-computing EWS ([earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) by @dakos2012methods,
+computing EWS, namely
+[earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) by @dakos2012methods
 and 
-[spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) by @genin2018monitoring),
-both using the R programming language.
+[spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) by @genin2018monitoring, 
+which both use the R programming language.
 Given the recent surge in popularity of the Python programming language [@stanvcin2019overview],
-there is need for a Python-based implementation of EWS.
-Moreover, `ewstools` implements recently developed methods that harness deep learning, 
-which have outperformed conventional EWS in several model and empirical systems [@bury2021deep].
-These new methods should tried and tested for a variety of systems and I hope that this package
+a Python-based implementation of EWS should be useful.
+`ewstools` also implements novel deep learning methods for EWS, which have
+outperformed conventional EWS in several model and empirical systems [@bury2021deep].
+These new methods should tried and tested in a variety of systems and I hope that this package
 facilitates this endeavour.
 
 
@@ -152,7 +153,6 @@ Documentation for `ewstools` is available at
 [https://ewstools.readthedocs.io/en/latest/](https://ewstools.readthedocs.io/en/latest/).
 Tutorials in the form of Jupyter notebooks are available at
 [https://github.com/ThomasMBury/ewstools/tree/main/tutorials](https://github.com/ThomasMBury/ewstools/tree/main/tutorials).
-
 
 
 
