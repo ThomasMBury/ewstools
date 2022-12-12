@@ -32,7 +32,7 @@ From a mathematical perspective, these transitions may be understood as the
 crossing of a bifurcation (tipping point) in an appropriate dynamical system model.
 In 2009, Scheffer and colleagues proposed using statistical metrics to signal the
 approach of a bifurcation in time series data [@scheffer2009early].
-This created massive interest in the subject of EWS from a wide range scientific disciplines.
+This spurred massive interest in the subject of EWS from a wide range scientific disciplines.
 Now, there exist a multitude of different EWS and associated methods for
 anticipating bifurcations [@clements2018indicators].
 
@@ -73,13 +73,13 @@ Critical transitions may occur in many disciplines, including ecology, medicine,
 finance, and epidemiology, to name a few. As such, it is important that EWS are made 
 widely accessible. To my knowledge, there are two other software packages developed for
 computing EWS (
-[earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) by Dakos et al. [dakos2012methods],
+[earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) by Dakos et al. @dakos2012methods,
 and 
-[spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) by Génin et al. [genin2018monitoring]),
+[spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) by Génin et al. @genin2018monitoring),
 both using the R programming language.
 Given the recent surge in popularity of the Python programming language [@stanvcin2019overview],
 it makes sense to have a package available for these users.
-Moreover, ewstools implements recently developed methods (bury) that make use of deep learning
+Moreover, `ewstools` implements recently developed methods [@bury2021deep] that make use of deep learning
 and packages therein that are native to Python.
 
 
