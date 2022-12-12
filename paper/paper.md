@@ -54,12 +54,6 @@ visualising EWS in time seires data. The package provides:
 - Interactive tutorials in the form of Jupyter notebooks
 
 
-Earlier versions of `ewstools` were used in the following publications:
-
-- @bury2020detecting
-- @bury2021deep
-
-
 
 `ewstools` makes use of several open-source Python packages, including
 pandas [@mckinney2010data] for dataframe handling, 
@@ -73,14 +67,55 @@ and TensorFlow [@abadi2016tensorflow] for deep learning.
 
 
 
-
 # Statement of need
 
-It complements a popular EWS package written in R [@dakos2012methods]. 
-My hope that having an EWS toolbox in Python will allow for additional testing, 
-and appeal to those who primarily work in Python. 
+Critical transitions may occur in many disciplines, including ecology, medicine,
+finance, and epidemiology, to name a few. As such, it is important that EWS are made 
+widely accessible. To my knowledge, there are two other software packages developed for
+computing EWS (
+[earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) by Dakos et al. [dakos2012methods],
+and 
+[spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) by Génin et al. [genin2018monitoring]),
+both using the R programming language.
+Given the recent surge in popularity of the Python programming language [@stanvcin2019overview],
+it makes sense to have a package available for these users.
+Moreover, ewstools implements recently developed methods (bury) that make use of deep learning
+and packages therein that are native to Python.
 
 
+
+<!-- 
+]), both using the R programming language. 
+
+
+
+
+EWS are applicable to a wide range of scientific domains, making it important, it is important that they are made accessible
+to researchers spanning many different scientific domains and coding backgrounds.
+To my knowledge there exist two other software packages for computing EWS, 
+both using the R programming language.
+[earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) [@dakos2012methods] is a
+popular package for computing early warning signals in time series data, and 
+[spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) [@genin2018monitoring]
+was developed to compute EWS in spatial data, with particular application to
+ecosystem degradation.
+Given the recent surge in popularity of the Python programming language [@stanvcin2019overview],
+ewstools provides a convenient tool for these researchers and data scientists who primarily
+work in Python.
+
+
+I believe that an EWS package in Python will complement these existing packages, by allowing
+for additional testing and cross validation of EWS, whilst also appealing to those
+who primarily work in Python. 
+ 
+
+
+The use of python in the area of data science and machine learning has reached
+unprecedented levels, largely thanks to its ecosystem of open-source libraries [@stanvcin2019overview].
+As such, it is important that a python package exists for EWS.
+
+
+ -->
 
 
 # Usage Example
@@ -121,13 +156,6 @@ Tutorials in the form of Jupyter notebooks are available at
 [https://github.com/ThomasMBury/ewstools/tree/main/tutorials](https://github.com/ThomasMBury/ewstools/tree/main/tutorials).
 
 
-# Similar tools
-
-The R package 
-[earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) [@dakos2012methods]
-computes EWS from time series data, and the R package
-[spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) [@genin2018monitoring]
-computes EWS from spatial data.
 
 
 # Acknowledgements
