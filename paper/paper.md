@@ -25,7 +25,7 @@ bibliography: paper.bib
 # Summary
 
 Many systems in nature and society have the capacity to undergo critical transitions--
-sudden and profound changes in their dynamics that are hard to reverse.
+sudden and profound changes in dynamics that are hard to reverse.
 Examples include the outbreak of disease, the collapse of an ecosystem, or the onset 
 of a cardiac arrhythmia.
 From a mathematical perspective, these transitions may be understood as the 
@@ -57,11 +57,11 @@ visualising EWS in time seires data. The package provides:
 
 `ewstools` makes use of several open-source Python packages, including
 pandas [@mckinney2010data] for dataframe handling, 
-numpy [@harris2020array] for fast numerical computing, 
-plotly [@plotly] for visuliastion, 
+NumPy [@harris2020array] for fast numerical computing, 
+Plotly [@plotly] for visuliastion, 
 lmfit [@newville2016lmfit] for least-squares minimisation, 
 arch [@sheppard_2015_15681] for bootstrapping methods, 
-statsmodels [@seabold2010statsmodels] and scipy [@virtanen2020scipy] for detrending methods, 
+statsmodels [@seabold2010statsmodels] and SciPy [@virtanen2020scipy] for detrending methods, 
 and TensorFlow [@abadi2016tensorflow] for deep learning.
 
 
@@ -72,13 +72,12 @@ and TensorFlow [@abadi2016tensorflow] for deep learning.
 Critical transitions may occur in many disciplines, including ecology, medicine,
 finance, and epidemiology, to name a few. As such, it is important that EWS are made 
 widely accessible. To my knowledge, there are two other software packages developed for
-computing EWS (
-[earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) by Dakos et al. @dakos2012methods,
+computing EWS ([earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) by @dakos2012methods,
 and 
-[spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) by Génin et al. @genin2018monitoring),
+[spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) by @genin2018monitoring),
 both using the R programming language.
 Given the recent surge in popularity of the Python programming language [@stanvcin2019overview],
-it makes sense to have a package available for these users.
+there is need for a Python-based implementation of EWS.
 Moreover, `ewstools` implements recently developed methods [@bury2021deep] that make use of deep learning
 and packages therein that are native to Python.
 
