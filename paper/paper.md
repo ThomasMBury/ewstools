@@ -69,18 +69,20 @@ and TensorFlow [@abadi2016tensorflow] for deep learning.
 
 # Statement of need
 
-Critical transitions may occur in many disciplines, including ecology, medicine,
+Critical transitions are relevant to many disciplines, including ecology, medicine,
 finance, and epidemiology, to name a few. As such, it is important that EWS are made 
-widely accessible. To my knowledge, there are two other software packages developed for
+widely accessible. 
+To my knowledge, there are two other software packages developed for
 computing EWS ([earlywarnings](https://cran.r-project.org/web/packages/earlywarnings/index.html) by @dakos2012methods,
 and 
 [spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) by @genin2018monitoring),
 both using the R programming language.
 Given the recent surge in popularity of the Python programming language [@stanvcin2019overview],
 there is need for a Python-based implementation of EWS.
-Moreover, `ewstools` implements recently developed methods [@bury2021deep] that make use of deep learning
-and packages therein that are native to Python.
-
+Moreover, `ewstools` implements recently developed methods that harness deep learning, 
+which have outperformed conventional EWS in several model and empirical systems [@bury2021deep].
+These new methods should tried and tested for a variety of systems and I hope that this package
+facilitates this endeavour.
 
 
 <!-- 
