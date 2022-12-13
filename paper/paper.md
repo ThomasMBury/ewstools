@@ -45,12 +45,12 @@ EWS to their own data.
 `ewstools` is an accessible Python package for computing, analysing and 
 visualising EWS in time seires data. The package provides:
 
-- An intuitive, object-oriented framework to compute EWS for a given time series
-- Methods to detrend time series
-- A suite of standard temporal EWS such as variance, autocorrelation, skew
+- An intuitive, object-oriented framework for working with EWS in a given time series
+- A suite of temporal EWS and associated methods [@dakos2012methods]
 - A suite of spectral EWS [@bury2020detecting]
-- Methods to apply deep learning classifiers to detect and classify bifurcations [@bury2021deep]
+- Methods to apply deep learning classifiers for EWS [@bury2021deep]
 - Integrated plotting and evaluation functions to quickly check performance of EWS
+- Built-in theoretical models to test EWS
 - Interactive tutorials in the form of Jupyter notebooks
 
 
