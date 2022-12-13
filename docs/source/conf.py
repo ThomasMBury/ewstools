@@ -24,10 +24,10 @@ project = 'ewstools'
 copyright = '2022, Thomas M Bury'
 author = 'Thomas M Bury'
 
-# The short X.Y version
-version = '2.0.1'
-# The full version, including alpha/beta/rc tags
-release = '2.0.1'
+# # The short X.Y version
+# version = '2.0.1'
+# # The full version, including alpha/beta/rc tags
+# release = '2.0.1'
 
 
 # -- General configuration ---------------------------------------------------
