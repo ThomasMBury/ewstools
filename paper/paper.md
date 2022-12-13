@@ -35,8 +35,8 @@ based on statistics of noisy fluctuations in time series data [@scheffer2009earl
 This spurred massive interest in the subject, resulting in a multitude of different
 EWS for anticipating bifurcations [@clements2018indicators]. More recently, EWS 
 from deep learning classifiers have outperformed conventional EWS
-on several model and empirical datasets [@bury2021deep], whilst also providing
-information on the type of bifurcation.
+on several model and empirical datasets, whilst also providing
+information on the type of bifurcation [@bury2021deep].
 Software packages for EWS can facilitate the development and testing of EWS,
 whilst also providing the scientific community with tools to rapidly apply 
 EWS to their own data.

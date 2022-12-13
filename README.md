@@ -9,29 +9,26 @@
 
 ## Overview
 
-Many systems across nature and society have the capacity to undergo an abrupt and profound change in their dynamics. From a dynamical systemes perspective, these events are often associated with the crossing of a bifurcation. Early warning signals (EWS) for bifurcations are therefore in high demand. Two commonly used EWS for bifurcations are variance and lag-1 autocorrelation, that are expected to increase prior to many bifurcations due to critical slowing down ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). There now exist a wealth of other EWS based on changes in time series dynamics that are expected to occur prior to bifurcations (see e.g. [Clements & Ozgul 2018](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). More recently, deep learning classifiers have been trained and applied to detect bifurcations, with promising results ([Bury et al. 2021](https://www.pnas.org/doi/10.1073/pnas.2106140118)).
+Many systems in nature and society have the capacity to undergo critical transitions--sudden and profound changes in dynamics that are hard to reverse. Examples include the outbreak of disease, the collapse of an ecosystem, or the onset of a cardiac arrhythmia. From a mathematical perspective, these transitions may be understood as the crossing of a bifurcation (tipping point) in an appropriate dynamical system model. In 2009, Scheffer and colleagues proposed early warning signals (EWS) for bifurcations based on statistics of noisy fluctuations in time series data ([Scheffer et al. 2009](https://www.nature.com/articles/nature08227)). This spurred massive interest in the subject, resulting in a multitude of different EWS for anticipating bifurcations ([Clements & Ozgul 2018](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). More recently, EWS from deep learning classifiers have outperformed conventional EWS on several model and empirical datasets, whilst also providing information on the type of bifurcation ([Bury et al. 2021](https://www.pnas.org/doi/10.1073/pnas.2106140118)).
 
-The goal of this Python package is to provide a an accessible toolbox for computing, analysing and visulaising EWS in time series data. It complements an existing EWS package in R ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)). We hope that having an EWS toolbox in Python will allow for additional testing, and appeal to those who primarily work in Python.
+`ewstools` is an accessible toolbox for computing, analysing and visualising EWS in time series data. It complements an existing EWS package in R ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)). Given the recent surge in popularity of the Python programming langauge (PYPL, 2022)[https://pypl.github.io/PYPL.html], a Python-based implementation of EWS should be useful.
 
-Current functionality of *ewstools* includes
+The package provides:
 
+  - An intuitive, object-oriented framework for working with EWS in a given time series
   - Time series detrending methods using
     - A Gaussian kernel
     - LOWESS (Locally Weighted Scatterplot Smoothing)
-
   - Computation of CSD-based early warning signals including:
     - Variance and associated metrics (standard deviation, coefficient of variation)
     - Autocorrelation (at specified lag times)
     - Higher-order statistical moments (skewness, kurtosis)
     - Power spectrum and associated metrics
-
   - Computation of Kendall tau values to quantify trends
-  
-  - Application of deep learning classifiers for bifurcation prediction as in [Bury et al. (2022) PNAS](https://www.pnas.org/doi/10.1073/pnas.2106140118).
-
+  - Application of deep learning classifiers for bifurcation prediction as in [Bury et al. 2021](https://www.pnas.org/doi/10.1073/pnas.2106140118).
   - Block-bootstrapping of time-series to obtain confidence intervals on EWS estimates
-  
   - Visualisation tools to display output
+  - Built-in theoretical models to test EWS
 
 *ewstools* makes use of [pandas](https://pandas.pydata.org/) for dataframe handling, [numpy](https://numpy.org/) for fast numerical computing, [plotly](https://plotly.com/graphing-libraries/) for visuliastion, [lmfit](https://lmfit.github.io/lmfit-py/) for least-squares minimisation, [arch](https://github.com/bashtage/arch) for bootstrapping methods, [statsmodels](https://www.statsmodels.org/stable/index.html) and [scipy](https://scipy.org/) for detrending methods, and [TensorFlow](https://www.tensorflow.org/install) for deep learning.
 
