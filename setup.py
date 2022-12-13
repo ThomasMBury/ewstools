@@ -15,7 +15,7 @@ requirements = ['pandas>=0.23.0',
 
 setuptools.setup(
     name="ewstools",
-    version="2.0.1",
+    version="2.0.2",
     author="Thomas M Bury",
     author_email="tombury182@gmail.com",
     description="""Python package to compute early warning signals (EWS) 
