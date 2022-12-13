@@ -38,17 +38,17 @@ from deep learning classifiers have outperformed conventional EWS
 on several model and empirical datasets [@bury2021deep], whilst also providing
 information on the type of bifurcation.
 Software packages for EWS can facilitate the development and testing of EWS,
-whilst also providing the scientific community with a way to rapidly apply 
+whilst also providing the scientific community with tools to rapidly apply 
 EWS to their own data.
 
 
 `ewstools` is an accessible Python package for computing, analysing and 
-visualising EWS in time seires data. The package provides:
+visualising EWS in time series data. The package provides:
 
 - An intuitive, object-oriented framework for working with EWS in a given time series
 - A suite of temporal EWS and associated methods [@dakos2012methods]
 - A suite of spectral EWS [@bury2020detecting]
-- Methods to apply deep learning classifiers for EWS [@bury2021deep]
+- Methods to use deep learning classifiers for EWS [@bury2021deep]
 - Integrated plotting and evaluation functions to quickly check performance of EWS
 - Built-in theoretical models to test EWS
 - Interactive tutorials in the form of Jupyter notebooks
@@ -57,9 +57,9 @@ visualising EWS in time seires data. The package provides:
 `ewstools` makes use of several open-source Python packages, including
 pandas [@mckinney2010data] for dataframe handling, 
 NumPy [@harris2020array] for fast numerical computing, 
-Plotly [@plotly] for visuliastion, 
-lmfit [@newville2016lmfit] for least-squares minimisation, 
-arch [@sheppard_2015_15681] for bootstrapping methods, 
+Plotly [@plotly] for visualisation, 
+LMFIT [@newville2016lmfit] for nonlinear least-squares minimisation, 
+ARCH [@sheppard_2015_15681] for bootstrapping methods, 
 statsmodels [@seabold2010statsmodels] and SciPy [@virtanen2020scipy] for detrending methods, 
 and Keras [@chollet2015keras] and TensorFlow [@abadi2016tensorflow] for deep learning.
 
@@ -75,7 +75,7 @@ computing EWS, namely
 and 
 [spatialwarnings](https://cran.r-project.org/web/packages/spatialwarnings/index.html) by @genin2018monitoring, 
 which both use the R programming language.
-Given the recent surge in popularity of the Python programming language [@stanvcin2019overview],
+Given the recent surge in popularity of the Python programming language [@pypl],
 a Python-based implementation of EWS should be useful.
 `ewstools` also implements novel deep learning methods for EWS, which have
 outperformed conventional EWS in several model and empirical systems [@bury2021deep].
