@@ -159,7 +159,7 @@ Tutorials in the form of Jupyter notebooks are available at
 # Acknowledgements
 
 This work is supported by the 
-Fonds de Recherche du Québec Nature et technologies (FRQNT)
+Fonds de Recherche du Québec -- Nature et technologies (FRQNT)
 and Compute Canada. Earlier versions were supported by the 
 Natural Sciences and Engineering Research Council of Canada (NSERC).
 

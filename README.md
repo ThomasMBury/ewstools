@@ -30,12 +30,12 @@ The package provides:
   - Visualisation tools to display output
   - Built-in theoretical models to test EWS
 
-*ewstools* makes use of [pandas](https://pandas.pydata.org/) for dataframe handling, [numpy](https://numpy.org/) for fast numerical computing, [plotly](https://plotly.com/graphing-libraries/) for visuliastion, [lmfit](https://lmfit.github.io/lmfit-py/) for least-squares minimisation, [arch](https://github.com/bashtage/arch) for bootstrapping methods, [statsmodels](https://www.statsmodels.org/stable/index.html) and [scipy](https://scipy.org/) for detrending methods, and [TensorFlow](https://www.tensorflow.org/install) for deep learning.
+`ewstools` makes use of [pandas](https://pandas.pydata.org/) for dataframe handling, [numpy](https://numpy.org/) for fast numerical computing, [plotly](https://plotly.com/graphing-libraries/) for visuliastion, [lmfit](https://lmfit.github.io/lmfit-py/) for least-squares minimisation, [arch](https://github.com/bashtage/arch) for bootstrapping methods, [statsmodels](https://www.statsmodels.org/stable/index.html) and [scipy](https://scipy.org/) for detrending methods, and [TensorFlow](https://www.tensorflow.org/install) for deep learning.
 
 
 ## Install
 
-Requires Python 3.7 or later. You can install *ewstools* with pip using the commands
+Requires Python 3.7 or later. You can install `ewstools` with pip using the commands
 
 ```bash
 pip install --upgrade pip
@@ -46,7 +46,7 @@ pip install ewstools
 ```bash
 pip install jupyter notebook
 ```
-Package dependencies of *ewstools* are
+Package dependencies are
 ```bash
 'pandas>=0.23.0',
 'numpy>=1.14.0',
@@ -58,7 +58,7 @@ Package dependencies of *ewstools* are
 ```
 and should be installed automatically. To use any of the deep learning functionality, you will need to install [TensorFlow](https://www.tensorflow.org/install) v2.0.0 or later.
 
-To install the latest *development* version of *ewstools*, use the command
+To install the latest *development* version, use the command
 ```bash
 pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
 ```
@@ -77,7 +77,7 @@ NB: the development version comes with the risk of undergoing continual changes,
 
 ## Quick demo
 
-First we need to import *ewstools* and collect the data we wish to analyse. Here we will run a simulation of the Ricker model, one of the model functions stored in [`ewstools.models`](https://ewstools.readthedocs.io/en/latest/ewstools.html#ewstools-models-submodule).
+First we need to import `ewstools` and collect data to analyse. Here we will run a simulation of the Ricker model, one of the models stored in [`ewstools.models`](https://ewstools.readthedocs.io/en/latest/ewstools.html#ewstools-models-submodule).
 ```python
 import ewstools
 from ewstools.models import simulate_ricker
@@ -128,10 +128,10 @@ This work is currently supported by an FRQNT (Fonds de recherche du Québec - Na
 
 If you like the respoitory, please give it a star :D
 
-If your research uses the deep learning functionality of *ewstools*, please cite
+If your research uses the deep learning functionality of `ewstools`, please cite
 
 Bury, Thomas M., et al. "[Deep learning for early warning signals of tipping points.](https://www.pnas.org/doi/abs/10.1073/pnas.2106140118)" *Proceedings of the National Academy of Sciences* 118.39 (2021): e2106140118.
 
-If your research computes spectral EWS using *ewstools*, please cite
+If your research computes spectral EWS using `ewstools`, please cite
 
 Bury, Thomas M., Chris T. Bauch, and Madhur Anand. "[Detecting and distinguishing tipping points using spectral early warning signals.](https://royalsocietypublishing.org/doi/full/10.1098/rsif.2020.0482)" *Journal of the Royal Society Interface* 17.170 (2020): 20200482.
