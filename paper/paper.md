@@ -79,8 +79,8 @@ Given the recent surge in popularity of the Python programming language [@pypl],
 a Python-based implementation of EWS should be useful.
 `ewstools` also implements novel deep learning methods for EWS, which have
 outperformed conventional EWS in several model and empirical systems [@bury2021deep].
-These new methods should tried and tested in a variety of systems and I hope that this package
-facilitates this endeavour.
+These new methods should be tried, tested and developed for a variety of systems 
+and I hope that this package facilitates this endeavour.
 
 
 <!-- 
