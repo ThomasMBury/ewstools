@@ -55,7 +55,7 @@ visualising EWS in time series data. The package provides:
 
 
 `ewstools` makes use of several open-source Python packages, including
-pandas [@reback2020pandas, @mckinney2010data] for dataframe handling, 
+pandas [@reback2020pandas; @mckinney2010data] for dataframe handling, 
 NumPy [@harris2020array] for fast numerical computing, 
 Plotly [@plotly] for visualisation, 
 LMFIT [@newville2016lmfit] for nonlinear least-squares minimisation, 
