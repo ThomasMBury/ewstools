@@ -24,9 +24,9 @@ bibliography: paper.bib
 
 # Summary
 
-Many systems in nature and society have the capacity to undergo critical transitions--
+Many systems in nature and society have the capacity to undergo critical transitions:
 sudden and profound changes in dynamics that are hard to reverse.
-Examples include the outbreak of disease, the collapse of an ecosystem, or the onset 
+Examples include the outbreak of disease, the collapse of an ecosystem, and the onset 
 of a cardiac arrhythmia.
 From a mathematical perspective, these transitions may be understood as the 
 crossing of a bifurcation (tipping point) in an appropriate dynamical system model.
@@ -42,7 +42,7 @@ whilst also providing the scientific community with tools to rapidly apply
 EWS to their own data.
 
 
-`ewstools` is an accessible Python package for computing, analysing and 
+`ewstools` is an accessible Python package for computing, analysing, and 
 visualising EWS in time series data. The package provides:
 
 - An intuitive, object-oriented framework for working with EWS in a given time series
@@ -79,7 +79,7 @@ Given the recent surge in popularity of the Python programming language [@pypl],
 a Python-based implementation of EWS should be useful.
 `ewstools` also implements novel deep learning methods for EWS, which have
 outperformed conventional EWS in several model and empirical systems [@bury2021deep].
-These new methods should be tried, tested and developed for a variety of systems 
+These new methods should be tried, tested, and developed for a variety of systems 
 and I hope that this package facilitates this endeavour.
 
 
