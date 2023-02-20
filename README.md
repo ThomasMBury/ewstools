@@ -3,6 +3,7 @@
 [![Documentation Status](https://readthedocs.org/projects/ewstools/badge/?version=latest)](https://ewstools.readthedocs.io/en/latest/?badge=latest)
 [![tests](https://github.com/ThomasMBury/ewstools/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/ThomasMBury/ewstools/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/ThomasMBury/ewstools/branch/main/graph/badge.svg?token=Q5LGRV6TLF)](https://codecov.io/gh/ThomasMBury/ewstools)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.05038/status.svg)](https://doi.org/10.21105/joss.05038)
 
 # ewstools
 **A Python package for early warning signals (EWS) of bifurcations in time series data.**
@@ -128,10 +129,6 @@ This work is currently supported by an FRQNT (Fonds de recherche du Québec - Na
 
 If you like the respoitory, please give it a star :D
 
-If your research uses the deep learning functionality of `ewstools`, please cite
+If your research makes use of it, please cite
 
-Bury, Thomas M., et al. "[Deep learning for early warning signals of tipping points.](https://www.pnas.org/doi/abs/10.1073/pnas.2106140118)" *Proceedings of the National Academy of Sciences* 118.39 (2021): e2106140118.
-
-If your research computes spectral EWS using `ewstools`, please cite
-
-Bury, Thomas M., Chris T. Bauch, and Madhur Anand. "[Detecting and distinguishing tipping points using spectral early warning signals.](https://royalsocietypublishing.org/doi/full/10.1098/rsif.2020.0482)" *Journal of the Royal Society Interface* 17.170 (2020): 20200482.
+Bury, Thomas M. "[ewstools: A Python package for early warning signals of bifurcations in time series data.](https://joss.theoj.org/papers/10.21105/joss.05038.pdf)" *Journal of Open Source Software* 8.82 (2023): 5038.
