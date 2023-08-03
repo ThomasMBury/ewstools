@@ -80,7 +80,6 @@ class TimeSeries:
     """
 
     def __init__(self, data, transition=None):
-
         # Put data into a pandas DataFrame
         if type(data) in [list, np.ndarray]:
             df_state = pd.DataFrame({"time": np.arange(len(data)), "state": data})
@@ -670,7 +669,6 @@ class TimeSeries:
 
         # Loop through window locations shifted by roll_offset
         for k in np.arange(0, num_comps - (rw_absolute - 1), roll_offset):
-
             # Select subset of series contained in window
             window_series = series.iloc[k : k + rw_absolute]
             # Asisgn the time value for the metrics (right end point of window)
@@ -953,7 +951,6 @@ class TimeSeries:
         if len(ac_labels) != 0:
             row_count += 1
         for ac_label in ac_labels:
-
             # Add kendall tau to name
             if kendall_tau and (ac_label in self.ktau.keys()):
                 ktau = self.ktau[ac_label]
@@ -1113,6 +1110,118 @@ class TimeSeries:
         return fig
 
 
+class MultiTimeSeries:
+    """
+    Multivariate time series data on which to compute early warning signals.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        Contains each time series as a column. Index represents time values and
+        is carried over.
+    transition : float
+        Time value at which transition occurs, if any. If defined, early warning signals
+        are only computed up to this point in the time series
+    """
+
+    def __init__(self, data, transition=None):
+        # If data is not provided as a dataframe, flag error
+        if type(data) != pd.DataFrame:
+            print("\nERROR: data has been provided as type {}".format(type(data)))
+            print("Please provide data as a pandas DataFrame.\n")
+
+        # Set state and transition attributes
+        self.state = data
+        self.transition = float(transition) if transition else transition
+
+        # Initialise other attributes
+        self.ews = pd.DataFrame(index=data.index)
+        self.ktau = dict()
+
+    def detrend(self, method="Gaussian", bandwidth=0.2, span=0.2):
+        """
+        Detrend the time series using a chosen method.
+        Add column to the dataframe for 'smoothing' and 'residuals' for each variable
+
+        Parameters
+        ----------
+        method : str, optional
+            Method of detrending to use.
+            Select from ['Gaussian', 'Lowess']
+            The default is 'Gaussian'.
+        bandwidth : float, optional
+            Bandwidth of Gaussian kernel. Provide as a proportion of data length
+            or as a number of data points. As in the R function ksmooth
+            (used by the earlywarnings package in R), we define the bandwidth
+            such that the kernel has its quartiles at +/- 0.25*bandwidth.
+            The default is 0.2.
+        span : float, optional
+            Span of time-series data used for Lowess filtering. Provide as a
+            proportion of data length or as a number of data points.
+            The default is 0.2.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Error messages
+        if method not in ["Lowess", "Gaussian"]:
+            print("ERROR: {} is not a valid detrending method.\n".format(method))
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+
+        # Names of variables in multivariate time series
+        var_names = df_pre.columns
+        print(var_names)
+
+        if method == "Gaussian":
+            # Get size of bandwidth in terms of num. datapoints if given as a proportion
+            if 0 < bandwidth <= 1:
+                bw_num = bandwidth * len(df_pre)
+            else:
+                bw_num = bandwidth
+
+            # Use the gaussian_filter function provided by Scipy
+            # Standard deviation of kernel given bandwidth
+            # Note that for a Gaussian, quartiles are at +/- 0.675*sigma
+            sigma = (0.25 / 0.675) * bw_num
+
+            # Do guassian smoothing on each variable
+            for var_name in var_names:
+                smooth_values = gf(df_pre[var_name].values, sigma=sigma, mode="reflect")
+                smooth_series = pd.Series(smooth_values, index=df_pre.index)
+                # Add smoothed data and residuals to the 'state' DataFrame
+                self.state["{}_smoothing".format(var_name)] = smooth_series
+                self.state["{}_residuals".format(var_name)] = (
+                    self.state[var_name] - self.state["{}_smoothing".format(var_name)]
+                )
+
+        if method == "Lowess":
+            # Convert span to a proportion of the length of the data
+            if not 0 < span <= 1:
+                span_prop = span / len(df_pre)
+            else:
+                span_prop = span
+
+            # Do Lowess smoothing on each variable
+            for var_name in var_names:
+                smooth_values = lowess(
+                    df_pre[var_name].values, df_pre.index.values, frac=span_prop
+                )[:, 1]
+                smooth_series = pd.Series(smooth_values, index=df_pre.index)
+                # Add smoothed data and residuals to the 'state' DataFrame
+                self.state["{}_smoothing".format(var_name)] = smooth_series
+                self.state["{}_residuals".format(var_name)] = (
+                    self.state[var_name] - self.state["{}_smoothing".format(var_name)]
+                )
+
+
 # -----------------------------
 # Eigenvalue reconstruction
 # ------------------------------
@@ -1190,7 +1299,6 @@ def eval_recon_rolling(
     if smooth == "Gaussian":
         # Loop through variables
         for var in var_names:
-
             smooth_data = gf(df_pre[var].values, sigma=bw_size, mode="reflect")
             smooth_series = pd.Series(smooth_data, index=df_pre.index)
             residuals = df_pre[var].values - smooth_data
@@ -1202,7 +1310,6 @@ def eval_recon_rolling(
     if smooth == "Lowess":
         # Loop through variabless
         for var in var_names:
-
             smooth_data = lowess(df_pre[var].values, df_pre.index.values, frac=span)[
                 :, 1
             ]
@@ -1228,7 +1335,6 @@ def eval_recon_rolling(
 
     # Loop through window locations shifted by roll_offset
     for k in np.arange(0, num_comps - (rw_size - 1), roll_offset):
-
         # Select subset of residuals contained in window
         df_window = df_pre[[var + "_r" for var in var_names]].iloc[k : k + rw_size]
         # Asisgn the time value for the metrics (right end point of window)
@@ -1266,7 +1372,6 @@ def eval_recon_rolling(
 
 
 def block_bootstrap(series, n_samples, bs_type="Stationary", block_size=10):
-
     """
     Computes block-bootstrap samples of series.
 
@@ -1300,7 +1405,6 @@ def block_bootstrap(series, n_samples, bs_type="Stationary", block_size=10):
         # Count for sample number
         count = 1
         for data in bs.bootstrap(n_samples):
-
             df_temp = pd.DataFrame(
                 {"sample": count, "time": series.index.values, "x": data[0][0]}
             )
@@ -1313,7 +1417,6 @@ def block_bootstrap(series, n_samples, bs_type="Stationary", block_size=10):
         # Count for sample number
         count = 1
         for data in bs.bootstrap(n_samples):
-
             df_temp = pd.DataFrame(
                 {"sample": count, "time": series.index.values, "x": data[0][0]}
             )
@@ -1338,7 +1441,6 @@ def roll_bootstrap(
     bs_type="Stationary",
     block_size=10,
 ):
-
     """
     Smooths raw_series and computes residuals over a rolling window.
     Bootstraps each segment and outputs samples.
@@ -1415,7 +1517,6 @@ def roll_bootstrap(
 
     # Loop through window locations shifted by roll_offset
     for k in np.arange(0, num_comps - (rw_size - 1), roll_offset):
-
         # Select subset of series contained in window
         window_series = resid_series.iloc[k : k + rw_size]
         # Asisgn the time value for the metrics (right end point of window)

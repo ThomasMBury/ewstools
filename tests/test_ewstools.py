@@ -11,76 +11,95 @@ import plotly
 
 from tensorflow.keras.models import load_model
 
-
 # Import ewstools
 import ewstools
 from ewstools import core
 from ewstools import helpers
 
 
-
 # # Import ewstools locally when testing locally
 # import sys
-# sys.path.append('../')
+
+# sys.path.append("../")
 # import ewstools
 
 
 def test_TimeSeries_init():
-    '''
+    """
     Test the TimeSeries initialisation process
-    '''
-    
+    """
+
     # Simulate a time series
     tVals = np.arange(0, 10, 0.1)
     xVals = 5 + np.random.normal(0, 1, len(tVals))
-    
+
     # Create TimeSeries object using np.ndarray
     ts = ewstools.TimeSeries(xVals)
     assert type(ts.state) == pd.DataFrame
     assert type(ts.ews) == pd.DataFrame
     assert type(ts.ktau) == dict
     assert type(ts.dl_preds) == pd.DataFrame
-    assert ts.state.index.name == 'time'
-    assert ts.ews.index.name == 'time'
-    
+    assert ts.state.index.name == "time"
+    assert ts.ews.index.name == "time"
+
     # Create TimeSeries object using list
     ts = ewstools.TimeSeries(list(xVals))
     assert type(ts.state) == pd.DataFrame
-    
+
     # Create TimeSeries object using pd.Series
     data = pd.Series(xVals, index=tVals)
-    data.index.name = 'test_index_name'
+    data.index.name = "test_index_name"
     ts = ewstools.TimeSeries(data)
     assert type(ts.state) == pd.DataFrame
-    assert ts.state.index.name == 'test_index_name'   
+    assert ts.state.index.name == "test_index_name"
 
     # Create TimeSeries object using pd.Series
     data = pd.Series(xVals, index=tVals)
     ts = ewstools.TimeSeries(data, transition=80)
     assert type(ts.state) == pd.DataFrame
-    assert ts.state.index.name == 'time'   
+    assert ts.state.index.name == "time"
     assert type(ts.transition) == float
-    
+
     # Make plotly fig
     fig = ts.make_plotly()
-    assert type(fig)==plotly.graph_objs._figure.Figure
+    assert type(fig) == plotly.graph_objs._figure.Figure
 
+
+def test_MultiTimeSeries_init():
+    """
+    Test the MultiTimeSeries initialisation process
+    """
+
+    # Simulate a time series
+    tVals = np.arange(0, 10, 0.1)
+    xVals = 5 + np.random.normal(0, 1, len(tVals))
+    yVals = 2 + np.random.normal(0, 2, len(tVals))
+    df = pd.DataFrame({"x": xVals, "y": yVals}, index=tVals)
+    df.index.name = "test_index"
+
+    # Create MultiTimeSeries object
+    mts = ewstools.core.MultiTimeSeries(df, transition=80)
+    assert type(mts.state) == pd.DataFrame
+    assert type(mts.ews) == pd.DataFrame
+    assert type(mts.ktau) == dict
+    assert mts.state.index.name == "test_index"
+    assert mts.ews.index.name == "test_index"
+    assert type(mts.transition) == float
 
 
 def test_TimeSeries_ews():
-    '''
+    """
     Test the TimeSeries methods that involve detrending and computing EWS
 
-    '''
-    
+    """
+
     # Simulate a time series
     tVals = np.arange(0, 10, 0.1)
     xVals = 5 + np.random.normal(0, 1, len(tVals))
     data = pd.Series(xVals, index=tVals)
     ts = ewstools.TimeSeries(data, transition=80)
-    ts2 =  ewstools.TimeSeries(data) # time series without a transition
-    
-    
+    ts2 = ewstools.TimeSeries(data)  # time series without a transition
+
     # Compute EWS without detrending
     rolling_window = 0.5
     ts.compute_var(rolling_window=rolling_window)
@@ -91,11 +110,10 @@ def test_TimeSeries_ews():
     ts.compute_skew(rolling_window=rolling_window)
     ts.compute_kurt(rolling_window=rolling_window)
     assert type(ts.ews) == pd.DataFrame
-    assert 'variance' in ts.ews.columns
-    assert 'ac5' in ts.ews.columns
-    assert 'cv' in ts.ews.columns
-    
-    
+    assert "variance" in ts.ews.columns
+    assert "ac5" in ts.ews.columns
+    assert "cv" in ts.ews.columns
+
     # Compute EWS on time series without transition
     rolling_window = 0.5
     ts2.compute_var(rolling_window=rolling_window)
@@ -106,18 +124,17 @@ def test_TimeSeries_ews():
     ts2.compute_skew(rolling_window=rolling_window)
     ts2.compute_kurt(rolling_window=rolling_window)
     assert type(ts2.ews) == pd.DataFrame
-    assert 'variance' in ts2.ews.columns
-    assert 'ac5' in ts2.ews.columns
-    assert 'cv' in ts2.ews.columns    
-    
-    
+    assert "variance" in ts2.ews.columns
+    assert "ac5" in ts2.ews.columns
+    assert "cv" in ts2.ews.columns
+
     # Detrend data using Gaussian and Lowess filter
-    ts.detrend('Gaussian', bandwidth=0.2)
-    ts.detrend('Gaussian', bandwidth=30)
-    ts.detrend('Lowess', span=0.2)
-    ts.detrend('Lowess', span=30)    
+    ts.detrend("Gaussian", bandwidth=0.2)
+    ts.detrend("Gaussian", bandwidth=30)
+    ts.detrend("Lowess", span=0.2)
+    ts.detrend("Lowess", span=30)
     assert type(ts.state) == pd.DataFrame
-    assert 'residuals' in ts.state.columns
+    assert "residuals" in ts.state.columns
 
     # Compute EWS on detrended data using rolling window as fraction and absolute
     rolling_window = 0.2
@@ -130,26 +147,25 @@ def test_TimeSeries_ews():
     ts.compute_kurt(rolling_window=rolling_window)
 
     assert type(ts.ews) == pd.DataFrame
-    assert 'variance' in ts.ews.columns
-    assert 'ac5' in ts.ews.columns
+    assert "variance" in ts.ews.columns
+    assert "ac5" in ts.ews.columns
 
     # Test kendall tau computation
     ts.compute_ktau()
     assert type(ts.ktau) == dict
-    assert 'variance' in ts.ktau.keys()
-    assert 'ac5' in ts.ktau.keys()
-    
+    assert "variance" in ts.ktau.keys()
+    assert "ac5" in ts.ktau.keys()
+
     # Make plotly fig
     fig = ts.make_plotly()
-    assert type(fig)==plotly.graph_objs._figure.Figure
-
+    assert type(fig) == plotly.graph_objs._figure.Figure
 
 
 def test_TimeSeries_dl_preds():
-    '''
+    """
     Test the TimeSeries methods that involve computing DL predictions
 
-    '''
+    """
 
     # Simulate a time series
     tVals = np.arange(0, 10, 0.1)
@@ -159,41 +175,40 @@ def test_TimeSeries_dl_preds():
 
     # Detrend time series
     ts.detrend()
-    
+
     # Import a classifier
-    classifier_path = 'saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.pkl'
+    classifier_path = "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.pkl"
     classifier = load_model(classifier_path)
 
     # Apply classifier with time bounds
-    ts.apply_classifier(classifier, name='c1', tmin=1, tmax=5)    
+    ts.apply_classifier(classifier, name="c1", tmin=1, tmax=5)
     assert type(ts.dl_preds) == pd.DataFrame
-    assert 'time' in ts.dl_preds.columns
-    assert 'classifier' in ts.dl_preds.columns
-    
+    assert "time" in ts.dl_preds.columns
+    assert "classifier" in ts.dl_preds.columns
+
     # Apply classifier many times on incrementally longer segments of time series
     ts.clear_dl_preds()
-    ts.apply_classifier_inc(classifier, inc=40, name='c1', verbose=1)
-    
+    ts.apply_classifier_inc(classifier, inc=40, name="c1", verbose=1)
+
     # Make plotly fig
     fig = ts.make_plotly()
-    assert type(fig)==plotly.graph_objs._figure.Figure
+    assert type(fig) == plotly.graph_objs._figure.Figure
 
     # Import and apply a second classifier
-    classifier_path = 'saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.pkl'
+    classifier_path = "saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.pkl"
     classifier2 = load_model(classifier_path)
-    ts.apply_classifier_inc(classifier2, inc=40, name='c2', verbose=1)
+    ts.apply_classifier_inc(classifier2, inc=40, name="c2", verbose=1)
 
     # Make plotly fig using ensemble average
     fig = ts.make_plotly(ens_avg=True)
-    assert type(fig)==plotly.graph_objs._figure.Figure
-    
-    
+    assert type(fig) == plotly.graph_objs._figure.Figure
+
 
 def test_TimeSeries_spec_ews():
-    '''
+    """
     Test the TimeSeries methods that involve computing spectral EWS
-    
-    '''
+
+    """
 
     # Simulate a time series
     tVals = np.arange(0, 10, 0.1)
@@ -206,22 +221,19 @@ def test_TimeSeries_spec_ews():
 
     # Compute power spectrum
     ts.compute_spectrum()
-    assert type(ts.pspec)==pd.DataFrame
-    assert 'frequency' in ts.pspec.columns
-    assert 'power' in ts.pspec.columns
-    
+    assert type(ts.pspec) == pd.DataFrame
+    assert "frequency" in ts.pspec.columns
+    assert "power" in ts.pspec.columns
+
     # Compute smax
     ts.compute_smax()
     # Compute spectrum types indicated by AIC weights
     ts.compute_spec_type()
-    assert type(ts.ews_spec)==pd.DataFrame
-    assert 'smax' in ts.ews_spec.columns
-    assert 'fold' in ts.ews_spec.columns
-    assert 'hopf' in ts.ews_spec.columns
-    assert 'null' in ts.ews_spec.columns
-
-
-
+    assert type(ts.ews_spec) == pd.DataFrame
+    assert "smax" in ts.ews_spec.columns
+    assert "fold" in ts.ews_spec.columns
+    assert "hopf" in ts.ews_spec.columns
+    assert "null" in ts.ews_spec.columns
 
 
 def test_pspec_welch():
