@@ -1207,7 +1207,7 @@ class MultiTimeSeries:
                 span_prop = span
 
             # Do Lowess smoothing on each variable
-            for var_name in var_names:
+            for var_name in self.var_names:
                 smooth_values = lowess(
                     df_pre[var_name].values, df_pre.index.values, frac=span_prop
                 )[:, 1]
