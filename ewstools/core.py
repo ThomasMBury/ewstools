@@ -1327,11 +1327,7 @@ class MultiTimeSeries:
             col_names_to_compute = self.var_names
 
         # Compute correlation matrix
-        df_corr = (
-            df_pre[col_names_to_compute]
-            .rolling(window=rw_absolute)
-            .corr(method="Pearson")
-        )
+        df_corr = df_pre[col_names_to_compute].rolling(window=rw_absolute).corr()
         self.corr = df_corr
 
 
