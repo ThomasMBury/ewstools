@@ -60,12 +60,22 @@ def test_MultiTimeSeries_ews():
     df.index.name = "index_name"
 
     # Create MultiTimeSeries object
-    mts = ewstools.core.MultiTimeSeries(df, transition=8)
+    mts = ewstools.MultiTimeSeries(np.array([1, 2, 3]))  # invalid entry
+    mts = ewstools.MultiTimeSeries(df, transition=8)
+    mts.detrend(method="XXX", bandwidth=0.2)  # invalid detrend method
     mts.detrend(method="Gaussian", bandwidth=0.2)
+    mts.detrend(method="Gaussian", bandwidth=20)
+    mts.detrend(method="Lowess", span=0.2)
+    mts.detrend(method="Lowess", span=20)
+
     mts.compute_covar(rolling_window=0.25, leading_eval=True)
+    mts.compute_covar(rolling_window=20, leading_eval=False)
+    mts.compute_corr(rolling_window=0.25)
+    mts.compute_corr(rolling_window=20)
 
     assert type(mts.ews) == pd.DataFrame
     assert type(mts.covar) == pd.DataFrame
+    assert type(mts.corr) == pd.DataFrame
     assert "x_residuals" in mts.state.columns
     assert "z_smoothing" in mts.state.columns
     assert "covar_leading_eval" in mts.ews.columns
@@ -81,6 +91,7 @@ def test_TimeSeries_init():
     xVals = 5 + np.random.normal(0, 1, len(tVals))
 
     # Create TimeSeries object using np.ndarray
+    ts = ewstools.TimeSeries("hello")  # invalid entry
     ts = ewstools.TimeSeries(xVals)
     assert type(ts.state) == pd.DataFrame
     assert type(ts.ews) == pd.DataFrame

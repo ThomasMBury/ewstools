@@ -99,6 +99,7 @@ class TimeSeries:
             print(
                 "Make sure to provide data as either a list, np.ndarray or pd.Series\n"
             )
+            return
 
         # Set state and transition attributes
         self.state = df_state
@@ -1129,6 +1130,7 @@ class MultiTimeSeries:
         if type(data) != pd.DataFrame:
             print("\nERROR: data has been provided as type {}".format(type(data)))
             print("Please provide data as a pandas DataFrame.\n")
+            return
 
         # Set state and transition attributes
         self.state = data
@@ -1224,7 +1226,8 @@ class MultiTimeSeries:
         If residuals have not been computed, computation will be
         performed over state variable.
 
-        Put into 'ews' dataframe
+        Put covariance matrices into self.covar
+        Put leading eigenvalue into self.ews
 
         Parameters
         ----------
@@ -1281,6 +1284,55 @@ class MultiTimeSeries:
                     ar_evals[idx] = np.nan
             series_evals = pd.Series(ar_evals, index=df_pre.index)
             self.ews["covar_leading_eval"] = series_evals
+
+    def compute_corr(self, rolling_window=0.25):
+        """
+        Compute the (Pearson) correlation matrix over a rolling window.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+
+        Put correlation matrices into self.corr
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute variance. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # If residuals column exists, compute over residuals.
+        if "{}_residuals".format(self.var_names[0]) in df_pre.columns:
+            col_names_to_compute = [
+                "{}_residuals".format(var) for var in self.var_names
+            ]
+        else:
+            col_names_to_compute = self.var_names
+
+        # Compute correlation matrix
+        df_corr = (
+            df_pre[col_names_to_compute]
+            .rolling(window=rw_absolute)
+            .corr(method="Pearson")
+        )
+        self.corr = df_corr
 
 
 # -----------------------------
