@@ -1133,6 +1133,7 @@ class MultiTimeSeries:
         # Set state and transition attributes
         self.state = data
         self.transition = float(transition) if transition else transition
+        self.var_names = data.columns
 
         # Initialise other attributes
         self.ews = pd.DataFrame(index=data.index)
@@ -1176,10 +1177,6 @@ class MultiTimeSeries:
         else:
             df_pre = self.state
 
-        # Names of variables in multivariate time series
-        var_names = df_pre.columns
-        print(var_names)
-
         if method == "Gaussian":
             # Get size of bandwidth in terms of num. datapoints if given as a proportion
             if 0 < bandwidth <= 1:
@@ -1193,7 +1190,7 @@ class MultiTimeSeries:
             sigma = (0.25 / 0.675) * bw_num
 
             # Do guassian smoothing on each variable
-            for var_name in var_names:
+            for var_name in self.var_names:
                 smooth_values = gf(df_pre[var_name].values, sigma=sigma, mode="reflect")
                 smooth_series = pd.Series(smooth_values, index=df_pre.index)
                 # Add smoothed data and residuals to the 'state' DataFrame
@@ -1220,6 +1217,70 @@ class MultiTimeSeries:
                 self.state["{}_residuals".format(var_name)] = (
                     self.state[var_name] - self.state["{}_smoothing".format(var_name)]
                 )
+
+    def compute_covar(self, rolling_window=0.25, leading_eval=False):
+        """
+        Compute the covariance matrix over a rolling window.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+
+        Put into 'ews' dataframe
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute variance. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+        leading_eval : bool
+            Whether to compute the leading eigenvalue of the covariance matrix.
+            This has been suggested as an early warning signal (Carpenter et al. 2008, Ecol. Letters)
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # If residuals column exists, compute over residuals.
+        if "{}_residuals".format(self.var_names[0]) in df_pre.columns:
+            col_names_to_compute = [
+                "{}_residuals".format(var) for var in self.var_names
+            ]
+        else:
+            col_names_to_compute = self.var_names
+
+        # Compute covariance matrix
+        df_covar = df_pre[col_names_to_compute].rolling(window=rw_absolute).cov()
+        self.covar = df_covar
+
+        # Compute leading eigenvalue
+        if leading_eval:
+            covar_matrices = df_covar.values.reshape(
+                -1, len(self.var_names), len(self.var_names)
+            )
+            ar_evals = np.zeros(len(df_pre))
+            for idx, mat in enumerate(covar_matrices):
+                # Only compute eval if there are no NaN entries
+                if not np.any(np.isnan(mat)):
+                    evals, evecs = np.linalg.eig(mat)
+                    ar_evals[idx] = max(evals)
+                else:
+                    ar_evals[idx] = np.nan
+            series_evals = pd.Series(ar_evals, index=df_pre.index)
+            self.ews["covar_leading_eval"] = series_evals
 
 
 # -----------------------------

@@ -24,6 +24,53 @@ from ewstools import helpers
 # import ewstools
 
 
+def test_MultiTimeSeries_init():
+    """
+    Test the MultiTimeSeries initialisation process
+    """
+
+    # Simulate a time series
+    tVals = np.arange(0, 10, 0.1)
+    xVals = 5 + np.random.normal(0, 1, len(tVals))
+    yVals = 2 + np.random.normal(0, 2, len(tVals))
+    df = pd.DataFrame({"x": xVals, "y": yVals}, index=tVals)
+    df.index.name = "index_name"
+
+    # Create MultiTimeSeries object
+    mts = ewstools.core.MultiTimeSeries(df, transition=8)
+    assert type(mts.state) == pd.DataFrame
+    assert type(mts.ews) == pd.DataFrame
+    assert type(mts.ktau) == dict
+    assert mts.state.index.name == "index_name"
+    assert mts.ews.index.name == "index_name"
+    assert type(mts.transition) == float
+
+
+def test_MultiTimeSeries_ews():
+    """
+    Test the MultiTimeSeries EWS computations
+    """
+
+    # Simulate a time series
+    tVals = np.arange(0, 10, 0.1)
+    xVals = 5 + np.random.normal(0, 1, len(tVals))
+    yVals = 2 + np.random.normal(0, 2, len(tVals))
+    zVals = 1 + 0.5 * tVals + np.random.normal(0, 2, len(tVals))
+    df = pd.DataFrame({"x": xVals, "y": yVals, "z": zVals}, index=tVals)
+    df.index.name = "index_name"
+
+    # Create MultiTimeSeries object
+    mts = ewstools.core.MultiTimeSeries(df, transition=8)
+    mts.detrend(method="Gaussian", bandwidth=0.2)
+    mts.compute_covar(rolling_window=0.25, leading_eval=True)
+
+    assert type(mts.ews) == pd.DataFrame
+    assert type(mts.covar) == pd.DataFrame
+    assert "x_residuals" in mts.state.columns
+    assert "z_smoothing" in mts.state.columns
+    assert "covar_leading_eval" in mts.ews.columns
+
+
 def test_TimeSeries_init():
     """
     Test the TimeSeries initialisation process
@@ -63,28 +110,6 @@ def test_TimeSeries_init():
     # Make plotly fig
     fig = ts.make_plotly()
     assert type(fig) == plotly.graph_objs._figure.Figure
-
-
-def test_MultiTimeSeries_init():
-    """
-    Test the MultiTimeSeries initialisation process
-    """
-
-    # Simulate a time series
-    tVals = np.arange(0, 10, 0.1)
-    xVals = 5 + np.random.normal(0, 1, len(tVals))
-    yVals = 2 + np.random.normal(0, 2, len(tVals))
-    df = pd.DataFrame({"x": xVals, "y": yVals}, index=tVals)
-    df.index.name = "test_index"
-
-    # Create MultiTimeSeries object
-    mts = ewstools.core.MultiTimeSeries(df, transition=80)
-    assert type(mts.state) == pd.DataFrame
-    assert type(mts.ews) == pd.DataFrame
-    assert type(mts.ktau) == dict
-    assert mts.state.index.name == "test_index"
-    assert mts.ews.index.name == "test_index"
-    assert type(mts.transition) == float
 
 
 def test_TimeSeries_ews():
