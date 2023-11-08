@@ -13,5 +13,5 @@ plotly==5.9.0
 lmfit==1.0.3
 statsmodels==0.13.2
 scipy==1.8.1
-tensorflow==2.9.3
+tensorflow==2.11.1
 deprecation==2.1.0
