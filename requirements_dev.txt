@@ -1,7 +1,7 @@
 pip==22.1.2
-setuptools==62.6.0
+setuptools==65.5.1
 twine==4.0.1
-wheel==0.37.1
+wheel==0.38.1
 pytest==7.1.2
 pytest-cov==3.0.0
 sphinx==5.0.2
@@ -13,5 +13,5 @@ plotly==5.9.0
 lmfit==1.0.3
 statsmodels==0.13.2
 scipy==1.8.1
-tensorflow==2.9.1
+tensorflow==2.9.3
 deprecation==2.1.0

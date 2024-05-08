@@ -1,0 +1,27 @@
+{
+    "description": "A Python package for early warning signals of bifurcations in time series data", 
+    "license": "CC BY 4.0", 
+    "title": "ewstools: A Python package for early warning signals of bifurcations in time series data", 
+    "version": "v2.1.1",
+    "upload_type": "software",
+    "publication_date": "2023-02-10", 
+    "creators": [
+        {
+            "affiliation": "McGill University", 
+            "name": "Thomas Bury"
+        }
+    ], 
+    "access_right": "open", 
+    "related_identifiers": [
+        {
+            "scheme": "url", 
+            "identifier": "https://github.com/ThomasMBury/ewstools/tree/v2.1.1", 
+            "relation": "isSupplementTo"
+        }, 
+        {
+            "scheme": "doi", 
+            "identifier": "10.5281/zenodo.2598517", 
+            "relation": "isVersionOf"
+        }
+    ]
+}

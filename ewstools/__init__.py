@@ -8,3 +8,4 @@ from . import models
 
 # Import specific classes and functions
 from .core import TimeSeries
+from .core import MultiTimeSeries
