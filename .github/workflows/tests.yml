@@ -26,7 +26,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest pytest-cov
           pip --default-timeout=100 install -e .
-          pip --default-timeout=100 install "keras<3.0.0"
           pip --default-timeout=100 install "tensorflow>=2.0.0,<2.12"
       - name: Lint with flake8
         run: |
