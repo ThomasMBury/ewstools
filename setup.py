@@ -3,15 +3,17 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-requirements = ['pandas>=0.23.0',
-                'numpy>=1.14.0',
-                'plotly>=2.3.0',
-                'lmfit>=0.9.0', 
-                'arch>=4.4',
-                'statsmodels>=0.9.0',
-                'scipy>=1.0.1',
-                'deprecation>=2.0',
-                ]
+requirements = [
+    "pandas>=0.23.0",
+    "numpy>=1.14.0",
+    "plotly>=2.3.0",
+    "lmfit>=0.9.0",
+    "arch>=4.4",
+    "statsmodels>=0.9.0",
+    "scipy>=1.0.1",
+    "deprecation>=2.0",
+    "entropyhub>=2.0",
+]
 
 setuptools.setup(
     name="ewstools",
