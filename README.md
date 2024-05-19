@@ -16,7 +16,7 @@ Many systems in nature and society have the capacity to undergo critical transit
 
 The package provides:
 
-  - An intuitive, object-oriented framework for working with EWS in a given time series
+  - An intuitive, object-oriented framework for computing EWS for a given time series
   - Time series detrending methods using
     - A Gaussian kernel
     - LOWESS (Locally Weighted Scatterplot Smoothing)
@@ -25,9 +25,9 @@ The package provides:
     - Autocorrelation (at specified lag times)
     - Higher-order statistical moments (skewness, kurtosis)
     - Power spectrum and associated metrics
+    - Various entropy measures
   - Computation of Kendall tau values to quantify trends
   - Application of deep learning classifiers for bifurcation prediction as in [Bury et al. 2021](https://www.pnas.org/doi/10.1073/pnas.2106140118).
-  - Block-bootstrapping of time-series to obtain confidence intervals on EWS estimates
   - Visualisation tools to display output
   - Built-in theoretical models to test EWS
 
