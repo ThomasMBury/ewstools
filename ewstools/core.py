@@ -54,6 +54,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+import EntropyHub as EH
 
 # For deprecating old functions
 import deprecation
@@ -66,7 +67,8 @@ import deprecation
 
 class TimeSeries:
     """
-    Univariate time series data on which to compute early warning signals.
+    Class to hold univariate time series data on which to
+    compute early warning signals.
 
     Parameters
     ----------
@@ -116,7 +118,7 @@ class TimeSeries:
     def detrend(self, method="Gaussian", bandwidth=0.2, span=0.2):
         """
         Detrend the time series using a chosen method.
-        Add column to the dataframe for 'smoothing' and 'residuals'
+        Output is stored in the self.state dataframe.
 
         Parameters
         ----------
@@ -182,8 +184,7 @@ class TimeSeries:
         Compute variance over a rolling window.
         If residuals have not been computed, computation will be
         performed over state variable.
-
-        Put into 'ews' dataframe
+        Output is stored in the self.ews dataframe.
 
         Parameters
         ----------
@@ -224,8 +225,8 @@ class TimeSeries:
         Compute standard deviation over a rolling window.
         If residuals have not been computed, computation will be
         performed over state variable.
+        Output is stored in the self.ews dataframe.
 
-        Put into 'ews' dataframe
 
         Parameters
         ----------
@@ -268,8 +269,7 @@ class TimeSeries:
         mean of the state variable.
         If residuals have not been computed, computation will be
         performed over state variable.
-
-        Put into 'ews' dataframe
+        Output is stored in the self.ews dataframe.
 
         Parameters
         ----------
@@ -313,7 +313,10 @@ class TimeSeries:
 
     def compute_auto(self, rolling_window=0.25, lag=1):
         """
-        Compute autocorrelation over a rolling window. Add to dataframe.
+        Compute autocorrelation at a give lag over a rolling window.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+        Output is stored in the self.ews dataframe.
 
         Parameters
         ----------
@@ -364,8 +367,8 @@ class TimeSeries:
         Compute skew over a rolling window.
         If residuals have not been computed, computation will be
         performed over state variable.
+        Output is stored in the self.ews dataframe.
 
-        Add to dataframe.
 
         Parameters
         ----------
@@ -406,8 +409,8 @@ class TimeSeries:
         Compute kurtosis over a rolling window.
         If residuals have not been computed, computation will be
         performed over state variable.
+        Output is stored in the self.ews dataframe.
 
-        Add to dataframe.
 
         Parameters
         ----------
@@ -442,6 +445,99 @@ class TimeSeries:
             kurt_values = df_pre["state"].rolling(window=rw_absolute).kurt()
 
         self.ews["kurtosis"] = kurt_values
+
+    def compute_entropy(self, rolling_window=0.25, method="sample", **kwargs):
+        """
+        Compute entropy using a given method over a rolling window.
+        Uses EntropyHub https://www.entropyhub.xyz/Home.html.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+        Output is stored in the self.ews dataframe.
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute variance. Can be specified
+            as an absolute value or as a proportion of the length of the
+            data being analysed. Default is 0.25.
+        method : str
+            The method by which to compute entropy. Options include 'sample',
+            'approximate', and 'kolmogorov'
+        **kwargs
+            Keyword arguments for the EntropyHub function
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Get time series data prior to transition
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+
+        # Get absolute size of rollling window if given as a proportion
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+
+        # Get data on which to compute entropy
+        if "residuals" in df_pre.columns:
+            ts_vals = df_pre["residuals"]
+        else:
+            ts_vals = df_pre["state"]
+
+        # Compute sample entropy
+        if method == "sample":
+
+            def entropy_func(series):
+                Samp, A, B = EH.SampEn(series.values, **kwargs)
+                return Samp
+
+        # Compute approxiamte entropy
+        if method == "approximate":
+
+            def entropy_func(series):
+                Ap, Phi = EH.ApEn(series.values, **kwargs)
+                return Ap
+
+        # Compute komogorov entropy
+        if method == "kolmogorov":
+
+            def entropy_func(series):
+                K2, Ci = EH.K2En(series.values, **kwargs)
+                return K2
+
+        list_times = []
+        list_entropy = []
+        # Set up rolling window (cannot use pandas.rolling as multi-output fn)
+        for k in np.arange(0, len(ts_vals) - (rw_absolute - 1)):
+            # Select subset of series contained in window
+            window_series = ts_vals.iloc[k : k + rw_absolute]
+            # Assign the time value for the metrics (right end point of window)
+            t_point = ts_vals.index[k + (rw_absolute - 1)]
+            # Compute entropy (value for each channel)
+            entropy = entropy_func(window_series)
+
+            list_times.append(t_point)
+            list_entropy.append(entropy)
+
+        ar_entropy = np.array(list_entropy)
+
+        df_entropy = pd.DataFrame()
+        df_entropy["time"] = list_times
+        num_embedding_dims = ar_entropy.shape[1]
+        for dim in range(num_embedding_dims):
+            df_entropy["{}-entropy-{}".format(method, dim)] = ar_entropy[:, dim]
+        df_entropy.set_index("time", inplace=True)
+
+        # Add info to self.ews dataframe
+        for col in df_entropy.columns:
+            self.ews[col] = df_entropy[col]
+        # self.ews = pd.merge(self.ews, df_entropy, how="left", on="time")
 
     def compute_ktau(self, tmin="earliest", tmax="latest"):
         """
