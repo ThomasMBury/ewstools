@@ -16,7 +16,7 @@ Many systems in nature and society have the capacity to undergo critical transit
 
 The package provides:
 
-  - An intuitive, object-oriented framework for working with EWS in a given time series
+  - An intuitive, object-oriented framework for computing EWS for a given time series
   - Time series detrending methods using
     - A Gaussian kernel
     - LOWESS (Locally Weighted Scatterplot Smoothing)
@@ -25,13 +25,13 @@ The package provides:
     - Autocorrelation (at specified lag times)
     - Higher-order statistical moments (skewness, kurtosis)
     - Power spectrum and associated metrics
+    - Various entropy measures
   - Computation of Kendall tau values to quantify trends
   - Application of deep learning classifiers for bifurcation prediction as in [Bury et al. 2021](https://www.pnas.org/doi/10.1073/pnas.2106140118).
-  - Block-bootstrapping of time-series to obtain confidence intervals on EWS estimates
   - Visualisation tools to display output
   - Built-in theoretical models to test EWS
 
-`ewstools` makes use of [pandas](https://pandas.pydata.org/) for dataframe handling, [numpy](https://numpy.org/) for fast numerical computing, [plotly](https://plotly.com/graphing-libraries/) for visuliastion, [lmfit](https://lmfit.github.io/lmfit-py/) for least-squares minimisation, [arch](https://github.com/bashtage/arch) for bootstrapping methods, [statsmodels](https://www.statsmodels.org/stable/index.html) and [scipy](https://scipy.org/) for detrending methods, and [TensorFlow](https://www.tensorflow.org/install) for deep learning.
+`ewstools` makes use of [pandas](https://pandas.pydata.org/) for dataframe handling, [numpy](https://numpy.org/) for fast numerical computing, [plotly](https://plotly.com/graphing-libraries/) for visuliastion, [lmfit](https://lmfit.github.io/lmfit-py/) for least-squares minimisation, [arch](https://github.com/bashtage/arch) for bootstrapping methods, [EntropyHub](https://www.entropyhub.xyz/index.html) for entropy computations, [statsmodels](https://www.statsmodels.org/stable/index.html) and [scipy](https://scipy.org/) for detrending methods, and [TensorFlow](https://www.tensorflow.org/install) for deep learning.
 
 
 ## Install
@@ -57,7 +57,7 @@ Package dependencies are
 'statsmodels>=0.9.0',
 'scipy>=1.0.1',
 ```
-and should be installed automatically. To use the deep learning functionality, you will need to install [TensorFlow](https://www.tensorflow.org/install) v2.0.0 or later with [Keras](https://keras.io/2.16/api/) v2.
+and should be installed automatically. To use the deep learning functionality, you will need to install [TensorFlow](https://www.tensorflow.org/install) with version later than 2.0 and earlier than 2.12.
 
 To install the latest *development* version, use the command
 ```bash
