@@ -559,10 +559,10 @@ class TimeSeries:
 
         # Get tmin and tmax values if using extrema
         if tmin == "earliest":
-            tmin = self.ews.dropna().index[0]
+            tmin = self.ews.dropna(how="all").index[0]
 
         if tmax == "latest":
-            tmax = self.ews.dropna().index[-1]
+            tmax = self.ews.dropna(how="all").index[-1]
 
         # Get cropped data
         df_ews = self.ews[(self.ews.index >= tmin) & (self.ews.index <= tmax)].copy()
