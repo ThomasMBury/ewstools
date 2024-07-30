@@ -15,4 +15,4 @@ statsmodels==0.13.2
 scipy==1.8.1
 deprecation==2.1.0
 EntropyHub==2.0
-tensorflow==2.11.1
+tensorflow==2.12.1
