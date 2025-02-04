@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 requirements = [
     "pandas>=0.23.0",
-    "numpy>=1.14.0",
+    "numpy>=1.14.0<1.25.0",
     "plotly>=2.3.0",
     "lmfit>=0.9.0",
     "arch>=4.4",
