@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 requirements = [
     "pandas>=0.23.0",
-    "numpy>=1.14.0",
+    "numpy>=1.14.0,<1.25",
     "plotly>=2.3.0",
     "lmfit>=0.9.0",
     "arch>=4.4",
@@ -17,7 +17,7 @@ requirements = [
 
 setuptools.setup(
     name="ewstools",
-    version="2.1.0",
+    version="2.1.2",
     author="Thomas M Bury",
     author_email="tombury182@gmail.com",
     description="""Python package to compute early warning signals (EWS) 
