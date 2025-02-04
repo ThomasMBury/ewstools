@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ewstools"
+version = "2.1.2"
+description = "A Python package for early warning signals (EWS) of bifurcations in time series data."
+authors = [{ name = "Thomas M Bury", email = "tombury182@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.8" # Adjust based on your supported Python version
+dependencies = [
+    "pandas>=0.23.0",
+    "numpy>=1.14.0,<1.25.0",
+    "plotly>=2.3.0",
+    "lmfit>=0.9.0",
+    "arch>=4.4",
+    "statsmodels>=0.9.0",
+    "scipy>=1.0.1",
+    "deprecation>=2.0",
+    "entropyhub>=2.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ThomasMBury/ewstools"
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools]
+include-package-data = true
