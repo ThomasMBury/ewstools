@@ -235,7 +235,10 @@ def test_TimeSeries_dl_preds():
     ts.detrend()
 
     # Import a classifier
-    classifier_path = "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.pkl"
+    # classifier_path = "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.pkl"
+    classifier_path = (
+        "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.keras"
+    )
     classifier = load_model(classifier_path)
 
     # Apply classifier with time bounds
@@ -253,7 +256,10 @@ def test_TimeSeries_dl_preds():
     assert type(fig) == plotly.graph_objs._figure.Figure
 
     # Import and apply a second classifier
-    classifier_path = "saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.pkl"
+    # classifier_path = "saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.pkl"
+    classifier_path = (
+        "saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.keras"
+    )
     classifier2 = load_model(classifier_path)
     ts.apply_classifier_inc(classifier2, inc=40, name="c2", verbose=1)
 
