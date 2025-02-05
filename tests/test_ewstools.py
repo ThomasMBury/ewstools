@@ -237,14 +237,14 @@ def test_TimeSeries_dl_preds():
     ts.detrend()
 
     # Import a classifier
-    if version.parse(tf.__version__) < version.parse("2.14"):
-        print("Using TensorFlow version earlier than 2.14")
+    if version.parse(tf.__version__) < version.parse("2.15"):
+        print("Using TensorFlow version earlier than 2.15")
         tf_legacy = True
         classifier_path = (
             "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.pkl"
         )
     else:
-        print("Using TensorFlow version later than 2.14")
+        print("Using TensorFlow version later than 2.15")
         tf_legacy = False
         classifier_path = (
             "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.keras"
