@@ -57,7 +57,7 @@ Package dependencies are
 'statsmodels>=0.9.0',
 'scipy>=1.0.1',
 ```
-and should be installed automatically. To use the deep learning functionality, you will need to install [TensorFlow](https://www.tensorflow.org/install) with version later than 2.0 and earlier than 2.12.
+and should be installed automatically. To use the deep learning functionality, you will need to install [TensorFlow](https://www.tensorflow.org/install) with version later than 2.10 and earlier than 2.16.
 
 To install the latest *development* version, use the command
 ```bash
