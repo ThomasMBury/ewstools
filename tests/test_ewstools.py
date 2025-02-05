@@ -8,7 +8,9 @@ import numpy as np
 import pandas as pd
 import plotly
 
-from tensorflow.keras.models import load_model
+import tensorflow as tf
+from tf.keras.models import load_model
+from packaging import version
 
 # Import ewstools
 import ewstools
@@ -235,10 +237,18 @@ def test_TimeSeries_dl_preds():
     ts.detrend()
 
     # Import a classifier
-    # classifier_path = "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.pkl"
-    classifier_path = (
-        "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.keras"
-    )
+    if version.parse(tf.__version__) < version.parse("2.14"):
+        print("Using TensorFlow version earlier than 2.14")
+        tf_legacy = True
+        classifier_path = (
+            "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.pkl"
+        )
+    else:
+        print("Using TensorFlow version later than 2.14")
+        tf_legacy = False
+        classifier_path = (
+            "saved_classifiers/bury_pnas_21/len500/best_model_1_1_len500.keras"
+        )
     classifier = load_model(classifier_path)
 
     # Apply classifier with time bounds
@@ -256,10 +266,14 @@ def test_TimeSeries_dl_preds():
     assert type(fig) == plotly.graph_objs._figure.Figure
 
     # Import and apply a second classifier
-    # classifier_path = "saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.pkl"
-    classifier_path = (
-        "saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.keras"
-    )
+    if tf_legacy:
+        classifier_path = (
+            "saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.pkl"
+        )
+    else:
+        classifier_path = (
+            "saved_classifiers/bury_pnas_21/len500/best_model_1_2_len500.keras"
+        )
     classifier2 = load_model(classifier_path)
     ts.apply_classifier_inc(classifier2, inc=40, name="c2", verbose=1)
 
