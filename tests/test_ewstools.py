@@ -9,7 +9,7 @@ import pandas as pd
 import plotly
 
 import tensorflow as tf
-from tf.keras.models import load_model
+from tensorflow.keras.models import load_model
 from packaging import version
 
 # Import ewstools
