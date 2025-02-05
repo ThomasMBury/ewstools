@@ -27,8 +27,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest pytest-cov
           pip --default-timeout=100 install -e .
-          # pip --default-timeout=100 install "tensorflow>=2.0.0,<2.12"
-          pip --default-timeout=100 install "tensorflow>=2.13"
+          pip --default-timeout=100 install "tensorflow>=2.10,<2.16"
+          # pip --default-timeout=100 install "tensorflow>=2.13"
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
