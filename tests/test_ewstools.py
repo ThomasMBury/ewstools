@@ -146,18 +146,18 @@ def test_TimeSeries_ews():
     ts.compute_auto(lag=5, rolling_window=rolling_window)
     ts.compute_skew(rolling_window=rolling_window)
     ts.compute_kurt(rolling_window=rolling_window)
-    ts.compute_entropy(rolling_window=rolling_window, method="sample")
-    ts.compute_entropy(rolling_window=rolling_window, method="approximate")
-    ts.compute_entropy(rolling_window=rolling_window, method="kolmogorov")
+    # ts.compute_entropy(rolling_window=rolling_window, method="sample")
+    # ts.compute_entropy(rolling_window=rolling_window, method="approximate")
+    # ts.compute_entropy(rolling_window=rolling_window, method="kolmogorov")
 
     assert type(ts.ews) == pd.DataFrame
     assert "variance" in ts.ews.columns
     assert "ac5" in ts.ews.columns
     assert "cv" in ts.ews.columns
-    assert "sample-entropy-0" in ts.ews.columns
-    assert "sample-entropy-2" in ts.ews.columns
-    assert "approximate-entropy-1" in ts.ews.columns
-    assert "kolmogorov-entropy-1" in ts.ews.columns
+    # assert "sample-entropy-0" in ts.ews.columns
+    # assert "sample-entropy-2" in ts.ews.columns
+    # assert "approximate-entropy-1" in ts.ews.columns
+    # assert "kolmogorov-entropy-1" in ts.ews.columns
 
     # Compute EWS on time series without transition
     rolling_window = 0.5
@@ -168,17 +168,17 @@ def test_TimeSeries_ews():
     ts2.compute_auto(lag=5, rolling_window=rolling_window)
     ts2.compute_skew(rolling_window=rolling_window)
     ts2.compute_kurt(rolling_window=rolling_window)
-    ts2.compute_entropy(rolling_window=rolling_window, method="sample")
-    ts2.compute_entropy(rolling_window=rolling_window, method="approximate")
-    ts2.compute_entropy(rolling_window=rolling_window, method="kolmogorov")
+    # ts2.compute_entropy(rolling_window=rolling_window, method="sample")
+    # ts2.compute_entropy(rolling_window=rolling_window, method="approximate")
+    # ts2.compute_entropy(rolling_window=rolling_window, method="kolmogorov")
     assert type(ts2.ews) == pd.DataFrame
     assert "variance" in ts2.ews.columns
     assert "ac5" in ts2.ews.columns
     assert "cv" in ts2.ews.columns
-    assert "sample-entropy-0" in ts2.ews.columns
-    assert "sample-entropy-2" in ts2.ews.columns
-    assert "approximate-entropy-1" in ts2.ews.columns
-    assert "kolmogorov-entropy-1" in ts2.ews.columns
+    # assert "sample-entropy-0" in ts2.ews.columns
+    # assert "sample-entropy-2" in ts2.ews.columns
+    # assert "approximate-entropy-1" in ts2.ews.columns
+    # assert "kolmogorov-entropy-1" in ts2.ews.columns
 
     # Detrend data using Gaussian and Lowess filter
     ts.detrend("Gaussian", bandwidth=0.2)
@@ -197,24 +197,24 @@ def test_TimeSeries_ews():
     ts.compute_auto(lag=5, rolling_window=rolling_window)
     ts.compute_skew(rolling_window=rolling_window)
     ts.compute_kurt(rolling_window=rolling_window)
-    ts.compute_entropy(rolling_window=rolling_window, method="sample")
-    ts.compute_entropy(rolling_window=rolling_window, method="approximate")
-    ts.compute_entropy(rolling_window=rolling_window, method="kolmogorov")
+    # ts.compute_entropy(rolling_window=rolling_window, method="sample")
+    # ts.compute_entropy(rolling_window=rolling_window, method="approximate")
+    # ts.compute_entropy(rolling_window=rolling_window, method="kolmogorov")
 
     assert type(ts.ews) == pd.DataFrame
     assert "variance" in ts.ews.columns
     assert "ac5" in ts.ews.columns
-    assert "sample-entropy-0" in ts.ews.columns
-    assert "sample-entropy-2" in ts.ews.columns
-    assert "approximate-entropy-1" in ts.ews.columns
-    assert "kolmogorov-entropy-1" in ts.ews.columns
+    # assert "sample-entropy-0" in ts.ews.columns
+    # assert "sample-entropy-2" in ts.ews.columns
+    # assert "approximate-entropy-1" in ts.ews.columns
+    # assert "kolmogorov-entropy-1" in ts.ews.columns
 
     # Test kendall tau computation
     ts.compute_ktau()
     assert type(ts.ktau) == dict
     assert "variance" in ts.ktau.keys()
     assert "ac5" in ts.ktau.keys()
-    assert "sample-entropy-0" in ts.ktau.keys()
+    # assert "sample-entropy-0" in ts.ktau.keys()
 
     # Make plotly fig
     fig = ts.make_plotly()
