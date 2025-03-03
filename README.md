@@ -36,7 +36,7 @@ The package provides:
 
 ## Install
 
-Requires Python 3.8 or later. You can install `ewstools` with pip using the commands
+Requires Python between 3.8 and 3.11. You can install `ewstools` with pip using the commands
 
 ```bash
 pip install --upgrade pip
@@ -52,12 +52,16 @@ Package dependencies are
 'pandas>=0.23.0',
 'numpy>=1.14.0',
 'plotly>=2.3.0',
-'lmfit>=0.9.0', 
+'lmfit>=0.9.0',
 'arch>=4.4',
 'statsmodels>=0.9.0',
 'scipy>=1.0.1',
 ```
-and should be installed automatically. To use the deep learning functionality, you will need to install [TensorFlow](https://www.tensorflow.org/install) with version later than 2.10 and earlier than 2.16.
+and should be installed automatically. To use the deep learning functionality, you will need to install [TensorFlow](https://www.tensorflow.org/install) with the command
+```bash
+pip install ewstools[tf]
+```
+Note that TensorFlow has no wheels on Windows, therefore can only be installed on Linux and macOS.
 
 To install the latest *development* version, use the command
 ```bash

@@ -8,7 +8,7 @@ version = "2.1.2"
 description = "A Python package for early warning signals (EWS) of bifurcations in time series data."
 authors = [{ name = "Thomas M Bury", email = "tombury182@gmail.com" }]
 readme = "README.md"
-requires-python = ">=3.8" # Adjust based on your supported Python version
+requires-python = ">=3.8,<3.12" # Adjust based on your supported Python version
 dependencies = [
     "pandas>=0.23.0",
     "numpy>=1.14.0,<1.25.0",
@@ -28,6 +28,11 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/ThomasMBury/ewstools"
+
+[project.optional-dependencies]
+tf = [
+    "tensorflow>=2.10,<=2.16 ; sys_platform != 'win32'",
+]
 
 [tool.setuptools.packages]
 find = {}
