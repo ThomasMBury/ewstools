@@ -12,9 +12,9 @@
 
 Many systems in nature and society can undergo critical transitions—sudden, often irreversible shifts in dynamics. Examples include the outbreak of disease, ecosystem collapse, and cardiac arrhythmias. Mathematically, such transitions often correspond to bifurcations (tipping points) in an underlying dynamical system.
 
-[Scheffer et al. (2009)](https://www.nature.com/articles/nature08227) proposed early warning signals (EWS) based on noisy fluctuations in time series data, sparking a surge of research on different ways to predict bifurcations (e.g. [Clements & Ozgul 2018](https://onlinelibrary.wiley.com/doi/full/10.1111/ele.12948)). More recently, EWS from deep learning classifiers have outperformed conventional EWS on several model and empirical datasets, whilst also providing information on the type of bifurcation ([Bury et al. 2021](https://www.pnas.org/doi/10.1073/pnas.2106140118)).
+[Scheffer et al. (2009)](https://www.nature.com/articles/nature08227) proposed early warning signals (EWS) for bifurcations based on noisy fluctuations in time series data, sparking a surge of related ways to predict bifurcations (see [Dakos et al. (2024)](https://esd.copernicus.org/articles/15/1117/2024/esd-15-1117-2024.html) for a recent review). More recently, deep learing has shown great potential for predicting bifurcations and their type ([Bury et al. 2021](https://www.pnas.org/doi/10.1073/pnas.2106140118)).
 
-`ewstools` is a Python package for computing, analyzing, and visualizing EWS in time series. It complements the R package by ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)) and meets growing demand for Python-based tools ([PYPL, 2022](https://pypl.github.io/PYPL.html)).
+`ewstools` is a Python package for computing and visualizing EWS in time series. It complements the R package by ([Dakos et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041010)) and meets growing demand for Python-based tools ([PYPL, 2022](https://pypl.github.io/PYPL.html)).
 
 Features include:
   - An intuitive, object-oriented framework for computing EWS
