@@ -87,7 +87,7 @@ pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
 
 ## Quick demo
 
-Import `ewstools` and simulate a time series (e.g., the Ricker model):
+Code in `quick_demo.ipynb`. Import `ewstools` and simulate a time series (e.g., the Ricker model):
 ```python
 import ewstools
 from ewstools.models import simulate_ricker
@@ -110,6 +110,12 @@ ts.compute_var(rolling_window=0.5)
 ts.compute_auto(lag=1, rolling_window=0.5)
 ts.compute_auto(lag=2, rolling_window=0.5)
 ts.compute_ktau()
+```
+
+Get predictions from deep learning classifiers
+```python
+for idx, classifier in enumerate(list_classifiers):
+    ts.apply_classifier_inc(classifier, inc=10, verbose=0, name=str(idx))
 ```
 
 Plot results interactively:
