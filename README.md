@@ -50,7 +50,7 @@ For tutorials, install [Jupyter notebook](https://jupyter.org/install):
 pip install jupyter notebook
 ```
 
-Main dependencies (installed automatically):
+<!-- Main dependencies (installed automatically):
 
 ```bash
 'pandas>=0.23.0',
@@ -60,7 +60,7 @@ Main dependencies (installed automatically):
 'arch>=4.4',
 'statsmodels>=0.9.0',
 'scipy>=1.0.1',
-```
+``` -->
 
 To enable deep learning features, install [TensorFlow](https://www.tensorflow.org/install):
 
@@ -87,7 +87,7 @@ pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
 
 ## Quick demo
 
-Code in `quick_demo.ipynb`. Import `ewstools` and simulate a time series (e.g., the Ricker model):
+Code available in `./quick_demo.ipynb`. Import `ewstools` and simulate a time series (e.g., the Ricker model):
 ```python
 import ewstools
 from ewstools.models import simulate_ricker
@@ -118,7 +118,7 @@ for idx, classifier in enumerate(list_classifiers):
     ts.apply_classifier_inc(classifier, inc=10, verbose=0, name=str(idx))
 ```
 
-Plot results interactively:
+Make an interactive visualization in Plotly:
 
 ```python
 ts.make_plotly()
