@@ -109,7 +109,7 @@ parso==0.8.4
 pathos==0.3.4
 patsy==1.0.1
 pexpect==4.9.0
-pillow==11.2.1
+pillow==11.3.0
 platformdirs==4.3.7
 plotly==6.0.1
 pluggy==1.5.0
