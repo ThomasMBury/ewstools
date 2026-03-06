@@ -8,13 +8,13 @@ version = "2.1.2"
 description = "A Python package for early warning signals (EWS) of bifurcations in time series data."
 authors = [{ name = "Thomas M Bury", email = "tombury182@gmail.com" }]
 readme = "README.md"
-requires-python = ">=3.8,<3.12" # Adjust based on your supported Python version
+requires-python = ">=3.9"
 dependencies = [
     "pandas>=0.23.0",
-    "numpy>=1.14.0,<1.25.0",
+    "numpy>=1.26.0,<2.0",  # 1.26 is oldest with 3.12 wheels; <2.0 avoids breaking changes
     "plotly>=2.3.0",
     "lmfit>=0.9.0",
-    "arch>=4.4",
+    "arch>=6.2",  # 6.2 is oldest with compiled 3.12 wheels
     "statsmodels>=0.9.0",
     "scipy>=1.0.1",
     "deprecation>=2.0",
@@ -31,8 +31,12 @@ classifiers = [
 
 [project.optional-dependencies]
 tf = [
-    "tensorflow>=2.10,<=2.16 ; sys_platform != 'win32'",
+    # <=2.16 includes 2.16.0 (Keras 3 breaking change); <2.16 excludes it
+    "tensorflow>=2.10,<2.16 ; sys_platform != 'win32'",
 ]
+
+[tool.pytest.ini_options]
+markers = ["tensorflow: tests requiring TensorFlow (deselect with '-m \"not tensorflow\"')"]
 
 [tool.setuptools.packages]
 find = {}
