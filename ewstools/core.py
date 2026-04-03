@@ -539,6 +539,50 @@ class TimeSeries:
             self.ews[col] = df_entropy[col]
         # self.ews = pd.merge(self.ews, df_entropy, how="left", on="time")
 
+
+    def compute_dfa(self, rolling_window=0.25, order=1):
+        """
+        Compute DFA scaling exponent over a rolling window.
+        If residuals have not been computed, computation will be
+        performed over state variable.
+        Output is stored in the self.ews dataframe.
+
+        Parameters
+        ----------
+        rolling_window : float
+            Length of rolling window used to compute DFA exponent. Can be
+            specified as an absolute value or as a proportion of the length
+            of the data being analysed. Default is 0.25.
+        order : int
+            Polynomial detrending order within DFA (1 = linear). Default
+            is 1.
+
+        Returns
+        -------
+        None.
+
+        """
+        if self.transition:
+            df_pre = self.state[self.state.index <= self.transition]
+        else:
+            df_pre = self.state
+        if 0 < rolling_window <= 1:
+            rw_absolute = int(rolling_window * len(df_pre))
+        else:
+            rw_absolute = rolling_window
+        if 'residuals' in df_pre.columns:
+            dfa_values = (
+                df_pre['residuals']
+                .rolling(window=rw_absolute)
+                .apply(func=lambda x: helpers.dfa(x, order=order), raw=True)
+            )
+        else:
+            dfa_values = (
+                df_pre['state']
+                .rolling(window=rw_absolute)
+                .apply(func=lambda x: helpers.dfa(x, order=order), raw=True)
+            )
+        self.ews['dfa'] = dfa_values
     def compute_ktau(self, tmin="earliest", tmax="latest"):
         """
         Compute kendall tau values of CSD-based EWS.
