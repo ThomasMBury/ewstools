@@ -8,10 +8,6 @@ import numpy as np
 import pandas as pd
 import plotly
 
-import tensorflow as tf
-from tensorflow.keras.models import load_model
-from packaging import version
-
 # Import ewstools
 import ewstools
 from ewstools import core
@@ -221,11 +217,16 @@ def test_TimeSeries_ews():
     assert type(fig) == plotly.graph_objs._figure.Figure
 
 
+@pytest.mark.tensorflow
 def test_TimeSeries_dl_preds():
     """
     Test the TimeSeries methods that involve computing DL predictions
 
     """
+    # TF imports moved inside test so rest of suite runs without TF installed
+    tf = pytest.importorskip("tensorflow")
+    from tensorflow.keras.models import load_model
+    from packaging import version
 
     # Simulate a time series
     tVals = np.arange(0, 10, 0.1)

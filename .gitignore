@@ -24,6 +24,7 @@ symbolic_computation
 # Distribution / packaging
 ############################
 .Python
+.venv/
 venv/
 build/
 dist/

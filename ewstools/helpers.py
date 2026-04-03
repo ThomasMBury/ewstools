@@ -106,7 +106,7 @@ def pspec_welch(yVals,
     ham_offset_points = int(ham_offset*ham_length)
 
     ## Compute the periodogram using Welch's method (scipy.signal function)
-    pspec_raw = signal.welch(yVals,
+    pspec_raw = signal.welch(np.asarray(yVals),
                                fs,
                                nperseg=ham_length,
                                noverlap=ham_offset_points,
