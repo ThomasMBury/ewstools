@@ -27,6 +27,7 @@ Features include:
     - Skewness, kurtosis
     - Power spectra metrics
     - Entropy measures
+    - Detrended Fluctuation Analysis (DFA)
   - Kendall tau statistics to quantify trends
   - Deep learning classifiers for bifurcation prediction ([Bury et al. 2021](https://www.pnas.org/doi/10.1073/pnas.2106140118))
   - Visualization tools
@@ -37,7 +38,7 @@ Features include:
 
 ## Install
 
-Requires Python 3.8–3.11. Install via:
+Requires Python 3.9–3.12. Install via:
 
 ```bash
 pip install --upgrade pip

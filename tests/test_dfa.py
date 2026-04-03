@@ -1,4 +1,5 @@
 """Tests for DFA (Detrended Fluctuation Analysis)."""
+
 import numpy as np
 import pandas as pd
 import ewstools
@@ -43,10 +44,10 @@ def test_TimeSeries_dfa():
     ts = ewstools.TimeSeries(data, transition=8)
     ts.compute_dfa(rolling_window=0.25)
     assert isinstance(ts.ews, pd.DataFrame)
-    assert 'dfa' in ts.ews.columns
+    assert "dfa" in ts.ews.columns
     ts.compute_ktau()
     assert isinstance(ts.ktau, dict)
-    assert 'dfa' in ts.ktau.keys()
+    assert "dfa" in ts.ktau.keys()
 
 
 def test_TimeSeries_dfa_no_transition():
@@ -56,4 +57,4 @@ def test_TimeSeries_dfa_no_transition():
     data = pd.Series(5 + rng.standard_normal(len(tVals)), index=tVals)
     ts = ewstools.TimeSeries(data)
     ts.compute_dfa(rolling_window=0.25)
-    assert 'dfa' in ts.ews.columns
+    assert "dfa" in ts.ews.columns
