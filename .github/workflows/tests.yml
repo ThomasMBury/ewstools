@@ -41,7 +41,7 @@ jobs:
         run: |
             pytest --doctest-modules --cov=ewstools --cov-report=xml tests/      
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage.xml
           verbose: true # optional (default = false)

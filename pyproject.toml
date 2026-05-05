@@ -37,6 +37,7 @@ tf = [
 
 [tool.pytest.ini_options]
 markers = ["tensorflow: tests requiring TensorFlow (deselect with '-m \"not tensorflow\"')"]
+addopts = "--strict-markers"
 
 [tool.setuptools.packages]
 find = {}
