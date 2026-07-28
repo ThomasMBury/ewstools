@@ -1,0 +1,88 @@
+name: Release to PyPI
+
+# Publishes to PyPI when a version tag is pushed.
+#
+# Uses PyPI Trusted Publishing (OIDC) — there is NO API token stored anywhere.
+# GitHub mints a short-lived identity token for this specific workflow in this
+# specific repository, and PyPI verifies it. Nothing long-lived exists to leak,
+# and a stolen credential cannot be replayed from anywhere else.
+#
+# One-time setup on PyPI (project Owner only — pypi.org/manage/project/ewstools/settings/publishing/):
+#     PyPI project name : ewstools
+#     Owner             : ThomasMBury
+#     Repository name   : ewstools
+#     Workflow filename : release.yml
+#     Environment name  : pypi
+#
+# To cut a release:
+#     1. bump `version` in pyproject.toml, land it on main
+#     2. git tag v2.1.3 && git push origin v2.1.3
+# The tag must match pyproject.toml exactly; the build job fails loudly if not.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:        # manual re-run without re-tagging
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # The classic release failure is a tag that disagrees with the packaged
+      # version: you tag v2.1.3, ship 2.1.2, and PyPI rejects it as a duplicate
+      # (or worse, accepts it under the wrong number). Fail here, before build.
+      - name: Tag must match pyproject version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG="$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")"
+          echo "tag=$TAG  pyproject=$PKG"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::tag v$TAG does not match pyproject.toml version $PKG"
+            exit 1
+          fi
+
+      - name: Build sdist and wheel
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+
+      - name: Check metadata renders on PyPI
+        run: python -m twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    # Gate the credential on a named environment so the publish step can be
+    # given required reviewers later if you ever want a human approval on
+    # release, without touching this file.
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ewstools
+    permissions:
+      id-token: write        # REQUIRED for trusted publishing; nothing else is
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
