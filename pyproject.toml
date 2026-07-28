@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ewstools"
-version = "2.1.2"
+version = "2.1.3"
 description = "A Python package for early warning signals (EWS) of bifurcations in time series data."
 authors = [{ name = "Thomas M Bury", email = "tombury182@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "pandas>=0.23.0",
-    "numpy>=1.26.0,<2.0",  # 1.26 is oldest with 3.12 wheels; <2.0 avoids breaking changes
+    "numpy>=1.26.0",  # 1.26 is oldest with 3.12 wheels. NumPy 2.x supported and covered by CI.
     "plotly>=2.3.0",
     "lmfit>=0.9.0",
     "arch>=6.2",  # 6.2 is oldest with compiled 3.12 wheels

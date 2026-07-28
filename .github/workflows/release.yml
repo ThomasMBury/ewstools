@@ -1,0 +1,130 @@
+name: Release
+
+# Builds on every PR; publishes only on a version tag.
+#
+# Uses PyPI Trusted Publishing (OIDC) — NO API token is stored anywhere. GitHub
+# mints a short-lived identity token scoped to this workflow in this repository,
+# and PyPI verifies it. Nothing long-lived exists to leak, and a stolen
+# credential cannot be replayed from anywhere else.
+#
+# ── ONE-TIME SETUP (PyPI project Owner only) ────────────────────────────────
+# https://pypi.org/manage/project/ewstools/settings/publishing/
+#     Owner             : ThomasMBury
+#     Repository name   : ewstools
+#     Workflow filename : release.yml
+#     Environment name  : pypi
+#
+# Optional dry-run target, same form at https://test.pypi.org (separate account):
+#     Environment name  : testpypi
+#
+# ── HOW TO RELEASE ──────────────────────────────────────────────────────────
+#   0. (optional, recommended first time) Actions ▸ Release ▸ Run workflow
+#      ▸ target = testpypi   — proves the whole path without touching real PyPI
+#   1. bump `version` in pyproject.toml, land it on main
+#   2. git tag v2.1.3 && git push origin v2.1.3
+#
+# The tag must match pyproject.toml exactly; the build job fails loudly if not,
+# BEFORE anything is published.
+
+on:
+  push:
+    tags: ['v*']
+  pull_request:              # build + metadata check only, never publishes
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Where to publish (dry-run defaults to nowhere)'
+        required: true
+        default: 'none'
+        type: choice
+        options: ['none', 'testpypi', 'pypi']
+
+permissions:
+  contents: read
+
+# One release at a time. Prevents a double-pushed tag, or a tag plus a manual
+# dispatch, from racing two uploads at the same artefact.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and check distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'      # >=3.11 required: tomllib is stdlib there
+
+      # The classic release failure is a tag that disagrees with the packaged
+      # version: you tag v2.1.3, ship 2.1.2, and PyPI either rejects it as a
+      # duplicate or accepts it under the wrong number. Catch it before build.
+      - name: Tag must match pyproject version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG="$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")"
+          echo "tag=$TAG  pyproject=$PKG"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::tag v$TAG does not match pyproject.toml version $PKG"
+            exit 1
+          fi
+
+      - name: Build sdist and wheel
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+
+      # Catches broken long_description / bad classifiers BEFORE upload. PyPI
+      # rejects those at upload time, which on a tag means a failed release.
+      - name: Check metadata renders on PyPI
+        run: python -m twine check --strict dist/*
+
+      - name: Confirm the built artefact imports
+        run: |
+          python -m pip install dist/*.whl
+          python -c "import ewstools; print('import OK:', ewstools.__file__)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish-testpypi:
+    name: Publish to TestPyPI (dry run)
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi'
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/ewstools
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {name: dist, path: dist/}
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: build
+    # Tags publish automatically; a manual dispatch must explicitly ask for pypi.
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.target == 'pypi')
+    runs-on: ubuntu-latest
+    # Named environment so a human approval can be required later (Settings ▸
+    # Environments ▸ pypi ▸ required reviewers) without editing this file.
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ewstools
+    permissions:
+      id-token: write        # REQUIRED for trusted publishing; nothing else is
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {name: dist, path: dist/}
+      - uses: pypa/gh-action-pypi-publish@release/v1

@@ -13,8 +13,11 @@ jobs:
     # runs-on: ubuntu-20.04
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        # Spans the supported range end to end. 3.13/3.14 are what catch modern-stack
+        # breakage (NumPy 2.x, pandas 3.x, SciPy 1.16+) that older runners never see.
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -28,8 +31,10 @@ jobs:
           pip install flake8 pytest pytest-cov
           pip --default-timeout=100 install -e .
       - name: Install TensorFlow
-        # TF <2.16 has no 3.12 wheels (3.12 support requires TF 2.16+/Keras 3)
-        if: matrix.python-version != '3.12'
+        # TF <2.16 has no wheels for 3.12+ (3.12 support requires TF 2.16+/Keras 3).
+        # Where TF is absent the deep-learning tests skip themselves via
+        # pytest.importorskip("tensorflow") — the rest of the suite still runs.
+        if: ${{ !contains(fromJSON('["3.12","3.13","3.14"]'), matrix.python-version) }}
         run: pip install "tensorflow>=2.10,<2.16"
       - name: Lint with flake8
         run: |

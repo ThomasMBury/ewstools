@@ -553,3 +553,22 @@ def test_mean_ci():
 
     assert type(intervals) == dict
     assert type(intervals["Mean"]) == np.float64 or type(intervals["Mean"]) == float
+
+
+def test_kolmogorov_entropy_works_on_numpy_2():
+    """EntropyHub 2.0 uses np.NaN, removed in NumPy 2.0, so EH.K2En() raised
+    AttributeError on a modern stack. ewstools 2.1.3 relaxes the NumPy pin to
+    allow 2.x, which would have shipped a release where compute_entropy(
+    method='sample') worked and method='kolmogorov' broke -- a partial failure
+    that stays hidden until someone uses that method. Regression test for the
+    compatibility shim in ewstools/core.py."""
+    import numpy as np
+    import ewstools
+    from ewstools.core import TimeSeries
+    from ewstools.models import simulate_ricker
+
+    series = simulate_ricker(tmax=200, F=[0, 2.7])
+    ts = TimeSeries(data=series, transition=180)
+    ts.detrend(method="Lowess", span=0.2)
+    ts.compute_entropy(rolling_window=0.5, method="kolmogorov")
+    assert any("kolmogorov" in c for c in ts.ews.columns)
