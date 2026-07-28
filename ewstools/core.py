@@ -54,6 +54,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+# EntropyHub 2.0 (the latest release) still uses `np.NaN`, which NumPy removed in
+# 2.0 — so EH.K2En() and EH.CoSiEn() raise AttributeError on a modern stack even
+# though ewstools itself is clean. Restore the alias before importing EntropyHub;
+# `np.NaN` was only ever a spelling of `np.nan`, so this is not a behaviour change.
+# Remove once EntropyHub ships a NumPy 2 compatible release (reported upstream).
+if not hasattr(np, "NaN"):  # pragma: no cover - depends on installed NumPy
+    np.NaN = np.nan
+
 import EntropyHub as EH
 
 # For deprecating old functions
