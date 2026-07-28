@@ -3,7 +3,7 @@
 All notable changes to `ewstools` are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.3] — unreleased
+## [2.1.3] — 2026-07-28
 
 Maintenance release. **No API changes and no behavioural changes** — existing code and
 notebooks run unmodified.
@@ -20,6 +20,18 @@ notebooks run unmodified.
   The code fix landed on `main` in March 2026 but had not been published to PyPI, so every
   released install still carried the break. This release ships it.
   Reported in [#474](https://github.com/ThomasMBury/ewstools/issues/474).
+
+- **`compute_entropy(method='kolmogorov')` now works on NumPy 2.** EntropyHub 2.0 — its
+  latest release — still uses `np.NaN`, which NumPy removed in 2.0, so `EH.K2En()` and
+  `EH.CoSiEn()` raised `AttributeError`. `ewstools`' own source was already clean; the
+  alias is restored immediately before the EntropyHub import, and `np.NaN` was only ever
+  a spelling of `np.nan`, so nothing changes numerically. This matters *because* of the
+  NumPy change below: lifting the `numpy<2` ceiling is what puts users on the stack where
+  the break appears, and it was a partial break — `method='sample'` worked while
+  `method='kolmogorov'` failed — which stays hidden until someone reaches for that method.
+  Verified on NumPy 2.4.6 / pandas 3.0.5 / SciPy 1.17.1: fails without the shim, passes
+  with it. Covered by a regression test. The shim can be dropped once EntropyHub ships a
+  NumPy 2 compatible release ([EntropyHub#21](https://github.com/MattWillFlood/EntropyHub/issues/21)).
 
 ### Changed
 
@@ -49,3 +61,7 @@ The single skip is the TensorFlow deep-learning test, which guards itself with
 
 Against released 2.1.2 in the same container, all four spectral entry points fail; on this
 branch all four pass.
+
+These container runs predate the `compute_entropy` fix above, which adds a regression test —
+hence 30 here and 31 in the suite as shipped. That fix was verified separately, on
+NumPy 2.4.6 / pandas 3.0.5 / SciPy 1.17.1.
