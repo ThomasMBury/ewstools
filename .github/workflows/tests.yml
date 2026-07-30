@@ -50,3 +50,41 @@ jobs:
         with:
           files: ./coverage.xml
           verbose: true # optional (default = false)
+
+  docs:
+    name: Docs build
+    # Read the Docs already enforces `fail_on_warning: true`. This job adds no
+    # new rule -- it moves an existing one earlier, from after-merge to on-the-PR,
+    # so a docs regression shows up next to the code that caused it.
+    #
+    # Mirrors .readthedocs.yaml deliberately. A docs job that is greener than RTD
+    # is worse than none at all, because it manufactures confidence:
+    #   build.os          -> ubuntu-24.04
+    #   build.tools.python-> 3.12
+    #   python.install    -> docs/requirements.txt AND the package itself
+    #   fail_on_warning   -> -W
+    #
+    # Two things this job does NOT cover, so nobody mistakes it for full coverage:
+    #   1. It would not have caught the July 2026 breakage, where RTD retired its
+    #      ubuntu-20.04 build image. That is a property of RTD's environment; a
+    #      GitHub-hosted sphinx build is a different environment and passes fine.
+    #      Only RTD's own build status can tell you about RTD.
+    #   2. RTD also builds pdf and epub (`formats:`). This builds HTML only.
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install docs requirements and the package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r docs/requirements.txt
+          pip install .          # autodoc imports ewstools.core / .helpers / .models
+
+      - name: Build HTML docs, warnings are errors
+        run: sphinx-build -W -b html docs/source docs/_build/html
