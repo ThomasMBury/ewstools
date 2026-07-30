@@ -21,17 +21,18 @@ Install ewstools with pip
 
     pip install ewstools
     
-Demos
-========
+Tutorials
+=========
 
-For tutorials on using *ewstools*:
-`https://github.com/ThomasMBury/ewstools/tree/main/tutorials`_
-    
+For tutorials on using *ewstools*, see the
+`tutorials directory <https://github.com/ThomasMBury/ewstools/tree/main/tutorials>`_
+on Github.
+
 Support
 =======
 
-Issues and suggestions may be posted on Github via the issue tracker:
-`https://github.com/ThomasMBury/ewstools/issues`_
+Issues and suggestions may be posted on Github via the
+`issue tracker <https://github.com/ThomasMBury/ewstools/issues>`_.
 
 
 License
@@ -46,6 +47,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-.. _https://github.com/ThomasMBury/ewstools/tree/main/tutorials: https://github.com/ThomasMBury/ewstools/tree/main/tutorials
-.. _https://github.com/ThomasMBury/ewstools/issues: https://github.com/ThomasMBury/ewstools/issues
