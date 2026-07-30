@@ -24,8 +24,44 @@ project = "ewstools"
 copyright = "2022, Thomas M Bury"
 author = "Thomas M Bury"
 
-# Semantic version number
-version = "2.1.1"
+# Semantic version number.
+#
+# Derived, never hardcoded. This line had to be bumped by hand, so it drifted:
+# it still read 2.1.1 while the package was on 2.1.3.
+#
+# Resolution order: installed package metadata first, because that is how the
+# docs are actually built (.readthedocs.yaml installs the package, and so does
+# CI); then pyproject.toml, for a build tree where the package is not installed;
+# then a literal fallback.
+#
+# This must not raise under any circumstances: .readthedocs.yaml sets
+# `sphinx.fail_on_warning`, so an exception here takes the whole build down.
+def _resolve_version():
+    try:
+        from importlib.metadata import version as _installed_version
+
+        return _installed_version("ewstools")
+    except Exception:
+        pass
+    try:
+        import tomllib  # standard library on Python 3.11+ only
+
+        _pyproject = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "..", "pyproject.toml"
+        )
+        with open(_pyproject, "rb") as _f:
+            return tomllib.load(_f)["project"]["version"]
+    except Exception:
+        pass
+    return "unknown"
+
+
+version = _resolve_version()
+
+# The sphinx_rtd_theme displays `release`, not `version`. Leaving `release`
+# unset is why the stale value above went unnoticed across two releases: it was
+# wrong, but it was never rendered anywhere a reader would see it.
+release = version
 
 # -- General configuration ---------------------------------------------------
 
