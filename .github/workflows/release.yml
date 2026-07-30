@@ -25,6 +25,17 @@ name: Release
 #
 # The tag must match pyproject.toml exactly; the build job fails loudly if not,
 # BEFORE anything is published.
+#
+# ── IF THE DOCS GATE BLOCKS A RELEASE ───────────────────────────────────────
+# A tagged release also requires that Read the Docs built successfully. If RTD
+# is down, slow, or wrong, that gate would otherwise strand a release, so there
+# is a deliberate way past it:
+#
+#     Actions ▸ Release ▸ Run workflow ▸ target = pypi ▸ skip_docs_gate = true
+#
+# That publishes the current branch state without waiting on RTD. It is the
+# escape hatch, and it is meant to be used when RTD is the thing that is broken
+# -- not as a way to ship known-broken docs.
 
 on:
   push:
@@ -38,6 +49,11 @@ on:
         default: 'none'
         type: choice
         options: ['none', 'testpypi', 'pypi']
+      skip_docs_gate:
+        description: 'Publish even if Read the Docs is red (use when RTD is what is broken)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -73,6 +89,85 @@ jobs:
             exit 1
           fi
 
+      # 2.1.3 shipped while the Read the Docs build was red: RTD had failed on
+      # the three preceding pushes to main, and the `stable` build triggered by
+      # the tag itself failed one minute before the upload. GitHub Actions was
+      # green throughout, because RTD is a separate build system with separate
+      # failure modes. Green CI is not a green project, so ask RTD directly.
+      #
+      # Read-only and unauthenticated -- RTD exposes build state for public
+      # projects without a token. That is deliberate: this workflow stores no
+      # long-lived credentials and should not start now.
+      - name: Read the Docs must be green
+        if: >-
+          (startsWith(github.ref, 'refs/tags/')
+            || (github.event_name == 'workflow_dispatch' && inputs.target == 'pypi'))
+          && inputs.skip_docs_gate != true
+        env:
+          RTD_PROJECT: ewstools
+          # A tag makes RTD build `stable`, so wait for that build to appear.
+          # A manual dispatch triggers no RTD build, so check `latest`, which
+          # tracks main, and take it as-is.
+          RTD_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && 'stable' || 'latest' }}
+          RTD_REQUIRE_FRESH: ${{ startsWith(github.ref, 'refs/tags/') && 'true' || 'false' }}
+        run: |
+          python - <<'PY'
+          import json, os, sys, time, urllib.request
+          from datetime import datetime, timezone
+
+          project = os.environ["RTD_PROJECT"]
+          want = os.environ["RTD_VERSION"]
+          require_fresh = os.environ["RTD_REQUIRE_FRESH"] == "true"
+          api = f"https://readthedocs.org/api/v3/projects/{project}/builds/?limit=20"
+
+          # Do NOT key this on the build's `commit`: RTD records an EMPTY commit
+          # string for builds that fail before checkout, which is exactly the
+          # case this gate exists to catch. Match on newest-build-for-`want`
+          # plus recency instead.
+          deadline = time.time() + 15 * 60
+          fresh_minutes = 30
+          build_url = f"https://app.readthedocs.org/projects/{project}/builds"
+          escape = ("If RTD itself is the problem, publish via "
+                    "Actions > Release > Run workflow with target=pypi and "
+                    "skip_docs_gate=true.")
+
+          def newest():
+              with urllib.request.urlopen(api, timeout=30) as r:
+                  for b in json.load(r)["results"]:
+                      if b.get("version") == want:
+                          return b
+              return None
+
+          while True:
+              try:
+                  b = newest()
+              except Exception as exc:            # transient: retry until deadline
+                  b, why = None, f"RTD API unreachable ({exc})"
+              else:
+                  why = f"no {want} build found yet"
+
+              if b is not None:
+                  created = datetime.fromisoformat(b["created"].replace("Z", "+00:00"))
+                  age = (datetime.now(timezone.utc) - created).total_seconds() / 60
+                  finished = (b.get("state") or {}).get("code") == "finished"
+                  print(f"newest {want} build: id={b.get('id')} "
+                        f"state={(b.get('state') or {}).get('code')} "
+                        f"success={b.get('success')} age={age:.1f}min")
+                  if finished and not (require_fresh and age > fresh_minutes):
+                      if b.get("success"):
+                          print(f"::notice::Read the Docs {want} build {b['id']} succeeded")
+                          sys.exit(0)
+                      sys.exit(f"::error::Read the Docs {want} build {b['id']} FAILED "
+                               f"-- {build_url}/{b['id']}/ . Fix the docs build. {escape}")
+                  why = ("still building" if not finished else
+                         f"newest {want} build is {age:.0f}min old; waiting for this release's build")
+
+              if time.time() > deadline:
+                  sys.exit(f"::error::Timed out after 15 min: {why}. {build_url}/ . {escape}")
+              print(f"waiting: {why}")
+              time.sleep(30)
+          PY
+
       - name: Build sdist and wheel
         run: |
           python -m pip install --upgrade pip build twine
@@ -96,7 +191,9 @@ jobs:
   publish-testpypi:
     name: Publish to TestPyPI (dry run)
     needs: build
-    if: github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi'
+    # Never publish from a fork: a `v*` tag pushed on any fork would otherwise
+    # reach the trusted-publishing handshake before failing.
+    if: github.repository == 'ThomasMBury/ewstools' && github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi'
     runs-on: ubuntu-latest
     environment:
       name: testpypi
@@ -115,7 +212,7 @@ jobs:
     name: Publish to PyPI
     needs: build
     # Tags publish automatically; a manual dispatch must explicitly ask for pypi.
-    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.target == 'pypi')
+    if: github.repository == 'ThomasMBury/ewstools' && (startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.target == 'pypi'))
     runs-on: ubuntu-latest
     # Named environment so a human approval can be required later (Settings ▸
     # Environments ▸ pypi ▸ required reviewers) without editing this file.
