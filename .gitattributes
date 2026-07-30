@@ -1,1 +1,1 @@
-tutorials/** linguist-vendored
+*.ipynb linguist-documentation filter=nbstripout diff=ipynb
