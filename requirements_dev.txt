@@ -37,4 +37,4 @@ six==1.17.0
 statsmodels==0.14.6
 tqdm==4.67.3
 uncertainties==3.2.3
-urllib3==2.6.3
+urllib3==2.7.0
