@@ -473,11 +473,34 @@ class TimeSeries:
             The method by which to compute entropy. Options include 'sample',
             'approximate', and 'kolmogorov'
         **kwargs
-            Keyword arguments for the EntropyHub function
+            Keyword arguments for the EntropyHub function, e.g. `m` (embedding
+            dimension, default 2) and `tau` (time delay, default 1).
 
         Returns
         -------
         None.
+
+        Notes
+        -----
+        EntropyHub's `SampEn`, `ApEn`, and `K2En` functions each return an
+        entropy estimate for every embedding dimension up to `m`, rather
+        than a single value. `compute_entropy` stores each of these as a
+        separate column named '{method}-entropy-{dim}'.
+
+        For method='sample' and method='approximate', `dim` runs from 0 to
+        `m` inclusive, and equals the embedding dimension used for that
+        estimate (e.g. 'sample-entropy-0' is computed with embedding
+        dimension 0, 'sample-entropy-1' with dimension 1, and so on).
+
+        For method='kolmogorov', EntropyHub's `K2En` only computes
+        embedding dimensions 1 to `m` (dimension 0 is not defined for
+        Kolmogorov entropy), so the column index is offset by one from the
+        embedding dimension: 'kolmogorov-entropy-0' uses embedding
+        dimension 1, 'kolmogorov-entropy-1' uses dimension 2, and so on.
+
+        With the default `m=2`, this produces three columns per method
+        ('-0', '-1', '-2') for 'sample'/'approximate', and two columns
+        ('-0', '-1') for 'kolmogorov'.
 
         """
 
