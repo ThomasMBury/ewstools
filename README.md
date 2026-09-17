@@ -137,7 +137,7 @@ Full documentation available on [ReadTheDocs](https://ewstools.readthedocs.io/en
 
 Found a bug or have a suggestion? Please post it on the [issue tracker](https://github.com/ThomasMBury/ewstools/issues).
 
-Contributions are welcome! Feel free to reach out or submit a pull request.
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first — it sets out what is in scope and how to shape a contribution.
 
 ## Acknowledgements
 
