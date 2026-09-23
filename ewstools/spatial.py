@@ -29,6 +29,46 @@ import numpy as np
 import pandas as pd
 
 
+def lattice_weights(n_rows: int, n_cols: int | None = None, connectivity: str = "rook") -> np.ndarray:
+    """Build a spatial weights matrix for a regular rectangular lattice.
+
+    A convenience for the common regular-grid case only -- for irregular
+    real-world networks (real adjacency, k-nearest-neighbours, distance
+    thresholds), use `libpysal.weights` and pass its dense array here.
+
+    Parameters
+    ----------
+    n_rows, n_cols : int
+        Grid dimensions. `n_cols` defaults to `n_rows` (a square grid).
+        Cell `(r, c)` corresponds to flattened index `r * n_cols + c`
+        (row-major), matching `numpy`'s default `.flatten()` order.
+    connectivity : str
+        "rook" (4 orthogonal neighbours) or "queen" (8 neighbours,
+        including diagonals).
+
+    Returns
+    -------
+    numpy.ndarray, shape (n_rows*n_cols, n_rows*n_cols)
+    """
+    if connectivity not in ("rook", "queen"):
+        raise ValueError('connectivity must be "rook" or "queen"')
+    n_cols = n_rows if n_cols is None else n_cols
+    offsets = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+    if connectivity == "queen":
+        offsets += [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+    n = n_rows * n_cols
+    weights = np.zeros((n, n))
+    for r in range(n_rows):
+        for c in range(n_cols):
+            i = r * n_cols + c
+            for dr, dc in offsets:
+                rr, cc = r + dr, c + dc
+                if 0 <= rr < n_rows and 0 <= cc < n_cols:
+                    weights[i, rr * n_cols + cc] = 1
+    return weights
+
+
 def morans_i(values, weights) -> float:
     """Moran's I spatial autocorrelation statistic.
 
@@ -160,6 +200,18 @@ class SpatialEWS:
     Rows after ``transition`` have NaN residuals and are excluded by
     ``SpatialEWS`` in the same way. Rows containing NaN produce NaN
     Moran's I (see ``compute_moran``).
+
+    **Reference period.** Moran's I depends on the unit set and the
+    weights as much as on the field, so a single value is not meaningful
+    on its own -- compare a candidate window against a reference period
+    (e.g. the same field early in the record, or a period known to be
+    far from any transition) rather than reading an absolute level.
+
+    **Single-snapshot inference.** For an analytic significance test on
+    ONE time point (rather than a trend across many, which is what this
+    class is for), see ``esda.moran.Moran`` (part of `PySAL
+    <https://pysal.org/esda/>`_), which additionally supports
+    row-standardised weights and conditional/analytical p-values.
     """
 
     def __init__(self, data, weights, transition=None):

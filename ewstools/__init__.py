@@ -10,4 +10,4 @@ from . import spatial
 # Import specific classes and functions
 from .core import TimeSeries
 from .core import MultiTimeSeries
-from .spatial import SpatialEWS
+from .spatial import SpatialEWS, lattice_weights

@@ -2,19 +2,45 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ewstools.spatial import SpatialEWS, morans_i, morans_i_permutation_test
+from ewstools.spatial import SpatialEWS, lattice_weights, morans_i, morans_i_permutation_test
 
 
 def _grid_rook_weights(n):
-    weights = np.zeros((n * n, n * n))
+    return lattice_weights(n, connectivity="rook")
+
+
+# -- lattice_weights ---------------------------------------------------------
+
+
+def test_lattice_weights_rook_matches_hand_built_grid():
+    n = 3
+    hand_built = np.zeros((n * n, n * n))
     for r in range(n):
         for c in range(n):
             i = r * n + c
             for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
                 rr, cc = r + dr, c + dc
                 if 0 <= rr < n and 0 <= cc < n:
-                    weights[i, rr * n + cc] = 1
-    return weights
+                    hand_built[i, rr * n + cc] = 1
+    assert np.array_equal(lattice_weights(n), hand_built)
+
+
+def test_lattice_weights_queen_has_more_neighbours_than_rook():
+    rook = lattice_weights(3, connectivity="rook")
+    queen = lattice_weights(3, connectivity="queen")
+    # Centre cell of a 3x3 grid: 4 rook neighbours, 8 queen neighbours.
+    assert rook[4].sum() == 4
+    assert queen[4].sum() == 8
+
+
+def test_lattice_weights_rectangular_shape():
+    weights = lattice_weights(2, 5)
+    assert weights.shape == (10, 10)
+
+
+def test_lattice_weights_rejects_invalid_connectivity():
+    with pytest.raises(ValueError):
+        lattice_weights(3, connectivity="bishop")
 
 
 # -- morans_i --------------------------------------------------------------
