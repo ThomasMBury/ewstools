@@ -3,6 +3,24 @@
 All notable changes to `ewstools` are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Spatial early warning signals** (`ewstools.spatial`): `morans_i()`,
+  `morans_i_permutation_test()`, `lattice_weights()` (a convenience for
+  building a regular-grid weights matrix; use `libpysal.weights` for
+  irregular networks), and a new `SpatialEWS` class (mirroring the
+  `data`/`state`/`ews` conventions of `MultiTimeSeries`) for computing Moran's I
+  and its significance across space at every time point — the spatial branch of
+  the critical-slowing-down literature (Dakos et al., 2010; MacLaren, Aihara &
+  Masuda, 2025) had no equivalent in this package. Includes a documented trend-
+  control recipe (`MultiTimeSeries.detrend` residuals piped into `SpatialEWS`),
+  a reference-period note, an `esda.moran.Moran` interop pointer for analytic
+  single-snapshot inference, and a permutation p-value floored at
+  1/(n_permutations + 1) so it can never land on exactly 0.
+- 19 new tests (`tests/test_spatial.py`), 0 regressions on the existing suite.
+
 ## [2.1.3] — 2026-07-28
 
 Maintenance release. **No API changes and no behavioural changes** — existing code and
