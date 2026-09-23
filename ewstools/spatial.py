@@ -23,6 +23,8 @@ indicator over a rolling window.
 """
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -76,7 +78,9 @@ def morans_i_permutation_test(values, weights, n_permutations: int = 500, seed=N
     dict with keys: observed_i, p_value, n_permutations, null_mean, null_std.
     `p_value` is one-sided (probability of a permuted I at least as large
     as the observed one) -- appropriate for testing an INCREASE in
-    spatial correlation as an early warning signal.
+    spatial correlation as an early warning signal. The p-value has a
+    floor of 1/(n_permutations + 1) (Davison & Hinkley 1997; North,
+    Curtis & Sham 2002) so it can never be exactly zero.
     """
     observed = morans_i(values, weights)
     if np.isnan(observed):
@@ -90,7 +94,7 @@ def morans_i_permutation_test(values, weights, n_permutations: int = 500, seed=N
 
     return {
         "observed_i": observed,
-        "p_value": float(np.mean(null_values >= observed)),
+        "p_value": float((1 + np.sum(null_values >= observed)) / (1 + n_permutations)),
         "n_permutations": n_permutations,
         "null_mean": float(np.mean(null_values)),
         "null_std": float(np.std(null_values)),
@@ -112,10 +116,50 @@ class SpatialEWS:
     weights : array-like, shape (n_units, n_units)
         Spatial weights matrix for the units in `data.columns` (same
         order), fixed over time -- the network itself is not assumed to
-        change, only the values observed on it.
+        change, only the values observed on it. ``weights[i, j]`` refers
+        to ``data.columns[i]`` and ``data.columns[j]`` **by position**:
+        reordering, merging or sorting the columns after building
+        ``weights`` changes the value silently; there is no check. If
+        the real network changes over time -- units added or removed,
+        links strengthened -- Moran's I trends for that reason alone,
+        independently of the system's dynamics (Dakos et al. 2010,
+        Fig. 6a). Recompute over a sub-network that is present and
+        connected throughout.
     transition : float, optional
         Time value at which a transition occurs, if any. If given,
         spatial EWS are only computed up to this point.
+
+    Notes
+    -----
+    **Trend control.** Moran's I is computed on the raw field at each
+    time point. A spatial pattern whose amplitude changes slowly over
+    time (for example a gradient that strengthens) produces a trend in
+    Moran's I with no change in the system's dynamics. Where such
+    patterns are plausible, compute the indicator on residuals from a
+    per-unit temporal detrend: pass the field through
+    ``MultiTimeSeries.detrend`` and hand the residual columns to
+    ``SpatialEWS`` (recipe below). The temporal detrend removes slowly
+    varying spatial patterns only. It does not remove a rise in the
+    amplitude of spatially coherent fluctuations relative to unit-level
+    noise, which also raises Moran's I. Dakos et al. (2010, Fig. 6) show
+    two further ways spatial correlation rises with no change in
+    proximity to a transition: increased connectivity (6a) and increased
+    environmental heterogeneity (6b). Compare the indicator against a
+    reference period and against the field's spatial amplitude before
+    reading a trend as slowing down.
+
+    **Recipe** (``MultiTimeSeries`` appends columns to the frame it is
+    given -- pass a copy)::
+
+        mts = MultiTimeSeries(df.copy(), transition=t_trans)
+        mts.detrend(method="Gaussian", bandwidth=0.2)
+        resid = mts.state[[f"{c}_residuals" for c in df.columns]].set_axis(
+            df.columns, axis=1)
+        sews = SpatialEWS(resid, weights=W, transition=t_trans)
+
+    Rows after ``transition`` have NaN residuals and are excluded by
+    ``SpatialEWS`` in the same way. Rows containing NaN produce NaN
+    Moran's I (see ``compute_moran``).
     """
 
     def __init__(self, data, weights, transition=None):
@@ -140,20 +184,44 @@ class SpatialEWS:
 
     def compute_moran(self):
         """Compute Moran's I at every time point. Output stored in
-        `self.ews['morans_i']`.
+        `self.ews['morans_i']`. Computed on the raw field; for trend
+        control see the Notes section above. Rows containing NaN produce
+        NaN and are counted in a warning.
         """
         df_pre = self._pre_transition()
-        self.ews["morans_i"] = df_pre.apply(lambda row: morans_i(row.to_numpy(), self.weights), axis=1)
+        values = df_pre.apply(lambda row: morans_i(row.to_numpy(), self.weights), axis=1)
+        self.ews["morans_i"] = values
+        n_nan = int(values.isna().sum())
+        if n_nan:
+            warnings.warn(
+                f"Moran's I is nan for {n_nan} of {len(df_pre)} time points. A time "
+                "point yields nan if any unit is missing at that time, or if the "
+                "field has no variation there. Missing units are not dropped: the "
+                "whole time point is discarded.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
 
     def compute_moran_significance(self, n_permutations: int = 500, seed=None):
         """Permutation-test p-value for Moran's I at every time point.
         Output stored in `self.ews['morans_i_pvalue']`.
         """
         df_pre = self._pre_transition()
-        self.ews["morans_i_pvalue"] = df_pre.apply(
+        values = df_pre.apply(
             lambda row: morans_i_permutation_test(row.to_numpy(), self.weights, n_permutations, seed)["p_value"],
             axis=1,
         )
+        self.ews["morans_i_pvalue"] = values
+        n_nan = int(values.isna().sum())
+        if n_nan:
+            warnings.warn(
+                f"Moran's I is nan for {n_nan} of {len(df_pre)} time points. A time "
+                "point yields nan if any unit is missing at that time, or if the "
+                "field has no variation there. Missing units are not dropped: the "
+                "whole time point is discarded.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
 
     def compute_ktau(self, tmin="earliest", tmax="latest"):
         """Kendall tau of each spatial EWS against time -- same convention

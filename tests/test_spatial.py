@@ -127,21 +127,32 @@ def test_spatialews_compute_moran_significance_produces_valid_pvalues():
     assert pvals.between(0, 1).all()
 
 
-def test_spatialews_compute_ktau_detects_increasing_trend():
-    n_time, n_units = 30, 9
-    weights = _grid_rook_weights(3)
+def test_spatialews_ktau_rises_under_strengthening_gradient_without_trend_control():
+    # NEGATIVE CONTROL: this field has no critical slowing down. Its Moran's I
+    # rises only because the spatial gradient strengthens over time. See the
+    # Trend control section of the SpatialEWS docstring.
+    #
+    # Grid size and window length also matter for how reliable this bound is:
+    # at 3x3/T=30, an equivalent assertion (`> 0.5`) only passes on 526/1000
+    # random seeds (mean 0.486, sd 0.096) -- essentially a coin flip. At
+    # 6x6/T=60, `> 0.30` holds on 1000/1000 seeds tested here; even at the
+    # 0.30 threshold alone a 3x3 grid still fails on ~5% of seeds, confirming
+    # grid size (not just the threshold) was the missing parameter.
+    grid_side = 6
+    n_time, n_units = 60, grid_side * grid_side
+    weights = _grid_rook_weights(grid_side)
     rng = np.random.default_rng(5)
     rows = []
     for t in range(n_time):
         # Gradient strength grows over time -> Moran's I should trend up.
-        base = np.indices((3, 3))[1].flatten().astype(float)
+        base = np.indices((grid_side, grid_side))[1].flatten().astype(float)
         rows.append(base * (t / n_time) + rng.normal(scale=0.05, size=n_units))
     data = pd.DataFrame(rows, index=np.arange(n_time))
 
     spatial = SpatialEWS(data, weights)
     spatial.compute_moran()
     spatial.compute_ktau()
-    assert spatial.ktau["morans_i"] > 0.5
+    assert spatial.ktau["morans_i"] > 0.30
 
 
 def test_spatialews_transition_restricts_computation():
@@ -149,3 +160,19 @@ def test_spatialews_transition_restricts_computation():
     spatial = SpatialEWS(data, weights, transition=5)
     spatial.compute_moran()
     assert spatial.ews["morans_i"].dropna().index.max() <= 5
+
+
+def test_compute_moran_warns_on_rows_with_nan():
+    rng = np.random.default_rng(0)
+    data = pd.DataFrame(rng.normal(size=(6, 9)), index=np.arange(6))
+    data.iloc[2, 4] = np.nan
+    weights = _grid_rook_weights(3)
+
+    spatial = SpatialEWS(data, weights)
+    with pytest.warns(RuntimeWarning, match=r"nan for 1 of 6 time points"):
+        spatial.compute_moran()
+    assert spatial.ews["morans_i"].isna().sum() == 1
+
+    with pytest.warns(RuntimeWarning, match=r"nan for 1 of 6 time points"):
+        spatial.compute_moran_significance(n_permutations=20, seed=0)
+    assert spatial.ews["morans_i_pvalue"].isna().sum() == 1

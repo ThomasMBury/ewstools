@@ -12,15 +12,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   `data`/`state`/`ews` conventions of `MultiTimeSeries`) for computing Moran's I
   and its significance across space at every time point — the spatial branch of
   the critical-slowing-down literature (Dakos et al., 2010; MacLaren, Aihara &
-  Masuda, 2025) had no equivalent in this package. See
-  `CONTRIBUTION_spatial_significance.md` for the full write-up.
-- **Combining correlated p-values** (`ewstools.pvalues`): `combine_pvalues_ebm()`,
-  an implementation of the Empirical Brown's Method (Poole et al., 2016) for
-  combining several early-warning indicators' p-values without assuming they are
-  independent, which Fisher's method requires but indicators computed from the
-  same underlying system rarely satisfy.
-- 21 new tests (`tests/test_spatial.py`, `tests/test_pvalues.py`), 0 regressions
-  on the existing suite.
+  Masuda, 2025) had no equivalent in this package. Includes a documented trend-
+  control recipe (`MultiTimeSeries.detrend` residuals piped into `SpatialEWS`)
+  and a permutation p-value floored at 1/(n_permutations + 1) so it can never
+  land on exactly 0.
+- 15 new tests (`tests/test_spatial.py`), 0 regressions on the existing suite.
 
 ## [2.1.3] — 2026-07-28
 
