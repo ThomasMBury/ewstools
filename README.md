@@ -83,6 +83,7 @@ pip install git+https://github.com/thomasmbury/ewstools.git#egg=ewstools
 1. [Introduction to *ewstools*](https://github.com/ThomasMBury/ewstools/tree/main/tutorials/tutorial_intro.ipynb)
 2. [Spectral EWS](https://github.com/ThomasMBury/ewstools/tree/main/tutorials/tutorial_spectral.ipynb)
 3. [Deep learning classifiers for bifurcation prediction](https://github.com/ThomasMBury/ewstools/tree/main/tutorials/tutorial_deep_learning.ipynb)
+4. [Computing entropy](https://github.com/ThomasMBury/ewstools/tree/main/tutorials/tutorial_entropy.ipynb)
 
 
 

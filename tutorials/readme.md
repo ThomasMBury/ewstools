@@ -20,3 +20,7 @@ To run these tutorials, [Jupyter notebook](https://jupyter.org/install) must be 
 
 - Import a TensorFlow classifier and obtain its predictions on a section of time series data
 - Compute predictions made from an ensemble of classifiers
+
+### 4. Computing entropy (tutorial_entropy.ipynb)
+
+- Compute entropy measures (sample, approximate and Kolmogorov entropy) as early warning signals for a bifurcation
