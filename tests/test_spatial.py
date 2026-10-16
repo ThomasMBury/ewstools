@@ -1,3 +1,5 @@
+from fractions import Fraction
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -76,9 +78,40 @@ def test_morans_i_smooth_gradient_gives_strong_positive_autocorrelation():
     assert morans_i(values, _grid_rook_weights(n)) > 0.5
 
 
-def test_morans_i_constant_values_is_nan():
-    values = np.full(9, 3.0)
+@pytest.mark.parametrize("value", [3.0, 0.1, 0.23, -0.7, 1e6 + 0.1])
+@pytest.mark.parametrize("side", [3, 10])
+def test_morans_i_constant_values_is_nan(value, side):
+    # 3.0 is exactly representable; 0.1, 0.23, ... are not, so the computed mean
+    # is off by one rounding step and every deviation is the same tiny nonzero
+    # number. An exact `denominator == 0` check returns I = 1.0 for these.
+    values = np.full(side * side, value)
+    assert np.isnan(morans_i(values, _grid_rook_weights(side)))
+
+
+@pytest.mark.parametrize("side", [3, 10])
+def test_morans_i_constant_values_is_nan_for_all_two_decimal_constants(side):
+    weights = _grid_rook_weights(side)
+    for c in np.arange(1, 200) / 100:
+        assert np.isnan(morans_i(np.full(side * side, round(c, 2)), weights)), c
+
+
+def test_morans_i_field_flat_to_within_rounding_noise_is_nan():
+    # One value differs from the rest by a single unit in the last place
+    # (0.1 + 0.2 == 0.30000000000000004 != 0.3): indistinguishable from
+    # rounding noise, so not a real spatial pattern.
+    values = np.full(9, 0.3)
+    values[4] = 0.1 + 0.2
+    assert values[4] != 0.3
     assert np.isnan(morans_i(values, _grid_rook_weights(3)))
+
+
+def test_morans_i_tiny_but_real_variation_is_not_mistaken_for_constant():
+    # Guard against a constant-field tolerance that is too wide: a field varying
+    # by 1e-12 (relative) is far above float resolution (~1e-16) and must still
+    # produce a value.
+    rng = np.random.default_rng(0)
+    values = 1000.0 * (1 + 1e-12 * rng.normal(size=100))
+    assert np.isfinite(morans_i(values, _grid_rook_weights(10)))
 
 
 def test_morans_i_zero_weights_is_nan():
@@ -89,6 +122,23 @@ def test_morans_i_zero_weights_is_nan():
 def test_morans_i_shape_mismatch_raises():
     with pytest.raises(ValueError):
         morans_i(np.array([1.0, 2.0, 3.0]), np.zeros((4, 4)))
+
+
+def test_morans_i_rejects_nonzero_diagonal_weights():
+    # Self-weights silently inflate I (here from about -0.11 to +0.19).
+    values = np.random.default_rng(2).normal(size=9)
+    weights = _grid_rook_weights(3)
+    with pytest.raises(ValueError, match="zero diagonal"):
+        morans_i(values, weights + np.eye(9))
+
+
+@pytest.mark.parametrize("bad", [np.nan, np.inf])
+def test_morans_i_rejects_nonfinite_weights(bad):
+    values = np.random.default_rng(2).normal(size=9)
+    weights = _grid_rook_weights(3)
+    weights[0, 1] = bad
+    with pytest.raises(ValueError, match="finite"):
+        morans_i(values, weights)
 
 
 # -- morans_i_permutation_test ----------------------------------------------
@@ -113,6 +163,36 @@ def test_permutation_test_p_value_in_bounds_and_matches_observed():
     result = morans_i_permutation_test(values, _grid_rook_weights(n), n_permutations=500, seed=2)
     assert result["observed_i"] == pytest.approx(morans_i(values, _grid_rook_weights(n)))
     assert 0.0 <= result["p_value"] <= 1.0
+
+
+def _exact_morans_i(values, weights):
+    """Moran's I in exact rational arithmetic (integer-valued fields only)."""
+    n = len(values)
+    s0 = int(weights.sum())
+    mean = Fraction(int(sum(values)), n)
+    dev = [Fraction(int(v)) - mean for v in values]
+    denominator = sum(d * d for d in dev)
+    numerator = sum(dev[i] * dev[j] for i, j in zip(*np.nonzero(weights)))
+    return Fraction(n, s0) * numerator / denominator
+
+
+@pytest.mark.parametrize("field_seed", [0, 11, 13])
+def test_permutation_test_counts_exact_ties(field_seed):
+    # Binary fields produce many permutations whose I is *exactly* equal to the
+    # observed I but comes out one rounding step lower in floating point. With an
+    # exact `>=` those ties were dropped and the p-value understated (by ~0.01
+    # on these fields). Reference: the same permutations, in exact arithmetic.
+    weights = _grid_rook_weights(10)
+    field = np.random.default_rng(field_seed).integers(0, 2, 100).astype(float)
+    n_permutations, seed = 100, 1
+
+    observed = _exact_morans_i(field, weights)
+    rng = np.random.default_rng(seed)
+    n_ge = sum(_exact_morans_i(rng.permutation(field), weights) >= observed for _ in range(n_permutations))
+    expected = float(Fraction(1 + n_ge, 1 + n_permutations))
+
+    result = morans_i_permutation_test(field, weights, n_permutations=n_permutations, seed=seed)
+    assert result["p_value"] == expected
 
 
 # -- SpatialEWS ---------------------------------------------------------------
@@ -181,11 +261,61 @@ def test_spatialews_ktau_rises_under_strengthening_gradient_without_trend_contro
     assert spatial.ktau["morans_i"] > 0.30
 
 
+def test_spatialews_rejects_invalid_weights():
+    data, weights = _toy_spatial_frame()
+    with pytest.raises(ValueError, match="zero diagonal"):
+        SpatialEWS(data, weights + np.eye(9))
+    bad = weights.copy()
+    bad[0, 1] = np.nan
+    with pytest.raises(ValueError, match="finite"):
+        SpatialEWS(data, bad)
+
+
 def test_spatialews_transition_restricts_computation():
     data, weights = _toy_spatial_frame(n_time=10)
     spatial = SpatialEWS(data, weights, transition=5)
     spatial.compute_moran()
     assert spatial.ews["morans_i"].dropna().index.max() <= 5
+
+
+def test_spatialews_transition_zero_is_a_transition():
+    # `if transition:` treated 0 as "no transition": Moran's I was computed
+    # all the way to the end of an index spanning negative and positive values.
+    rng = np.random.default_rng(0)
+    data = pd.DataFrame(rng.normal(size=(11, 9)), index=np.arange(-5, 6))
+    spatial = SpatialEWS(data, _grid_rook_weights(3), transition=0)
+    spatial.compute_moran()
+    assert spatial.ews["morans_i"].dropna().index.max() == 0
+
+
+def test_spatialews_transition_accepts_timestamp():
+    rng = np.random.default_rng(0)
+    index = pd.date_range("2020-01-01", periods=8)
+    data = pd.DataFrame(rng.normal(size=(8, 9)), index=index)
+    transition = pd.Timestamp("2020-01-04")
+    spatial = SpatialEWS(data, _grid_rook_weights(3), transition=transition)
+    spatial.compute_moran()
+    assert spatial.ews["morans_i"].dropna().index.max() == transition
+
+
+def test_compute_moran_significance_uses_different_permutations_at_each_time_point():
+    # Identical rows: if every row re-created default_rng(seed), every row would
+    # get the same permutations and hence the same p-value. A single generator
+    # shared across rows gives independent draws.
+    field = np.random.default_rng(0).normal(size=9)
+    data = pd.DataFrame(np.tile(field, (8, 1)), index=np.arange(8))
+    spatial = SpatialEWS(data, _grid_rook_weights(3))
+    spatial.compute_moran_significance(n_permutations=30, seed=0)
+    assert spatial.ews["morans_i_pvalue"].nunique() > 1
+
+
+def test_compute_moran_significance_is_reproducible_for_a_given_seed():
+    data, weights = _toy_spatial_frame(n_time=6)
+    a = SpatialEWS(data, weights)
+    b = SpatialEWS(data, weights)
+    a.compute_moran_significance(n_permutations=50, seed=123)
+    b.compute_moran_significance(n_permutations=50, seed=123)
+    assert a.ews["morans_i_pvalue"].equals(b.ews["morans_i_pvalue"])
 
 
 def test_compute_moran_warns_on_rows_with_nan():
@@ -199,6 +329,7 @@ def test_compute_moran_warns_on_rows_with_nan():
         spatial.compute_moran()
     assert spatial.ews["morans_i"].isna().sum() == 1
 
-    with pytest.warns(RuntimeWarning, match=r"nan for 1 of 6 time points"):
+    # The warning for the p-values must talk about p-values, not about Moran's I.
+    with pytest.warns(RuntimeWarning, match=r"p-value is nan for 1 of 6 time points"):
         spatial.compute_moran_significance(n_permutations=20, seed=0)
     assert spatial.ews["morans_i_pvalue"].isna().sum() == 1

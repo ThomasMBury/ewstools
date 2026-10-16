@@ -18,8 +18,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   control recipe (`MultiTimeSeries.detrend` residuals piped into `SpatialEWS`),
   a reference-period note, an `esda.moran.Moran` interop pointer for analytic
   single-snapshot inference, and a permutation p-value floored at
-  1/(n_permutations + 1) so it can never land on exactly 0.
-- 19 new tests (`tests/test_spatial.py`), 0 regressions on the existing suite.
+  1/(n_permutations + 1) so it can never land on exactly 0. Weights are
+  validated (finite, zero diagonal), a constant field returns `nan` rather
+  than a spurious value, permutation ties are counted, each time point gets its
+  own permutations, and `transition` accepts 0 and timestamps.
+- 43 new tests, counting parametrised cases (`tests/test_spatial.py`), 0
+  regressions on the existing suite.
 
 ## [2.1.3] — 2026-07-28
 
