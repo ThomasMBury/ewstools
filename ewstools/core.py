@@ -114,7 +114,7 @@ class TimeSeries:
 
         # Set state and transition attributes
         self.state = df_state
-        self.transition = float(transition) if transition else transition
+        self.transition = float(transition) if transition is not None else None
 
         # Initialise other attributes
         self.ews = pd.DataFrame(index=df_state.index)
@@ -153,7 +153,7 @@ class TimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -209,7 +209,7 @@ class TimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -251,7 +251,7 @@ class TimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -294,7 +294,7 @@ class TimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -343,7 +343,7 @@ class TimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -393,7 +393,7 @@ class TimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -435,7 +435,7 @@ class TimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -505,7 +505,7 @@ class TimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -594,7 +594,7 @@ class TimeSeries:
         None.
 
         """
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -751,7 +751,7 @@ class TimeSeries:
 
         dt = self.state.index[1] - self.state.index[0]
         tmin = self.state.index[0]
-        tend = self.state.index[-1] if not self.transition else self.transition
+        tend = self.state.index[-1] if self.transition is None else self.transition
         tend += dt  # Make transition point inclusive
 
         # Tmax values for each time series segment
@@ -811,7 +811,7 @@ class TimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -1306,7 +1306,7 @@ class MultiTimeSeries:
 
         # Set state and transition attributes
         self.state = data
-        self.transition = float(transition) if transition else transition
+        self.transition = float(transition) if transition is not None else None
         self.var_names = data.columns
 
         # Initialise other attributes
@@ -1346,7 +1346,7 @@ class MultiTimeSeries:
             print("ERROR: {} is not a valid detrending method.\n".format(method))
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -1418,7 +1418,7 @@ class MultiTimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state
@@ -1479,7 +1479,7 @@ class MultiTimeSeries:
         """
 
         # Get time series data prior to transition
-        if self.transition:
+        if self.transition is not None:
             df_pre = self.state[self.state.index <= self.transition]
         else:
             df_pre = self.state

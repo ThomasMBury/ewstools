@@ -3,6 +3,14 @@
 All notable changes to `ewstools` are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- `transition=0` is now honoured by `TimeSeries` and `MultiTimeSeries`. The code tested `if self.transition:`, which is false for `0`,
+  so a series indexed from a negative time with the transition at time zero was treated as if no transition had been given and
+  every indicator (and `detrend`, `compute_spectrum`, `apply_classifier_inc`) ran over the whole series, past the transition.
+  The checks are now `is not None`. Behaviour for `transition=None` and for non-zero transitions is unchanged.
+
 ## [2.1.3] — 2026-07-28
 
 Maintenance release. **No API changes and no behavioural changes** — existing code and
